@@ -30,7 +30,6 @@ import java.util.function.Consumer;
 /**
  *
  * @author Philippe Charles
- * @since 2.1.0
  */
 final class AdoConnection extends _Connection {
 

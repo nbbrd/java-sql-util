@@ -14,9 +14,8 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.odbc.win;
+package internal.sql.lhod;
 
-import internal.sql.jdbc.SqlConnectionSuppliers;
 import java.sql.Connection;
 import java.sql.SQLException;
 import nbbrd.service.ServiceProvider;
@@ -30,10 +29,9 @@ import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
 @ServiceProvider(OdbcConnectionSupplierSpi.class)
 public final class LhodConnectionSupplier implements OdbcConnectionSupplierSpi {
 
-    private static final String DRIVER_CLASS_NAME = "internal.sql.lhod.AdoDriver";
-    private static final String DRIVER_PREFIX = "jdbc:lhod:";
+    private static final String DRIVER_CLASS_NAME = AdoDriver.class.getName();
 
-    private final SqlConnectionSupplier delegate = SqlConnectionSupplier.usingDriverManager(DRIVER_CLASS_NAME, o -> DRIVER_PREFIX + o);
+    private final SqlConnectionSupplier delegate = SqlConnectionSupplier.ofDriverManager(DRIVER_CLASS_NAME, o -> AdoDriver.PREFIX + o);
 
     @Override
     public String getName() {
@@ -42,7 +40,13 @@ public final class LhodConnectionSupplier implements OdbcConnectionSupplierSpi {
 
     @Override
     public boolean isAvailable() {
-        return SqlConnectionSuppliers.isDriverAvailable(DRIVER_CLASS_NAME);
+        return SqlConnectionSupplier.isDriverLoadable(DRIVER_CLASS_NAME)
+                && SqlConnectionSupplier.isDriverRegistered(DRIVER_CLASS_NAME);
+    }
+
+    @Override
+    public int getCost() {
+        return HIGH_COST;
     }
 
     @Override

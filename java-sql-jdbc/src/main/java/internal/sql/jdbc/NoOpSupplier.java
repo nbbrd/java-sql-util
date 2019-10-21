@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 National Bank of Belgium
+ * Copyright 2019 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -14,36 +14,23 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package nbbrd.sql.odbc;
+package internal.sql.jdbc;
 
-import nbbrd.service.ServiceDefinition;
 import java.sql.Connection;
 import java.sql.SQLException;
-import nbbrd.service.Quantifier;
-import nbbrd.service.ServiceFilter;
-import nbbrd.service.ServiceSorter;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import java.util.Objects;
+import nbbrd.sql.jdbc.SqlConnectionSupplier;
 
 /**
  *
  * @author Philippe Charles
  */
-@ServiceDefinition(quantifier = Quantifier.OPTIONAL)
-public interface OdbcConnectionSupplierSpi {
+public enum NoOpSupplier implements SqlConnectionSupplier {
+    INSTANCE;
 
-    @NonNull
-    String getName();
-
-    @ServiceFilter
-    boolean isAvailable();
-
-    @ServiceSorter
-    int getCost();
-
-    @NonNull
-    Connection getConnection(@NonNull String connectionString) throws SQLException;
-
-    static final int NO_COST = 0;
-    static final int LOW_COST = 100;
-    static final int HIGH_COST = 1000;
+    @Override
+    public Connection getConnection(String connectionString) throws SQLException {
+        Objects.requireNonNull(connectionString);
+        throw new SQLException("No connection for '" + connectionString + "'");
+    }
 }

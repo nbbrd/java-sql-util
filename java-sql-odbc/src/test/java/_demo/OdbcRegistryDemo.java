@@ -27,8 +27,8 @@ import java.io.IOException;
 public class OdbcRegistryDemo {
 
     public static void main(String[] args) throws IOException {
-        OdbcRegistry registry = OdbcRegistry.ofServiceLoader();
-        
+        OdbcRegistry registry = OdbcRegistry.ofServiceLoader().orElseThrow(UnsupportedOperationException::new);
+
         System.out.println("Using registry '" + registry.getName() + "'");
         System.out.println("");
 

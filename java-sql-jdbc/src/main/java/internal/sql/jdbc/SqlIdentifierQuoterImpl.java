@@ -106,7 +106,7 @@ public final class SqlIdentifierQuoterImpl implements SqlIdentifierQuoter {
 
     @NonNull
     static Set<String> getSqlKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
-        return Stream.concat(splitKeywords(metaData.getSQLKeywords()), SqlKeywords.getSql2003ReservedWords().stream()).collect(Collectors.toSet());
+        return Stream.concat(splitKeywords(metaData.getSQLKeywords()), SqlKeywords.SQL2003_RESERVED_WORDS.getKeywords().stream()).collect(Collectors.toSet());
     }
 
     /**

@@ -32,7 +32,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  *
  * @author Philippe Charles
- * @since 2.1.0
  */
 final class AdoResultSet extends _ResultSet {
 

@@ -26,7 +26,6 @@ import static java.lang.String.format;
 /**
  *
  * @author Philippe Charles
- * @since 2.2.0
  */
 final class TsvReader implements Closeable {
 

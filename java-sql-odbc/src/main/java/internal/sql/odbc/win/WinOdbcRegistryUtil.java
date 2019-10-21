@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ class WinOdbcRegistryUtil {
     private static final String DATA_SOURCE_KEY = "SOFTWARE\\ODBC\\ODBC.INI";
     private static final String DRIVERS_KEY = "SOFTWARE\\ODBC\\Odbcinst.INI\\ODBC Drivers";
     private static final String DRIVER_KEY = "SOFTWARE\\ODBC\\Odbcinst.INI";
-    
+
     public static final String KEY_SEPARATOR = "\\";
 
     public List<OdbcDataSource> getDataSources(Registry reg, OdbcDataSource.Type... types) throws IOException {
@@ -120,14 +121,14 @@ class WinOdbcRegistryUtil {
         return OdbcDriver
                 .builder()
                 .name(driverName)
-                .apiLevel(toEnum(details.get("APILevel"), OdbcDriver.ApiLevel.class, OdbcDriver.ApiLevel.NONE))
+                .apiLevel(toEnum(details.get("APILevel"), OdbcDriver.ApiLevel.class).orElse(OdbcDriver.ApiLevel.NONE))
                 .connectFunctions(toConnectFunctions(details.get("ConnectFunctions"), null))
                 .driverPath(toFile(details.get("Driver"), null))
                 .driverOdbcVer(toString(details.get("DriverOdbcVer"), null))
                 .fileExtensions(toFileExtensions(details.get("FileExtns")))
-                .fileUsage(toEnum(details.get("FileUsage"), OdbcDriver.FileUsage.class, OdbcDriver.FileUsage.NONE))
+                .fileUsage(toEnum(details.get("FileUsage"), OdbcDriver.FileUsage.class).orElse(OdbcDriver.FileUsage.NONE))
                 .setupPath(toFile(details.get("Setup"), null))
-                .sqlLevel(toEnum(details.get("SQLLevel"), OdbcDriver.SqlLevel.class, OdbcDriver.SqlLevel.SQL_92_ENTRY))
+                .sqlLevel(toEnum(details.get("SQLLevel"), OdbcDriver.SqlLevel.class).orElse(OdbcDriver.SqlLevel.SQL_92_ENTRY))
                 .usageCount(toInt(details.get("UsageCount"), -1))
                 .build();
     }
@@ -144,36 +145,36 @@ class WinOdbcRegistryUtil {
         return obj instanceof Integer ? (Integer) obj : defaultValue;
     }
 
-    private <Z extends Enum<Z> & IntSupplier> Z toEnum(Object obj, Class<Z> enumType, Z defaultValue) {
+    private <Z extends Enum<Z> & IntSupplier> Optional<Z> toEnum(Object obj, Class<Z> enumType) {
         if (obj == null) {
-            return defaultValue;
+            return Optional.empty();
         }
         try {
             int value = Integer.parseInt(obj.toString());
-            return toEnum(value, enumType, defaultValue);
+            return toEnum(value, enumType);
         } catch (NumberFormatException ex) {
-            return defaultValue;
+            return Optional.empty();
         }
     }
 
-    private static <Z extends Enum<Z> & IntSupplier> Z toEnum(int value, Class<Z> enumType, Z defaultValue) {
+    private static <Z extends Enum<Z> & IntSupplier> Optional<Z> toEnum(int value, Class<Z> enumType) {
         for (Z o : enumType.getEnumConstants()) {
             if (o.getAsInt() == value) {
-                return o;
+                return Optional.of(o);
             }
         }
-        return defaultValue;
+        return Optional.empty();
     }
 
     private List<String> toFileExtensions(Object obj) {
         return obj != null
                 ? splitToStream(",", obj.toString())
-                .map(WinOdbcRegistryUtil::getFileExtension)
-                .filter(o -> !o.isEmpty())
-                .collect(Collectors.toList())
+                        .map(WinOdbcRegistryUtil::getFileExtension)
+                        .filter(o -> !o.isEmpty())
+                        .collect(Collectors.toList())
                 : Collections.emptyList();
     }
-    
+
     @NonNull
     private Stream<String> splitToStream(@NonNull String separator, @NonNull CharSequence input) {
         return Stream.of(input.toString().split(separator, -1));

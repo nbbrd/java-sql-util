@@ -17,21 +17,26 @@
 
 module nbbrd.sql.odbc {
 
+    // compile only
     requires static org.checkerframework.checker.qual;
     requires static lombok;
     requires static nbbrd.service;
 
-    requires nbbrd.sql.jdbc;
+    // required dependencies
+    requires transitive nbbrd.sql.jdbc;
 
+    // public api
     exports nbbrd.sql.odbc;
 
+    // services registration
     uses nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
-    uses nbbrd.sql.odbc.OdbcRegistrySpi;
-
     provides nbbrd.sql.odbc.OdbcConnectionSupplierSpi with
-            internal.sql.odbc.win.SunOdbcConnectionSupplier,
-            internal.sql.odbc.win.LhodConnectionSupplier;
+            internal.sql.odbc.win.SunOdbcConnectionSupplier;
 
+    uses nbbrd.sql.odbc.OdbcRegistrySpi;
     provides nbbrd.sql.odbc.OdbcRegistrySpi with
-            internal.sql.odbc.win.RegOdbcRegistry;
+            internal.sql.odbc.win.RegOdbcRegistrySpi;
+
+    // private api
+    exports internal.sql.odbc to nbbrd.sql.lhod;
 }

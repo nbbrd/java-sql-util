@@ -19,60 +19,41 @@ package nbbrd.sql.jdbc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Philippe Charles
  */
-@lombok.experimental.UtilityClass
-public class SqlKeywords {
+public enum SqlKeywords {
 
-    private static final Set<String> SQL92_RESERVED_WORDS = loadWords("Sql92ReservedWords.txt");
-    private static final Set<String> SQL92_NON_RESERVED_WORDS = loadWords("Sql92NonReservedWords.txt");
-    private static final Set<String> SQL99_RESERVED_WORDS = loadWords("Sql99ReservedWords.txt");
-    private static final Set<String> SQL2003_RESERVED_WORDS = loadWords("Sql2003ReservedWords.txt");
-    private static final Set<String> SQL2008_RESERVED_WORDS = loadWords("Sql2008ReservedWords.txt");
+    SQL92_RESERVED_WORDS("Sql92ReservedWords.txt"),
+    SQL92_NON_RESERVED_WORDS("Sql92NonReservedWords.txt"),
+    SQL99_RESERVED_WORDS("Sql99ReservedWords.txt"),
+    SQL2003_RESERVED_WORDS("Sql2003ReservedWords.txt"),
+    SQL2008_RESERVED_WORDS("Sql2008ReservedWords.txt");
 
-    @NonNull
-    public static Set<String> getSql92ReservedWords() {
-        return SQL92_RESERVED_WORDS;
-    }
+    @lombok.Getter
+    private final Set<String> keywords;
 
-    @NonNull
-    public static Set<String> getSql92NonReservedWords() {
-        return SQL92_NON_RESERVED_WORDS;
-    }
-
-    @NonNull
-    public static Set<String> getSql99ReservedWords() {
-        return SQL99_RESERVED_WORDS;
-    }
-
-    @NonNull
-    public static Set<String> getSql2003ReservedWords() {
-        return SQL2003_RESERVED_WORDS;
-    }
-
-    @NonNull
-    public static Set<String> getSql2008ReservedWords() {
-        return SQL2008_RESERVED_WORDS;
+    private SqlKeywords(String resourceName) {
+        keywords = loadWords(resourceName);
     }
 
     private static Set<String> loadWords(String resourceName) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(SqlKeywords.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
-            Set<String> result = new HashSet<>();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result.add(line);
-            }
-            return Collections.unmodifiableSet(result);
+            return reader.lines().collect(TO_UNMODIFIABLE_SET);
         } catch (IOException ex) {
             throw new RuntimeException("Missing resource '" + resourceName + "'", ex);
+        } catch (UncheckedIOException ex) {
+            throw new RuntimeException("Missing resource '" + resourceName + "'", ex.getCause());
         }
     }
+
+    private static final Collector<String, ?, Set<String>> TO_UNMODIFIABLE_SET = Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet);
 }

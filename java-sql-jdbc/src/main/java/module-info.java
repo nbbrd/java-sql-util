@@ -17,15 +17,17 @@
 
 module nbbrd.sql.jdbc {
 
+    // compile only
     requires static org.checkerframework.checker.qual;
     requires static lombok;
     requires static nbbrd.service;
 
+    // required dependencies
     requires transitive java.sql;
+
+    // optional dependencies
     requires static java.naming;
 
+    // public api
     exports nbbrd.sql.jdbc;
-    exports internal.sql.jdbc to
-            nbbrd.sql.odbc,
-            nbbrd.sql.lhod;
 }

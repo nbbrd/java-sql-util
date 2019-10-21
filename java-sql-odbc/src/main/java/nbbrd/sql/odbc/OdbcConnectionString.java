@@ -42,6 +42,10 @@ public class OdbcConnectionString {
     @lombok.NonNull
     private final Map<String, String> attributes;
 
+    private OdbcConnectionString(Map<String, String> attributes) {
+        this.attributes = attributes;
+    }
+
     @Nullable
     public String getDriver() {
         return get(DRIVER_KEYWORD);

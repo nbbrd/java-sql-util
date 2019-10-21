@@ -25,7 +25,6 @@ import java.util.function.LongSupplier;
  * Package private supporting class for {@link PropertyLoader}.
  *
  * @author Philippe Charles
- * @since 2.2.0
  */
 final class PropertyLoaders {
 

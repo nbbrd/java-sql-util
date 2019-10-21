@@ -27,7 +27,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  *
  * @author Philippe Charles
- * @since 2.2.0
  */
 @FunctionalInterface
 interface PropertyLoader {

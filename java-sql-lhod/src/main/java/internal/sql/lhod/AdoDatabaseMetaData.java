@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 /**
  *
  * @author Philippe Charles
- * @since 2.1.0
  */
 final class AdoDatabaseMetaData extends _DatabaseMetaData {
 

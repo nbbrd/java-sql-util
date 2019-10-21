@@ -32,7 +32,7 @@
         <!-- compile and runtime -->
         <dependency>
             <groupId>be.nbb.rd</groupId>
-            <artifactId>java-sql-jdbc</artifactId>
+            <artifactId>java-sql-odbc</artifactId>
             <version>${project.version}</version>
         </dependency>
         

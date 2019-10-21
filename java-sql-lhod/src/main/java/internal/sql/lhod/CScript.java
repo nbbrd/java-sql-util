@@ -16,7 +16,7 @@
  */
 package internal.sql.lhod;
 
-import internal.sql.jdbc.ProcessReader;
+import internal.sql.odbc.ProcessReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,7 +31,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  *
  * @author Philippe Charles
- * @since 2.1.0
  */
 //@ThreadSafe
 final class CScript implements Wsh {

@@ -16,9 +16,10 @@
  */
 package nbbrd.sql.odbc;
 
+import internal.sql.odbc.win.FailsafeOdbcConnectionSupplierSpi;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
+import java.util.Optional;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -26,78 +27,31 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @author Philippe Charles
  */
-@lombok.extern.java.Log
 @lombok.AllArgsConstructor(staticName = "of")
 public final class OdbcConnectionSupplier implements SqlConnectionSupplier {
 
     @NonNull
-    public static OdbcConnectionSupplier ofServiceLoader() {
-        return new OdbcConnectionSupplierSpiLoader().get()
-                .map(OdbcConnectionSupplier::new)
-                .orElseGet(OdbcConnectionSupplier::noOp);
-    }
-
-    @NonNull
-    public static OdbcConnectionSupplier noOp() {
-        return new OdbcConnectionSupplier(NoOp.INSTANCE);
+    public static Optional<OdbcConnectionSupplier> ofServiceLoader() {
+        return OdbcConnectionSupplierSpiLoader.load()
+                .map(FailsafeOdbcConnectionSupplierSpi::wrap)
+                .map(OdbcConnectionSupplier::new);
     }
 
     @lombok.NonNull
     private final OdbcConnectionSupplierSpi spi;
 
     @NonNull
-    @SuppressWarnings("null")
     public String getName() {
-        String result;
-
-        try {
-            result = spi.getName();
-        } catch (RuntimeException ex) {
-            log.log(Level.WARNING, "Unexpected exception while getting name for '" + spi.getClass().getName() + "'", ex);
-            return spi.getClass().getName();
-        }
-
-        if (result == null) {
-            log.log(Level.WARNING, "Unexpected null while getting name for ''{0}''", spi.getClass().getName());
-            return spi.getClass().getName();
-        }
-
-        return result;
+        return spi.getName();
     }
 
     @Override
     public Connection getConnection(String connectionString) throws SQLException {
-        Connection result;
-
-        try {
-            result = spi.getConnection(connectionString);
-        } catch (RuntimeException ex) {
-            throw new SQLException("Unexpected exception while getting connection for '" + connectionString + "'", ex);
-        }
-
-        if (result == null) {
-            throw new SQLException("Unexpected null while getting connection for '" + connectionString + "'");
-        }
-
-        return result;
+        return spi.getConnection(connectionString);
     }
 
-    private enum NoOp implements OdbcConnectionSupplierSpi {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "noOp";
-        }
-
-        @Override
-        public boolean isAvailable() {
-            return true;
-        }
-
-        @Override
-        public Connection getConnection(String connectionString) throws SQLException {
-            return SqlConnectionSupplier.noOp().getConnection(connectionString);
-        }
+    @NonNull
+    public Connection getConnection(@NonNull OdbcConnectionString connectionString) throws SQLException {
+        return spi.getConnection(connectionString.toString());
     }
 }

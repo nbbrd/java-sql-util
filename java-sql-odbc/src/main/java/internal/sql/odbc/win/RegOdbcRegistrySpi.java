@@ -33,7 +33,7 @@ import nbbrd.sql.odbc.OdbcRegistrySpi;
  * @author Philippe Charles
  */
 @ServiceProvider(OdbcRegistrySpi.class)
-public final class RegOdbcRegistry implements OdbcRegistrySpi {
+public final class RegOdbcRegistrySpi implements OdbcRegistrySpi {
 
     @Override
     public String getName() {
@@ -46,18 +46,23 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<OdbcDataSource> getDataSources(OdbcDataSource.Type... types) throws IOException {
+    public int getCost() {
+        return HIGH_COST;
+    }
+
+    @Override
+    public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
         Map<String, List<RegValue>> data = new HashMap<>();
         for (OdbcDataSource.Type o : types) {
             data.putAll(RegCommandWrapper.query(WinOdbcRegistryUtil.getRoot(o) + "\\SOFTWARE\\ODBC\\ODBC.INI"));
         }
-        return WinOdbcRegistryUtil.getDataSources(new CachedRegistry(data), types);
+        return WinOdbcRegistryUtil.getDataSources(new MapRegistry(data), types);
     }
 
     @Override
     public List<OdbcDriver> getDrivers() throws IOException {
         Map<String, List<RegValue>> data = RegCommandWrapper.query("HKEY_LOCAL_MACHINE\\SOFTWARE\\ODBC\\Odbcinst.INI");
-        return WinOdbcRegistryUtil.getDrivers(new CachedRegistry(data));
+        return WinOdbcRegistryUtil.getDrivers(new MapRegistry(data));
     }
 
     private static boolean isCommandAvailable() {
@@ -66,7 +71,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @lombok.AllArgsConstructor
-    private static class CachedRegistry implements WinOdbcRegistryUtil.Registry {
+    private static final class MapRegistry implements WinOdbcRegistryUtil.Registry {
 
         @lombok.NonNull
         private final Map<String, List<RegValue>> result;

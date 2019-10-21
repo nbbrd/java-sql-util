@@ -16,11 +16,10 @@
  */
 package nbbrd.sql.odbc;
 
+import internal.sql.odbc.win.FailsafeOdbcRegistrySpi;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -29,100 +28,31 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * http://msdn.microsoft.com/en-us/library/windows/desktop/ms715432(v=vs.85).aspx
  * @author Philippe Charles
  */
-@lombok.extern.java.Log
 @lombok.AllArgsConstructor(staticName = "of")
 public final class OdbcRegistry {
 
     @NonNull
-    public static OdbcRegistry ofServiceLoader() {
-        return new OdbcRegistrySpiLoader().get()
-                .map(OdbcRegistry::new)
-                .orElseGet(OdbcRegistry::noOp);
-    }
-
-    @NonNull
-    public static OdbcRegistry noOp() {
-        return new OdbcRegistry(NoOpRegistry.INSTANCE);
+    public static Optional<OdbcRegistry> ofServiceLoader() {
+        return OdbcRegistrySpiLoader.load()
+                .map(FailsafeOdbcRegistrySpi::wrap)
+                .map(OdbcRegistry::new);
     }
 
     @lombok.NonNull
     private final OdbcRegistrySpi spi;
 
     @NonNull
-    @SuppressWarnings("null")
     public String getName() {
-        String result;
-
-        try {
-            result = spi.getName();
-        } catch (RuntimeException ex) {
-            log.log(Level.WARNING, "Unexpected exception while getting name for '" + spi.getClass().getName() + "'", ex);
-            return spi.getClass().getName();
-        }
-
-        if (result == null) {
-            log.log(Level.WARNING, "Unexpected null while getting name for ''{0}''", spi.getClass().getName());
-            return spi.getClass().getName();
-        }
-
-        return result;
+        return spi.getName();
     }
 
     @NonNull
     public List<OdbcDataSource> getDataSources(OdbcDataSource.@NonNull Type... types) throws IOException {
-        List<OdbcDataSource> result;
-
-        try {
-            result = spi.getDataSources(types);
-        } catch (RuntimeException ex) {
-            throw new IOException("Unexpected exception while getting data sources for " + Arrays.toString(types), ex);
-        }
-
-        if (result == null) {
-            throw new IOException("Unexpected null while getting data sources for " + Arrays.toString(types));
-        }
-
-        return result;
+        return spi.getDataSources(types);
     }
 
     @NonNull
     public List<OdbcDriver> getDrivers() throws IOException {
-        List<OdbcDriver> result;
-
-        try {
-            result = spi.getDrivers();
-        } catch (RuntimeException ex) {
-            throw new IOException("Unexpected exception while getting drivers", ex);
-        }
-
-        if (result == null) {
-            throw new IOException("Unexpected null while getting data drivers");
-        }
-
-        return result;
-    }
-
-    private enum NoOpRegistry implements OdbcRegistrySpi {
-        INSTANCE;
-
-        @Override
-        public String getName() {
-            return "noOp";
-        }
-
-        @Override
-        public boolean isAvailable() {
-            return true;
-        }
-
-        @Override
-        public List<OdbcDataSource> getDataSources(OdbcDataSource.Type... types) {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public List<OdbcDriver> getDrivers() {
-            return Collections.emptyList();
-        }
+        return spi.getDrivers();
     }
 }

@@ -17,12 +17,18 @@
 
 module nbbrd.sql.lhod {
 
+    // compile only
     requires static org.checkerframework.checker.qual;
     requires static lombok;
     requires static nbbrd.service;
 
-    requires nbbrd.sql.jdbc;
+    // required dependencies
+    requires nbbrd.sql.odbc;
 
+    // services registration
     provides java.sql.Driver with
             internal.sql.lhod.AdoDriver;
+
+    provides nbbrd.sql.odbc.OdbcConnectionSupplierSpi with
+            internal.sql.lhod.LhodConnectionSupplier;
 }

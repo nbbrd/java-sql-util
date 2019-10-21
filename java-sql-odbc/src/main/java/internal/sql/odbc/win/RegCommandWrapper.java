@@ -16,7 +16,7 @@
  */
 package internal.sql.odbc.win;
 
-import internal.sql.jdbc.ProcessReader;
+import internal.sql.odbc.ProcessReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;

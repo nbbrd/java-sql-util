@@ -31,7 +31,6 @@ import nbbrd.service.ServiceProvider;
  * https://msdn.microsoft.com/en-us/library/aa478977.aspx
  *
  * @author Philippe Charles
- * @since 2.1.0
  */
 @lombok.extern.java.Log
 @ServiceProvider(Driver.class)

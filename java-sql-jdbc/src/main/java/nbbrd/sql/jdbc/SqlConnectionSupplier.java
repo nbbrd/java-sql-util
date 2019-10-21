@@ -16,9 +16,15 @@
  */
 package nbbrd.sql.jdbc;
 
-import internal.sql.jdbc.SqlConnectionSuppliers;
+import internal.sql.jdbc.DataSourceBasedSupplier;
+import internal.sql.jdbc.DriverManagerSupplier;
+import internal.sql.jdbc.JndiSupplier;
+import internal.sql.jdbc.NoOpSupplier;
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collections;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -41,22 +47,38 @@ public interface SqlConnectionSupplier {
     Connection getConnection(@NonNull String connectionString) throws SQLException;
 
     @NonNull
-    static SqlConnectionSupplier usingDriverManager(@NonNull String driverClassName, @NonNull SqlFunc<String, String> toUrl) {
-        return new SqlConnectionSuppliers.DriverBasedSupplier(driverClassName, toUrl);
+    static SqlConnectionSupplier ofDriverManager(@NonNull String driverClassName, @NonNull SqlFunc<String, String> toUrl) {
+        return new DriverManagerSupplier(driverClassName, toUrl);
     }
 
     @NonNull
-    static SqlConnectionSupplier usingDataSource(@NonNull SqlFunc<String, javax.sql.DataSource> toDataSource) {
-        return new SqlConnectionSuppliers.DataSourceBasedSupplier(toDataSource);
+    static SqlConnectionSupplier ofDataSource(@NonNull SqlFunc<String, javax.sql.DataSource> toDataSource) {
+        return new DataSourceBasedSupplier(toDataSource);
     }
 
     @NonNull
-    static SqlConnectionSupplier usingJndi() {
-        return SqlConnectionSuppliers.CustomSuppliers.JNDI;
+    static SqlConnectionSupplier ofJndi() {
+        return JndiSupplier.INSTANCE;
     }
 
     @NonNull
     static SqlConnectionSupplier noOp() {
-        return SqlConnectionSuppliers.CustomSuppliers.NO_OP;
+        return NoOpSupplier.INSTANCE;
+    }
+
+    static boolean isDriverLoadable(@NonNull String driverClassName) {
+        try {
+            return Driver.class.isAssignableFrom(Class.forName(driverClassName));
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+    }
+
+    static boolean isDriverRegistered(@NonNull String driverClassName) {
+        return Collections
+                .list(DriverManager.getDrivers())
+                .stream()
+                .map(o -> o.getClass().getName())
+                .anyMatch(driverClassName::equals);
     }
 }

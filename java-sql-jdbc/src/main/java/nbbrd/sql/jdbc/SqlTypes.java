@@ -16,9 +16,6 @@
  */
 package nbbrd.sql.jdbc;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,22 +24,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @lombok.experimental.UtilityClass
 public class SqlTypes {
-
-    // Get all field in java.sql.Types
-    @NonNull
-    public Map<Integer, String> getTypeNames() {
-        Map<Integer, String> result = new HashMap<>();
-        for (Field field : java.sql.Types.class.getFields()) {
-            try {
-                String name = field.getName();
-                Integer value = (Integer) field.get(null);
-                result.put(value, name);
-            } catch (IllegalAccessException ex) {
-                // do nothing
-            }
-        }
-        return result;
-    }
 
     public java.util.@NonNull Date getJavaDate(java.sql.@NonNull Date date) {
         return new java.util.Date(date.getTime());

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import nbbrd.service.Quantifier;
 import nbbrd.service.ServiceFilter;
+import nbbrd.service.ServiceSorter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -36,9 +37,16 @@ public interface OdbcRegistrySpi {
     @ServiceFilter
     boolean isAvailable();
 
+    @ServiceSorter
+    int getCost();
+
     @NonNull
-    List<OdbcDataSource> getDataSources(OdbcDataSource.@NonNull Type... types) throws IOException;
+    List<OdbcDataSource> getDataSources(OdbcDataSource.@NonNull Type[] types) throws IOException;
 
     @NonNull
     List<OdbcDriver> getDrivers() throws IOException;
+
+    static final int NO_COST = 0;
+    static final int LOW_COST = 100;
+    static final int HIGH_COST = 1000;
 }

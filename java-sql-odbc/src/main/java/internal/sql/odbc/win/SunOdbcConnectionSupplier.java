@@ -16,7 +16,6 @@
  */
 package internal.sql.odbc.win;
 
-import internal.sql.jdbc.SqlConnectionSuppliers;
 import java.sql.Connection;
 import java.sql.SQLException;
 import nbbrd.service.ServiceProvider;
@@ -33,7 +32,7 @@ public final class SunOdbcConnectionSupplier implements OdbcConnectionSupplierSp
     private static final String JDBC_ODBC_DRIVER_NAME = "sun.jdbc.odbc.JdbcOdbcDriver";
     private static final String JDBC_ODBC_DRIVER_PREFIX = "jdbc:odbc:";
 
-    private final SqlConnectionSupplier delegate = SqlConnectionSupplier.usingDriverManager(JDBC_ODBC_DRIVER_NAME, o -> JDBC_ODBC_DRIVER_PREFIX + o);
+    private final SqlConnectionSupplier delegate = SqlConnectionSupplier.ofDriverManager(JDBC_ODBC_DRIVER_NAME, o -> JDBC_ODBC_DRIVER_PREFIX + o);
 
     @Override
     public String getName() {
@@ -42,7 +41,14 @@ public final class SunOdbcConnectionSupplier implements OdbcConnectionSupplierSp
 
     @Override
     public boolean isAvailable() {
-        return !is64bit() && SqlConnectionSuppliers.isDriverAvailable(JDBC_ODBC_DRIVER_NAME);
+        return !is64bit()
+                && SqlConnectionSupplier.isDriverLoadable(JDBC_ODBC_DRIVER_NAME)
+                && SqlConnectionSupplier.isDriverRegistered(JDBC_ODBC_DRIVER_NAME);
+    }
+
+    @Override
+    public int getCost() {
+        return LOW_COST;
     }
 
     @Override
