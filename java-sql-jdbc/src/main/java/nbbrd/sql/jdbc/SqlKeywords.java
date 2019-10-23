@@ -27,6 +27,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
+ * https://developer.mimer.com/wp-content/uploads/standard-sql-reserved-words-summary.pdf
  *
  * @author Philippe Charles
  */
@@ -36,7 +37,10 @@ public enum SqlKeywords {
     SQL92_NON_RESERVED_WORDS("Sql92NonReservedWords.txt"),
     SQL99_RESERVED_WORDS("Sql99ReservedWords.txt"),
     SQL2003_RESERVED_WORDS("Sql2003ReservedWords.txt"),
-    SQL2008_RESERVED_WORDS("Sql2008ReservedWords.txt");
+    SQL2008_RESERVED_WORDS("Sql2008ReservedWords.txt"),
+    SQL2011_RESERVED_WORDS("Sql2011ReservedWords.txt"),
+    SQL2016_RESERVED_WORDS("Sql2016ReservedWords.txt"),
+    LATEST_RESERVED_WORDS("Sql2016ReservedWords.txt");
 
     @lombok.Getter
     private final Set<String> keywords;
