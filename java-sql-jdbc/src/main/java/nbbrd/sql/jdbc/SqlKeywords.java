@@ -23,7 +23,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -51,13 +50,11 @@ public enum SqlKeywords {
 
     private static Set<String> loadWords(String resourceName) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(SqlKeywords.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
-            return reader.lines().collect(TO_UNMODIFIABLE_SET);
+            return reader.lines().collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
         } catch (IOException ex) {
             throw new RuntimeException("Missing resource '" + resourceName + "'", ex);
         } catch (UncheckedIOException ex) {
             throw new RuntimeException("Missing resource '" + resourceName + "'", ex.getCause());
         }
     }
-
-    private static final Collector<String, ?, Set<String>> TO_UNMODIFIABLE_SET = Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet);
 }
