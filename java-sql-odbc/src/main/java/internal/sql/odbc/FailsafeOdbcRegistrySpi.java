@@ -14,7 +14,7 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.odbc.win;
+package internal.sql.odbc;
 
 import java.io.IOException;
 import java.util.List;

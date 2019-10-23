@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 National Bank of Belgium
+ * Copyright 2019 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -14,19 +14,17 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.lhod;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.NonNull;
+package internal.sys.win;
 
 /**
  *
  * @author Philippe Charles
  */
-//@ThreadSafe
-interface Wsh {
+@lombok.experimental.UtilityClass
+public class WindowsOS {
 
-    @NonNull
-    BufferedReader exec(@NonNull String scriptName, @NonNull String... args) throws IOException;
+    public boolean isWindows() {
+        String osName = System.getProperty("os.name");
+        return osName != null && osName.startsWith("Windows ");
+    }
 }

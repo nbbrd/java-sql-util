@@ -14,9 +14,9 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.odbc.win;
+package internal.sys.win;
 
-import internal.sql.odbc.ProcessReader;
+import internal.sys.ProcessReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,33 +33,39 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author Philippe Charles
  */
 @lombok.experimental.UtilityClass
-public class RegCommandWrapper {
+public class RegWrapper {
+
+    public static final String COMMAND = "reg";
 
     @NonNull
     public Map<String, List<RegValue>> query(@NonNull String key) throws IOException {
-        try (BufferedReader r = ProcessReader.newReader("reg", "query", key, "/s")) {
-            Map<String, List<RegValue>> result = new HashMap<>();
-            String line;
-            String subKey = null;
-            List<RegValue> value = new ArrayList<>();
-            while ((line = r.readLine()) != null) {
-                if (line.isEmpty()) {
-                    if (subKey != null) {
-                        result.put(subKey, value);
-                        subKey = null;
-                        value = new ArrayList<>();
-                    }
-                } else if (subKey == null) {
-                    subKey = line;
-                } else {
-                    RegValue regValue = RegValue.parse(line);
-                    if (regValue != null) {
-                        value.add(regValue);
-                    }
+        try (BufferedReader reader = ProcessReader.newReader(COMMAND, "query", key, "/s")) {
+            return parse(reader);
+        }
+    }
+
+    private Map<String, List<RegValue>> parse(BufferedReader reader) throws IOException {
+        Map<String, List<RegValue>> result = new HashMap<>();
+        String line;
+        String subKey = null;
+        List<RegValue> value = new ArrayList<>();
+        while ((line = reader.readLine()) != null) {
+            if (line.isEmpty()) {
+                if (subKey != null) {
+                    result.put(subKey, value);
+                    subKey = null;
+                    value = new ArrayList<>();
+                }
+            } else if (subKey == null) {
+                subKey = line;
+            } else {
+                RegValue regValue = RegValue.parse(line);
+                if (regValue != null) {
+                    value.add(regValue);
                 }
             }
-            return result;
         }
+        return result;
     }
 
     @lombok.Value

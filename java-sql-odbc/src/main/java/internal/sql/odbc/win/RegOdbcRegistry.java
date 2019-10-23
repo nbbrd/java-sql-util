@@ -16,12 +16,16 @@
  */
 package internal.sql.odbc.win;
 
-import internal.sql.odbc.win.RegCommandWrapper.RegValue;
+import internal.sys.win.RegWrapper;
+import internal.sys.win.RegWrapper.RegValue;
+import internal.sys.win.WhereWrapper;
+import internal.sys.win.WindowsOS;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import nbbrd.service.ServiceProvider;
 import nbbrd.sql.odbc.OdbcDataSource;
@@ -32,8 +36,9 @@ import nbbrd.sql.odbc.OdbcRegistrySpi;
  *
  * @author Philippe Charles
  */
+@lombok.extern.java.Log
 @ServiceProvider(OdbcRegistrySpi.class)
-public final class RegOdbcRegistrySpi implements OdbcRegistrySpi {
+public final class RegOdbcRegistry implements OdbcRegistrySpi {
 
     @Override
     public String getName() {
@@ -42,7 +47,7 @@ public final class RegOdbcRegistrySpi implements OdbcRegistrySpi {
 
     @Override
     public boolean isAvailable() {
-        return WinOdbcRegistryUtil.isWindows() && isCommandAvailable();
+        return WindowsOS.isWindows() && isCommandAvailable();
     }
 
     @Override
@@ -54,20 +59,24 @@ public final class RegOdbcRegistrySpi implements OdbcRegistrySpi {
     public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
         Map<String, List<RegValue>> data = new HashMap<>();
         for (OdbcDataSource.Type o : types) {
-            data.putAll(RegCommandWrapper.query(WinOdbcRegistryUtil.getRoot(o) + "\\SOFTWARE\\ODBC\\ODBC.INI"));
+            data.putAll(RegWrapper.query(WinOdbcRegistryUtil.getRoot(o) + "\\SOFTWARE\\ODBC\\ODBC.INI"));
         }
         return WinOdbcRegistryUtil.getDataSources(new MapRegistry(data), types);
     }
 
     @Override
     public List<OdbcDriver> getDrivers() throws IOException {
-        Map<String, List<RegValue>> data = RegCommandWrapper.query("HKEY_LOCAL_MACHINE\\SOFTWARE\\ODBC\\Odbcinst.INI");
+        Map<String, List<RegValue>> data = RegWrapper.query("HKEY_LOCAL_MACHINE\\SOFTWARE\\ODBC\\Odbcinst.INI");
         return WinOdbcRegistryUtil.getDrivers(new MapRegistry(data));
     }
 
     private static boolean isCommandAvailable() {
-        // TODO
-        return true;
+        try {
+            return WhereWrapper.isAvailable(RegWrapper.COMMAND);
+        } catch (IOException ex) {
+            log.log(Level.WARNING, "While checking command availability", ex);
+            return false;
+        }
     }
 
     @lombok.AllArgsConstructor

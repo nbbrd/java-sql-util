@@ -37,8 +37,8 @@ public class WshTest {
 
     static Wsh good() {
         Map<String, String> map = new HashMap<>();
-        map.put("DbProperties", "MyDbConnProperties.tsv");
-        map.put("OpenSchema", "MyDbTables.tsv");
+        map.put("DbProperties.vbs", "MyDbConnProperties.tsv");
+        map.put("OpenSchema.vbs", "MyDbTables.tsv");
         return (a, b) -> {
             try {
                 Path path = Paths.get(AdoConnectionTest.class.getResource(map.get(a)).toURI());

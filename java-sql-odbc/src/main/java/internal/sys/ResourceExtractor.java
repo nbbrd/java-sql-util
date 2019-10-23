@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 National Bank of Belgium
+ * Copyright 2019 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -14,9 +14,9 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.lhod;
+package internal.sys;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -24,9 +24,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @author Philippe Charles
  */
-//@ThreadSafe
-interface Wsh {
+public interface ResourceExtractor {
 
     @NonNull
-    BufferedReader exec(@NonNull String scriptName, @NonNull String... args) throws IOException;
+    File getResourceAsFile(@NonNull String resourceName) throws IOException;
 }

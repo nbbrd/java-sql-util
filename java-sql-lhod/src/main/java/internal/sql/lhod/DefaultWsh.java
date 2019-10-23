@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 National Bank of Belgium
+ * Copyright 2016 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -16,17 +16,28 @@
  */
 package internal.sql.lhod;
 
+import internal.sys.ProcessReader;
+import internal.sys.CachedResourceExtractor;
+import internal.sys.DefaultResourceExtractor;
+import internal.sys.ResourceExtractor;
+import internal.sys.win.CScriptWrapper;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
 //@ThreadSafe
-interface Wsh {
+final class DefaultWsh implements Wsh {
 
-    @NonNull
-    BufferedReader exec(@NonNull String scriptName, @NonNull String... args) throws IOException;
+    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(Wsh.class));
+
+    @Override
+    public BufferedReader exec(String scriptName, String... args) throws IOException {
+        File script = scripts.getResourceAsFile(scriptName);
+        Process process = CScriptWrapper.exec(script, args);
+        return ProcessReader.newReader(process);
+    }
 }

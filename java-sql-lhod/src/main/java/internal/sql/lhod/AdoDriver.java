@@ -50,7 +50,7 @@ public final class AdoDriver extends _Driver {
     private final ConcurrentMap<String, AdoContext> pool;
 
     public AdoDriver() {
-        this(Wsh.getDefault(), new ConcurrentHashMap<>());
+        this(new DefaultWsh(), new ConcurrentHashMap<>());
     }
 
 //    @VisibleForTesting

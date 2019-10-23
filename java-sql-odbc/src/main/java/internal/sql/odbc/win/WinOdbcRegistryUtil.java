@@ -190,9 +190,4 @@ class WinOdbcRegistryUtil {
                 ? OdbcDriver.ConnectFunctions.parse(obj.toString(), defaultValue)
                 : defaultValue;
     }
-
-    public boolean isWindows() {
-        String osName = System.getProperty("os.name");
-        return osName != null && osName.startsWith("Windows ");
-    }
 }

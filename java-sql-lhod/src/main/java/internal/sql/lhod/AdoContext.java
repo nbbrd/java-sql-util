@@ -106,7 +106,7 @@ final class AdoContext {
         for (int i = 0; i < parameters.size(); i++) {
             args[2 + i] = parameters.get(i);
         }
-        return TsvReader.of(wsh.exec("PreparedStatement", args), 2);
+        return TsvReader.of(wsh.exec("PreparedStatement.vbs", args), 2);
     }
 
     @NonNull
@@ -119,7 +119,7 @@ final class AdoContext {
         if (types != null) {
             System.arraycopy(types, 0, args, 4, types.length);
         }
-        return TsvReader.of(wsh.exec("OpenSchema", args), 2);
+        return TsvReader.of(wsh.exec("OpenSchema.vbs", args), 2);
     }
 
     //<editor-fold defaultstate="collapsed" desc="Internal implementation">
@@ -127,7 +127,7 @@ final class AdoContext {
         String[] args = new String[properties.length + 1];
         args[0] = connectionString;
         System.arraycopy(properties, 0, args, 1, properties.length);
-        try (TsvReader reader = TsvReader.of(wsh.exec("DbProperties", args), 2)) {
+        try (TsvReader reader = TsvReader.of(wsh.exec("DbProperties.vbs", args), 2)) {
             Map<String, String> result = new HashMap<>();
             String[] array = new String[reader.getHeader(0).length];
             while (reader.readNextInto(array)) {

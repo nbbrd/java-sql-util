@@ -16,7 +16,7 @@
  */
 package nbbrd.sql.odbc;
 
-import internal.sql.odbc.win.FailsafeOdbcConnectionSupplierSpi;
+import internal.sql.odbc.FailsafeOdbcConnectionSupplierSpi;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;

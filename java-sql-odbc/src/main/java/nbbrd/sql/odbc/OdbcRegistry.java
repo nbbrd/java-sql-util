@@ -16,7 +16,7 @@
  */
 package nbbrd.sql.odbc;
 
-import internal.sql.odbc.win.FailsafeOdbcRegistrySpi;
+import internal.sql.odbc.FailsafeOdbcRegistrySpi;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;

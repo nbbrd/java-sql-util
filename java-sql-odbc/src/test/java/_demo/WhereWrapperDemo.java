@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 National Bank of Belgium
+ * Copyright 2019 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -14,19 +14,19 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.lhod;
+package _demo;
 
-import java.io.BufferedReader;
+import internal.sys.win.WhereWrapper;
 import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
-//@ThreadSafe
-interface Wsh {
+public class WhereWrapperDemo {
 
-    @NonNull
-    BufferedReader exec(@NonNull String scriptName, @NonNull String... args) throws IOException;
+    public static void main(String[] args) throws IOException {
+        System.err.println("where: " + WhereWrapper.isAvailable("where"));
+        System.err.println("xxx: " + WhereWrapper.isAvailable("xxx"));
+    }
 }
