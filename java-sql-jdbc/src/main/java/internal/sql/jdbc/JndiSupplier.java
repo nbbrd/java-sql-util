@@ -19,8 +19,8 @@ package internal.sql.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
@@ -29,8 +29,11 @@ import nbbrd.sql.jdbc.SqlConnectionSupplier;
  *
  * @author Philippe Charles
  */
-public enum JndiSupplier implements SqlConnectionSupplier {
-    INSTANCE;
+@lombok.AllArgsConstructor
+public final class JndiSupplier implements SqlConnectionSupplier {
+
+    @lombok.NonNull
+    private final Callable<? extends Context> contextSupplier;
 
     @Override
     public Connection getConnection(String connectionString) throws SQLException {
@@ -40,10 +43,18 @@ public enum JndiSupplier implements SqlConnectionSupplier {
 
     private DataSource lookupByName(String name) throws SQLException {
         try {
-            Context ctx = new InitialContext();
+            Context ctx = getContext();
             return (DataSource) ctx.lookup(name);
         } catch (NamingException | ClassCastException ex) {
             throw new SQLException("Cannot retrieve javax.sql.DataSource for '" + name + "'", ex);
+        }
+    }
+
+    private Context getContext() throws SQLException {
+        try {
+            return contextSupplier.call();
+        } catch (Exception ex) {
+            throw new SQLException("Cannot retrieve context", ex);
         }
     }
 }

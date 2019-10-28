@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,32 +34,47 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author Philippe Charles
  */
 @lombok.Value
+@lombok.Builder(builderClassName = "Builder")
 public class SqlTable {
 
     /**
      * Creates a complete list of tables in a database.
      *
-     * @param md
+     * @param md a non-null database metadata
      * @return a non-null list of tables
-     * @throws SQLException
+     * @throws SQLException if a database access error occurs
      * @see DatabaseMetaData#getTables(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String[])
      */
     @NonNull
     public static List<SqlTable> allOf(@NonNull DatabaseMetaData md) throws SQLException {
-        return allOf(md, null, null, "%", null);
+        return allOf(md, ALL_CATALOGS, ALL_SCHEMAS, ALL_TABLE_NAMES, ALL_TYPES);
     }
+
+    public static final String ALL_CATALOGS = null;
+    public static final String ALL_SCHEMAS = null;
+    public static final String ALL_TABLE_NAMES = "%";
+    public static final String[] ALL_TYPES = null;
 
     /**
      * Creates a partial list of tables in a database by using patterns.
      *
-     * @param md
-     * @param catalog
-     * @param schemaPattern
-     * @param tableNamePattern
-     * @param types
+     * @param md a non-null database metadata
+     * @param catalog a catalog name; must match the catalog name as it is
+     * stored in the database; "" retrieves those without a catalog;
+     * <code>null</code> means that the catalog name should not be used to
+     * narrow the search
+     * @param schemaPattern a schema name pattern; must match the schema name as
+     * it is stored in the database; "" retrieves those without a schema;
+     * <code>null</code> means that the schema name should not be used to narrow
+     * the search
+     * @param tableNamePattern a table name pattern; must match the table name
+     * as it is stored in the database
+     * @param types a list of table types, which must be from the list of table
+     * types returned from {@link #getTableTypes},to include; <code>null</code>
+     * returns all types
      * @return a non-null list of tables
-     * @throws SQLException
+     * @throws SQLException if a database access error occurs
      * @see DatabaseMetaData#getTables(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String[])
      */
@@ -70,20 +86,23 @@ public class SqlTable {
             @NonNull String tableNamePattern,
             @Nullable String[] types
     ) throws SQLException {
+        Objects.requireNonNull(md, "md");
+        Objects.requireNonNull(tableNamePattern, "tableNamePattern");
+
         try (ResultSet rs = md.getTables(catalog, schemaPattern, tableNamePattern, types)) {
             return allOf(rs);
         }
     }
 
-    private static List<SqlTable> allOf(ResultSet rs) throws SQLException {
+    private static List<SqlTable> allOf(ResultSet tables) throws SQLException {
         // some infos are not supported by all drivers!
-        String[] normalizedColumnNames = getNormalizedColumnNames(rs.getMetaData());
+        String[] normalizedColumnNames = getNormalizedColumnNames(tables.getMetaData());
 
         List<SqlTable> result = new ArrayList<>();
         Map<String, String> row = new HashMap<>();
-        while (rs.next()) {
+        while (tables.next()) {
             for (int i = 0; i < normalizedColumnNames.length; i++) {
-                row.put(normalizedColumnNames[i], rs.getString(i + 1));
+                row.put(normalizedColumnNames[i], tables.getString(i + 1));
             }
             result.add(fromMap(row));
         }

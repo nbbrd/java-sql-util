@@ -25,6 +25,7 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collections;
+import javax.naming.InitialContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -58,7 +59,7 @@ public interface SqlConnectionSupplier {
 
     @NonNull
     static SqlConnectionSupplier ofJndi() {
-        return JndiSupplier.INSTANCE;
+        return new JndiSupplier(InitialContext::new);
     }
 
     @NonNull

@@ -27,10 +27,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @author Philippe Charles
  */
 @lombok.Value
+@lombok.Builder(builderClassName = "Builder")
 public class SqlColumn {
 
+    /**
+     * Creates a complete list of columns in a table.
+     *
+     * @param md a non-null resultset metadata
+     * @return a non-null list of columns
+     * @throws SQLException if a database access error occurs
+     */
     @NonNull
-    public static List<SqlColumn> ofAll(@NonNull ResultSetMetaData md) throws SQLException {
+    public static List<SqlColumn> allOf(@NonNull ResultSetMetaData md) throws SQLException {
         SqlColumn[] result = new SqlColumn[md.getColumnCount()];
         for (int i = 0; i < result.length; i++) {
             result[i] = of(md, i + 1);
@@ -38,6 +46,14 @@ public class SqlColumn {
         return Arrays.asList(result);
     }
 
+    /**
+     * Gets a specific column in a table.
+     *
+     * @param md a non-null resultset metadata
+     * @param columnIndex the first column is 1, the second is 2, ...
+     * @return a non-null column
+     * @throws SQLException if a database access error occurs
+     */
     @NonNull
     public static SqlColumn of(@NonNull ResultSetMetaData md, int columnIndex) throws SQLException {
         return new SqlColumn(
