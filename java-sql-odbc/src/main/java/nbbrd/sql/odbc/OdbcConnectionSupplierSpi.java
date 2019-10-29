@@ -28,7 +28,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @author Philippe Charles
  */
-@ServiceDefinition(quantifier = Quantifier.OPTIONAL)
+@ServiceDefinition(
+        quantifier = Quantifier.OPTIONAL,
+        loaderName = "internal.sql.odbc.OdbcConnectionSupplierSpiLoader"
+)
 public interface OdbcConnectionSupplierSpi {
 
     @NonNull

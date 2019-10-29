@@ -14,17 +14,19 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sys.win;
+package nbbrd.sql.odbc;
+
+import static org.assertj.core.api.Assertions.*;
+import org.junit.Test;
 
 /**
  *
  * @author Philippe Charles
  */
-@lombok.experimental.UtilityClass
-public class WindowsOS {
+public class OdbcConnectionSupplierTest {
 
-    public boolean isWindows() {
-        String osName = System.getProperty("os.name");
-        return osName != null && osName.startsWith("Windows ");
+    @Test
+    public void test() {
+        assertThat(OdbcConnectionSupplier.ofServiceLoader()).isEmpty();
     }
 }

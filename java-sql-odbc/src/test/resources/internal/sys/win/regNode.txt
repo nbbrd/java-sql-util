@@ -1,0 +1,9 @@
+
+HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseGit
+    ProcPath    REG_SZ    C:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe
+    LanguageFolderPath    REG_SZ    C:\Program Files\TortoiseGit\Languages
+    CachePath    REG_SZ    C:\Program Files\TortoiseGit\bin\TGitCache.exe
+    TMergePath    REG_SZ    C:\Program Files\TortoiseGit\bin\TortoiseGitMerge.exe
+    Directory    REG_SZ    C:\Program Files\TortoiseGit\
+
+HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseGit\Capabilities

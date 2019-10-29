@@ -16,10 +16,10 @@
  */
 package internal.sql.odbc.win;
 
+import internal.sys.OS;
 import internal.sys.win.RegWrapper;
 import internal.sys.win.RegWrapper.RegValue;
 import internal.sys.win.WhereWrapper;
-import internal.sys.win.WindowsOS;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
 
     @Override
     public boolean isAvailable() {
-        return WindowsOS.isWindows() && isCommandAvailable();
+        return OS.NAME == OS.Name.WINDOWS && isCommandAvailable();
     }
 
     @Override
@@ -59,14 +59,14 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
         Map<String, List<RegValue>> data = new HashMap<>();
         for (OdbcDataSource.Type o : types) {
-            data.putAll(RegWrapper.query(WinOdbcRegistryUtil.getRoot(o) + "\\SOFTWARE\\ODBC\\ODBC.INI"));
+            data.putAll(RegWrapper.query(WinOdbcRegistryUtil.getRoot(o) + "\\SOFTWARE\\ODBC\\ODBC.INI", true));
         }
         return WinOdbcRegistryUtil.getDataSources(new MapRegistry(data), types);
     }
 
     @Override
     public List<OdbcDriver> getDrivers() throws IOException {
-        Map<String, List<RegValue>> data = RegWrapper.query("HKEY_LOCAL_MACHINE\\SOFTWARE\\ODBC\\Odbcinst.INI");
+        Map<String, List<RegValue>> data = RegWrapper.query("HKEY_LOCAL_MACHINE\\SOFTWARE\\ODBC\\Odbcinst.INI", true);
         return WinOdbcRegistryUtil.getDrivers(new MapRegistry(data));
     }
 

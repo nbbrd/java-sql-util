@@ -16,7 +16,8 @@
  */
 package nbbrd.sql.odbc;
 
-import internal.sql.odbc.FailsafeOdbcConnectionSupplierSpi;
+import internal.sql.odbc.FailsafeOdbcConnectionSupplier;
+import internal.sql.odbc.OdbcConnectionSupplierSpiLoader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public final class OdbcConnectionSupplier implements SqlConnectionSupplier {
     @NonNull
     public static Optional<OdbcConnectionSupplier> ofServiceLoader() {
         return OdbcConnectionSupplierSpiLoader.load()
-                .map(FailsafeOdbcConnectionSupplierSpi::wrap)
+                .map(FailsafeOdbcConnectionSupplier::wrap)
                 .map(OdbcConnectionSupplier::new);
     }
 

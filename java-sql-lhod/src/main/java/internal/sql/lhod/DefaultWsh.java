@@ -21,6 +21,7 @@ import internal.sys.CachedResourceExtractor;
 import internal.sys.DefaultResourceExtractor;
 import internal.sys.ResourceExtractor;
 import internal.sys.win.CScriptWrapper;
+import static internal.sys.win.CScriptWrapper.NO_TIMEOUT;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +38,7 @@ final class DefaultWsh implements Wsh {
     @Override
     public BufferedReader exec(String scriptName, String... args) throws IOException {
         File script = scripts.getResourceAsFile(scriptName);
-        Process process = CScriptWrapper.exec(script, args);
+        Process process = CScriptWrapper.exec(script, NO_TIMEOUT, args);
         return ProcessReader.newReader(process);
     }
 }

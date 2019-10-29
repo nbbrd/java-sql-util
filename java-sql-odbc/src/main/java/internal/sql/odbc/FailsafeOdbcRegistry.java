@@ -18,6 +18,7 @@ package internal.sql.odbc;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -31,13 +32,13 @@ import nbbrd.sql.odbc.OdbcRegistrySpi;
  */
 @lombok.extern.java.Log
 @lombok.AllArgsConstructor
-public final class FailsafeOdbcRegistrySpi implements OdbcRegistrySpi {
+public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
 
     public static OdbcRegistrySpi wrap(OdbcRegistrySpi delegate) {
-        return new FailsafeOdbcRegistrySpi(
+        return new FailsafeOdbcRegistry(
                 delegate,
-                FailsafeOdbcRegistrySpi::logUnexpectedError,
-                FailsafeOdbcRegistrySpi::logUnexpectedNull
+                FailsafeOdbcRegistry::logUnexpectedError,
+                FailsafeOdbcRegistry::logUnexpectedNull
         );
     }
 
@@ -57,15 +58,15 @@ public final class FailsafeOdbcRegistrySpi implements OdbcRegistrySpi {
         try {
             result = delegate.getName();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'getName' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("getName");
             onUnexpectedError.accept(msg, unexpected);
-            return delegate.getClass().getName();
+            return getId();
         }
 
         if (result == null) {
-            String msg = "Unexpected null while calling 'getName' on '" + delegate + "'";
+            String msg = getUnexpectedNullMsg("getName");
             onUnexpectedNull.accept(msg);
-            return delegate.getClass().getName();
+            return getId();
         }
 
         return result;
@@ -76,7 +77,7 @@ public final class FailsafeOdbcRegistrySpi implements OdbcRegistrySpi {
         try {
             return delegate.isAvailable();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'isAvailable' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("isAvailable");
             onUnexpectedError.accept(msg, unexpected);
             return false;
         }
@@ -87,7 +88,7 @@ public final class FailsafeOdbcRegistrySpi implements OdbcRegistrySpi {
         try {
             return delegate.getCost();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'getCost' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("getCost");
             onUnexpectedError.accept(msg, unexpected);
             return Integer.MAX_VALUE;
         }
@@ -95,18 +96,20 @@ public final class FailsafeOdbcRegistrySpi implements OdbcRegistrySpi {
 
     @Override
     public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
+        Objects.requireNonNull(types);
+
         List<OdbcDataSource> result;
 
         try {
             result = delegate.getDataSources(types);
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'getDataSources' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("getDataSources");
             onUnexpectedError.accept(msg, unexpected);
             throw new IOException(msg, unexpected);
         }
 
         if (result == null) {
-            String msg = "Unexpected null while calling 'getDataSources' on '" + delegate + "'";
+            String msg = getUnexpectedNullMsg("getDataSources");
             onUnexpectedNull.accept(msg);
             throw new IOException(msg);
         }
@@ -121,18 +124,30 @@ public final class FailsafeOdbcRegistrySpi implements OdbcRegistrySpi {
         try {
             result = delegate.getDrivers();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'getDrivers' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("getDrivers");
             onUnexpectedError.accept(msg, unexpected);
             throw new IOException(msg, unexpected);
         }
 
         if (result == null) {
-            String msg = "Unexpected null while calling 'getDrivers' on '" + delegate + "'";
+            String msg = getUnexpectedNullMsg("getDrivers");
             onUnexpectedNull.accept(msg);
             throw new IOException(msg);
         }
 
         return result;
+    }
+
+    private String getId() {
+        return delegate.getClass().getName();
+    }
+
+    private String getUnexpectedErrorMsg(String method) {
+        return "Unexpected error while calling '" + method + "' on '" + getId() + "'";
+    }
+
+    private String getUnexpectedNullMsg(String method) {
+        return "Unexpected null while calling '" + method + "' on '" + getId() + "'";
     }
 
     private static void logUnexpectedError(String msg, RuntimeException ex) {

@@ -1,0 +1,8 @@
+
+HKEY_LOCAL_MACHINE\SOFTWARE\TortoiseGit\Capabilities\UrlAssociations
+    tgit    REG_SZ    
+    github-windows    REG_SZ    TortoiseGitURL
+    smartgit    REG_SZ    TortoiseGitURL
+    git    REG_SZ    TortoiseGitURL
+    x-github-client    REG_SZ    TortoiseGitURL
+

@@ -18,6 +18,9 @@ package internal.sys.win;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,15 +31,19 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class CScriptWrapper {
 
     public static final String COMMAND = "cscript";
+    public static final short NO_TIMEOUT = -1;
 
     @NonNull
-    public Process exec(@NonNull File script, @NonNull String... args) throws IOException {
+    public Process exec(@NonNull File script, short timeoutInSeconds, @NonNull String... args) throws IOException {
         // http://technet.microsoft.com/en-us/library/ff920171.aspx
-        String[] result = new String[3 + args.length];
-        result[0] = COMMAND;
-        result[1] = "/nologo";
-        result[2] = "\"" + script.getAbsolutePath() + "\"";
-        System.arraycopy(args, 0, result, 3, args.length);
+        List<String> result = new ArrayList<>();
+        result.add(COMMAND);
+        result.add("\"" + script.getAbsolutePath() + "\"");
+        result.add("//NoLogo");
+        if (timeoutInSeconds > 0) {
+            result.add("//T:" + timeoutInSeconds);
+        }
+        result.addAll(Arrays.asList(args));
         return new ProcessBuilder(result).start();
     }
 }

@@ -16,7 +16,8 @@
  */
 package nbbrd.sql.odbc;
 
-import internal.sql.odbc.FailsafeOdbcRegistrySpi;
+import internal.sql.odbc.FailsafeOdbcRegistry;
+import internal.sql.odbc.OdbcRegistrySpiLoader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public final class OdbcRegistry {
     @NonNull
     public static Optional<OdbcRegistry> ofServiceLoader() {
         return OdbcRegistrySpiLoader.load()
-                .map(FailsafeOdbcRegistrySpi::wrap)
+                .map(FailsafeOdbcRegistry::wrap)
                 .map(OdbcRegistry::new);
     }
 

@@ -17,6 +17,7 @@
 package internal.sys.win;
 
 import java.io.IOException;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -27,7 +28,7 @@ public class WhereWrapper {
 
     public static final String COMMAND = "where";
 
-    public boolean isAvailable(String command) throws IOException {
+    public boolean isAvailable(@NonNull String command) throws IOException {
         try {
             int exitCode = new ProcessBuilder(COMMAND, "/Q", command).start().waitFor();
             switch (exitCode) {

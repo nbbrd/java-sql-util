@@ -18,6 +18,7 @@ package internal.sql.odbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -29,13 +30,13 @@ import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
  */
 @lombok.extern.java.Log
 @lombok.AllArgsConstructor
-public final class FailsafeOdbcConnectionSupplierSpi implements OdbcConnectionSupplierSpi {
+public final class FailsafeOdbcConnectionSupplier implements OdbcConnectionSupplierSpi {
 
     public static OdbcConnectionSupplierSpi wrap(OdbcConnectionSupplierSpi delegate) {
-        return new FailsafeOdbcConnectionSupplierSpi(
+        return new FailsafeOdbcConnectionSupplier(
                 delegate,
-                FailsafeOdbcConnectionSupplierSpi::logUnexpectedError,
-                FailsafeOdbcConnectionSupplierSpi::logUnexpectedNull
+                FailsafeOdbcConnectionSupplier::logUnexpectedError,
+                FailsafeOdbcConnectionSupplier::logUnexpectedNull
         );
     }
 
@@ -55,15 +56,15 @@ public final class FailsafeOdbcConnectionSupplierSpi implements OdbcConnectionSu
         try {
             result = delegate.getName();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'getName' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("getName");
             onUnexpectedError.accept(msg, unexpected);
-            return delegate.getClass().getName();
+            return getId();
         }
 
         if (result == null) {
-            String msg = "Unexpected null while calling 'getName' on '" + delegate + "'";
+            String msg = getUnexpectedNullMsg("getName");
             onUnexpectedNull.accept(msg);
-            return delegate.getClass().getName();
+            return getId();
         }
 
         return result;
@@ -74,7 +75,7 @@ public final class FailsafeOdbcConnectionSupplierSpi implements OdbcConnectionSu
         try {
             return delegate.isAvailable();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'isAvailable' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("isAvailable");
             onUnexpectedError.accept(msg, unexpected);
             return false;
         }
@@ -85,7 +86,7 @@ public final class FailsafeOdbcConnectionSupplierSpi implements OdbcConnectionSu
         try {
             return delegate.getCost();
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while calling 'getCost' on '" + delegate + "'";
+            String msg = getUnexpectedErrorMsg("getCost");
             onUnexpectedError.accept(msg, unexpected);
             return Integer.MAX_VALUE;
         }
@@ -93,23 +94,37 @@ public final class FailsafeOdbcConnectionSupplierSpi implements OdbcConnectionSu
 
     @Override
     public Connection getConnection(String connectionString) throws SQLException {
+        Objects.requireNonNull(connectionString);
+
         Connection result;
 
         try {
             result = delegate.getConnection(connectionString);
         } catch (RuntimeException unexpected) {
-            String msg = "Unexpected error while getting connection' for '" + connectionString + "'";
+            String msg = getUnexpectedErrorMsg("getConnection");
             onUnexpectedError.accept(msg, unexpected);
             throw new SQLException(msg, unexpected);
         }
 
         if (result == null) {
-            String msg = "Unexpected null while getting connection' for '" + connectionString + "'";
+            String msg = getUnexpectedNullMsg("getConnection");
             onUnexpectedNull.accept(msg);
             throw new SQLException(msg);
         }
 
         return result;
+    }
+
+    private String getId() {
+        return delegate.getClass().getName();
+    }
+
+    private String getUnexpectedErrorMsg(String method) {
+        return "Unexpected error while calling '" + method + "' on '" + getId() + "'";
+    }
+
+    private String getUnexpectedNullMsg(String method) {
+        return "Unexpected null while calling '" + method + "' on '" + getId() + "'";
     }
 
     private static void logUnexpectedError(String msg, RuntimeException ex) {

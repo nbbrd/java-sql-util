@@ -28,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @author Philippe Charles
  */
-@lombok.Value(staticConstructor = "of")
+@lombok.Value
 @lombok.Builder(builderClassName = "Builder")
 public class OdbcDriver {
 

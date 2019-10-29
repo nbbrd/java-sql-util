@@ -72,6 +72,6 @@ public final class DefaultResourceExtractor implements ResourceExtractor {
         int idx = resourceName.lastIndexOf(".");
         return idx != -1
                 ? File.createTempFile(resourceName.substring(0, idx), resourceName.substring(idx), parent)
-                : File.createTempFile("", resourceName, parent);
+                : File.createTempFile("rsrc", resourceName, parent);
     }
 }
