@@ -18,6 +18,8 @@ package internal.sys;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -48,13 +50,13 @@ public final class CachedResourceExtractor implements ResourceExtractor {
         return result.getFile();
     }
 
-    private boolean isValid(Entry entry) {
+    private boolean isValid(Entry entry) throws IOException {
         return entry != null && entry.isValidFile();
     }
 
     private Entry newEntry(String resourceName) throws IOException {
         File result = extractor.getResourceAsFile(resourceName);
-        return new Entry(result, result.lastModified());
+        return new Entry(result, Files.getLastModifiedTime(result.toPath()));
     }
 
     public static Builder builder() {
@@ -70,11 +72,11 @@ public final class CachedResourceExtractor implements ResourceExtractor {
     public static final class Entry {
 
         private final File file;
-        private final long lastModified;
+        private final FileTime lastModified;
 
-        public boolean isValidFile() {
+        public boolean isValidFile() throws IOException {
             return file.exists() && file.isFile() && file.canRead()
-                    && file.lastModified() == lastModified;
+                    && lastModified.equals(Files.getLastModifiedTime(file.toPath()));
         }
     }
 }

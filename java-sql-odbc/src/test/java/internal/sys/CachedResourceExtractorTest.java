@@ -37,7 +37,7 @@ public class CachedResourceExtractorTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void test() throws IOException {
+    public void test() throws IOException, InterruptedException {
         CachedResourceExtractor x = CachedResourceExtractor.of(
                 DefaultResourceExtractor
                         .builder()
@@ -61,6 +61,7 @@ public class CachedResourceExtractorTest {
                 .isEqualTo(x.getResourceAsFile("Hello.txt"));
 
         hello = x.getResourceAsFile("Hello.txt");
+        Thread.sleep(1000);
         Files.write(hello.toPath(), Arrays.asList("abc"), StandardOpenOption.TRUNCATE_EXISTING);
         assertThat(hello)
                 .isNotEqualTo(x.getResourceAsFile("Hello.txt"));
