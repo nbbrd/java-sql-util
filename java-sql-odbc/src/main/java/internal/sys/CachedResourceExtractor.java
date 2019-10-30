@@ -55,8 +55,8 @@ public final class CachedResourceExtractor implements ResourceExtractor {
     }
 
     private Entry newEntry(String resourceName) throws IOException {
-        File result = extractor.getResourceAsFile(resourceName);
-        return new Entry(result, Files.getLastModifiedTime(result.toPath()));
+        File file = extractor.getResourceAsFile(resourceName);
+        return new Entry(file, file.length(), Files.getLastModifiedTime(file.toPath()));
     }
 
     public static Builder builder() {
@@ -72,10 +72,12 @@ public final class CachedResourceExtractor implements ResourceExtractor {
     public static final class Entry {
 
         private final File file;
+        private final long size;
         private final FileTime lastModified;
 
         public boolean isValidFile() throws IOException {
             return file.exists() && file.isFile() && file.canRead()
+                    && size == file.length()
                     && lastModified.equals(Files.getLastModifiedTime(file.toPath()));
         }
     }
