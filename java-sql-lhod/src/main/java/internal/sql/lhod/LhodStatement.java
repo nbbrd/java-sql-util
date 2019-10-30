@@ -22,33 +22,24 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
-final class AdoStatement extends _Statement {
+@lombok.RequiredArgsConstructor(staticName = "of")
+final class LhodStatement extends _Statement {
 
-    @NonNull
-    static AdoStatement of(@NonNull AdoConnection conn) {
-        return new AdoStatement(Objects.requireNonNull(conn));
-    }
-
-    private final AdoConnection conn;
-
-    private AdoStatement(AdoConnection conn) {
-        this.conn = conn;
-    }
+    @lombok.NonNull
+    private final LhodConnection conn;
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
         try {
-            return AdoResultSet.of(conn.getContext().preparedStatement(sql, Collections.emptyList()));
+            return LhodResultSet.of(conn.getContext().preparedStatement(sql, Collections.emptyList()));
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to execute query '%s'", sql), ex);
         }
     }

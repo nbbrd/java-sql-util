@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 National Bank of Belgium
+ * Copyright 2019 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -16,9 +16,9 @@
  */
 package internal.sql.lhod;
 
-import internal.sys.ProcessReader;
 import internal.sys.CachedResourceExtractor;
 import internal.sys.DefaultResourceExtractor;
+import internal.sys.ProcessReader;
 import internal.sys.ResourceExtractor;
 import internal.sys.win.CScriptWrapper;
 import static internal.sys.win.CScriptWrapper.NO_TIMEOUT;
@@ -30,13 +30,16 @@ import java.io.IOException;
  *
  * @author Philippe Charles
  */
-//@ThreadSafe
-final class DefaultWsh implements Wsh {
+final class VbsExecutor implements TabularDataExecutor {
 
-    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(Wsh.class));
+    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsExecutor.class));
 
     @Override
-    public BufferedReader exec(String scriptName, String... args) throws IOException {
+    public TabularDataReader exec(TabularDataQuery query) throws IOException {
+        return TabularDataReader.of(exec(query.getProcedure(), query.getParameters().toArray(new String[0])));
+    }
+
+    private BufferedReader exec(String scriptName, String[] args) throws IOException {
         File script = scripts.getResourceAsFile(scriptName);
         Process process = CScriptWrapper.exec(script, NO_TIMEOUT, args);
         return ProcessReader.newReader(process);

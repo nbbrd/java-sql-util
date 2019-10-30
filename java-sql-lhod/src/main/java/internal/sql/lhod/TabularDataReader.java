@@ -27,10 +27,11 @@ import static java.lang.String.format;
  *
  * @author Philippe Charles
  */
-final class TsvReader implements Closeable {
+final class TabularDataReader implements Closeable {
 
     @NonNull
-    static TsvReader of(@NonNull BufferedReader reader, int headerRowCount) throws IOException {
+    static TabularDataReader of(@NonNull BufferedReader reader) throws IOException {
+        int headerRowCount = 2;
         String[][] headers = new String[headerRowCount][];
         for (int i = 0; i < headerRowCount; i++) {
             String header = readNextLine(reader);
@@ -40,7 +41,7 @@ final class TsvReader implements Closeable {
             headers[i] = split(header);
         }
 
-        return new TsvReader(reader, headers);
+        return new TabularDataReader(reader, headers);
     }
 
     private static final String DELIMITER = "\t";
@@ -48,7 +49,7 @@ final class TsvReader implements Closeable {
     private final BufferedReader reader;
     private final String[][] headers;
 
-    private TsvReader(BufferedReader reader, String[][] headers) {
+    private TabularDataReader(BufferedReader reader, String[][] headers) {
         this.reader = reader;
         this.headers = headers;
     }
@@ -72,24 +73,6 @@ final class TsvReader implements Closeable {
         reader.close();
     }
 
-    static final class Err extends IOException {
-
-        private final int number;
-
-        public Err(String description, int number) {
-            super(description);
-            this.number = number;
-        }
-
-        public String getDescription() {
-            return getMessage();
-        }
-
-        public int getNumber() {
-            return number;
-        }
-    }
-
     //<editor-fold defaultstate="collapsed" desc="Internal implementation">
     private static String[] split(String line) {
         return line.split(DELIMITER, -1);
@@ -106,7 +89,7 @@ final class TsvReader implements Closeable {
     }
 
     @Nullable
-    private static String readNextLine(@NonNull BufferedReader reader) throws IOException, Err {
+    private static String readNextLine(@NonNull BufferedReader reader) throws IOException, TabularDataError {
         String line = reader.readLine();
         if (line != null && line.isEmpty()) {
             throw parseError(reader);
@@ -114,14 +97,13 @@ final class TsvReader implements Closeable {
         return line;
     }
 
-    @NonNull
-    private static Err parseError(@NonNull BufferedReader reader) throws IOException {
+    private static TabularDataError parseError(@NonNull BufferedReader reader) throws IOException {
         String line = reader.readLine();
         if (line != null && !line.isEmpty()) {
             int index = line.indexOf(DELIMITER);
             if (index != -1) {
                 try {
-                    return new Err(line.substring(index + DELIMITER.length()), Integer.parseInt(line.substring(0, index)));
+                    return new TabularDataError(line.substring(index + DELIMITER.length()), Integer.parseInt(line.substring(0, index)));
                 } catch (NumberFormatException ex) {
                     throw new IOException("Cannot parse error code", ex);
                 }

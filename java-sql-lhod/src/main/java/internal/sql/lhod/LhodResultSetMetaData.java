@@ -24,23 +24,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @author Philippe Charles
  */
-final class AdoResultSetMetaData extends _ResultSetMetaData {
+@lombok.RequiredArgsConstructor(staticName = "of")
+final class LhodResultSetMetaData extends _ResultSetMetaData {
 
     @NonNull
-    static AdoResultSetMetaData of(@NonNull String[] names, @NonNull String[] dataTypes) throws IllegalArgumentException {
+    static LhodResultSetMetaData of(@NonNull String[] names, @NonNull String[] dataTypes) throws IllegalArgumentException {
         if (names.length != dataTypes.length) {
             throw new IllegalArgumentException(String.format("Invalid data type length: expected '%s', found '%s'", names.length, dataTypes.length));
         }
-        return new AdoResultSetMetaData(names, Arrays.stream(dataTypes).mapToInt(Integer::parseInt).mapToObj(DataTypeEnum::parse).toArray(DataTypeEnum[]::new));
+        return new LhodResultSetMetaData(names, Arrays.stream(dataTypes).mapToInt(Integer::parseInt).mapToObj(DataTypeEnum::parse).toArray(DataTypeEnum[]::new));
     }
 
+    @lombok.NonNull
     private final String[] names;
-    private final DataTypeEnum[] types;
 
-    private AdoResultSetMetaData(String[] names, DataTypeEnum[] types) {
-        this.names = names;
-        this.types = types;
-    }
+    @lombok.NonNull
+    private final DataTypeEnum[] types;
 
     @Override
     public int getColumnCount() {

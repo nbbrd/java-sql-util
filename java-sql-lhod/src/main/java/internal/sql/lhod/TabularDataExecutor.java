@@ -14,21 +14,17 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
+package internal.sql.lhod;
 
-module nbbrd.sql.lhod {
+import java.io.IOException;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-    // compile only
-    requires static org.checkerframework.checker.qual;
-    requires static lombok;
-    requires static nbbrd.service;
+/**
+ *
+ * @author Philippe Charles
+ */
+interface TabularDataExecutor {
 
-    // required dependencies
-    requires nbbrd.sql.odbc;
-
-    // services registration
-    provides java.sql.Driver with
-            internal.sql.lhod.LhodDriver;
-
-    provides nbbrd.sql.odbc.OdbcConnectionSupplierSpi with
-            internal.sql.lhod.LhodConnectionSupplier;
+    @NonNull
+    TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException;
 }

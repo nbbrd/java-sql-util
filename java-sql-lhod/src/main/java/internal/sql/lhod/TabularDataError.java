@@ -14,21 +14,21 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
+package internal.sql.lhod;
 
-module nbbrd.sql.lhod {
+import java.io.IOException;
 
-    // compile only
-    requires static org.checkerframework.checker.qual;
-    requires static lombok;
-    requires static nbbrd.service;
+/**
+ *
+ * @author Philippe Charles
+ */
+final class TabularDataError extends IOException {
 
-    // required dependencies
-    requires nbbrd.sql.odbc;
+    @lombok.Getter
+    private final int number;
 
-    // services registration
-    provides java.sql.Driver with
-            internal.sql.lhod.LhodDriver;
-
-    provides nbbrd.sql.odbc.OdbcConnectionSupplierSpi with
-            internal.sql.lhod.LhodConnectionSupplier;
+    public TabularDataError(String description, int number) {
+        super(description);
+        this.number = number;
+    }
 }

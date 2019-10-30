@@ -16,41 +16,31 @@
  */
 package internal.sql.lhod;
 
-import static internal.sql.lhod.AdoContext.SPECIAL_CHARACTERS;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.lang.String.format;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
  *
  * @author Philippe Charles
  */
-final class AdoDatabaseMetaData extends _DatabaseMetaData {
+@lombok.RequiredArgsConstructor(staticName = "of")
+final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
-    @NonNull
-    static AdoDatabaseMetaData of(@NonNull AdoConnection conn) {
-        return new AdoDatabaseMetaData(Objects.requireNonNull(conn));
-    }
-
-    private final AdoConnection conn;
-
-    private AdoDatabaseMetaData(AdoConnection conn) {
-        this.conn = conn;
-    }
+    @lombok.NonNull
+    private final LhodConnection conn;
 
     @Override
     public boolean storesUpperCaseIdentifiers() throws SQLException {
         try {
-            return conn.getContext().getIdentifierCaseType() == AdoContext.IdentifierCaseType.UPPER;
+            return conn.getContext().getIdentifierCaseType() == LhodContext.IdentifierCaseType.UPPER;
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to get identifier case type of '%s'", conn.getContext().getConnectionString()), ex);
         }
     }
@@ -58,10 +48,10 @@ final class AdoDatabaseMetaData extends _DatabaseMetaData {
     @Override
     public boolean storesLowerCaseIdentifiers() throws SQLException {
         try {
-            return conn.getContext().getIdentifierCaseType() == AdoContext.IdentifierCaseType.LOWER;
+            return conn.getContext().getIdentifierCaseType() == LhodContext.IdentifierCaseType.LOWER;
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to get identifier case type of '%s'", conn.getContext().getConnectionString()), ex);
         }
     }
@@ -69,10 +59,10 @@ final class AdoDatabaseMetaData extends _DatabaseMetaData {
     @Override
     public boolean storesMixedCaseIdentifiers() throws SQLException {
         try {
-            return conn.getContext().getIdentifierCaseType() == AdoContext.IdentifierCaseType.MIXED;
+            return conn.getContext().getIdentifierCaseType() == LhodContext.IdentifierCaseType.MIXED;
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to get identifier case type of '%s'", conn.getContext().getConnectionString()), ex);
         }
     }
@@ -95,8 +85,8 @@ final class AdoDatabaseMetaData extends _DatabaseMetaData {
                     .sorted()
                     .collect(Collectors.joining(","));
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to get string functions of '%s'", conn.getContext().getConnectionString()), ex);
         }
     }
@@ -104,10 +94,10 @@ final class AdoDatabaseMetaData extends _DatabaseMetaData {
     @Override
     public String getExtraNameCharacters() throws SQLException {
         try {
-            return conn.getContext().getProperty(SPECIAL_CHARACTERS);
+            return conn.getContext().getProperty(LhodContext.DynamicProperty.SPECIAL_CHARACTERS);
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to get extra name chars of '%s'", conn.getContext().getConnectionString()), ex);
         }
     }
@@ -115,10 +105,10 @@ final class AdoDatabaseMetaData extends _DatabaseMetaData {
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
         try {
-            return AdoResultSet.of(conn.getContext().openSchema(catalog, schemaPattern, tableNamePattern, types));
+            return LhodResultSet.of(conn.getContext().openSchema(catalog, schemaPattern, tableNamePattern, types));
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to list tables with catalog='%s', schemaPattern='%s', tableNamePattern='%s', types='%s'", catalog, schemaPattern, tableNamePattern, types != null ? Arrays.toString(types) : null), ex);
         }
     }

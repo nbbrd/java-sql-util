@@ -33,50 +33,50 @@ import java.util.function.Supplier;
  *
  * @author Philippe Charles
  */
-public class WshTest {
+public class Resources {
 
-    static Wsh good() {
+    static TabularDataExecutor good() {
         Map<String, String> map = new HashMap<>();
         map.put("DbProperties.vbs", "MyDbConnProperties.tsv");
         map.put("OpenSchema.vbs", "MyDbTables.tsv");
-        return (a, b) -> {
+        return query -> {
             try {
-                Path path = Paths.get(AdoConnectionTest.class.getResource(map.get(a)).toURI());
-                return Files.newBufferedReader(path, StandardCharsets.UTF_8);
+                Path path = Paths.get(Resources.class.getResource(map.get(query.getProcedure())).toURI());
+                return TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
             } catch (URISyntaxException ex) {
                 throw new RuntimeException(ex);
             }
         };
     }
 
-    static Wsh bad() {
+    static TabularDataExecutor bad() {
         return ofException(FileNotFoundException::new);
     }
 
-    static Wsh ugly() {
+    static TabularDataExecutor ugly() {
         return ofContent("helloworld");
     }
 
-    static Wsh err() {
+    static TabularDataExecutor err() {
         return ofResource("MyDbErr.tsv");
     }
 
-    static Wsh ofResource(String name) {
+    static TabularDataExecutor ofResource(String name) {
         try {
-            Path path = Paths.get(AdoConnectionTest.class.getResource(name).toURI());
-            return (a, b) -> Files.newBufferedReader(path, StandardCharsets.UTF_8);
+            Path path = Paths.get(LhodConnectionTest.class.getResource(name).toURI());
+            return query -> TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    static Wsh ofException(Supplier<? extends IOException> supplier) {
-        return (a, b) -> {
+    static TabularDataExecutor ofException(Supplier<? extends IOException> supplier) {
+        return query -> {
             throw supplier.get();
         };
     }
 
-    static Wsh ofContent(CharSequence content) {
-        return (a, b) -> new BufferedReader(new StringReader(content.toString()));
+    static TabularDataExecutor ofContent(CharSequence content) {
+        return query -> TabularDataReader.of(new BufferedReader(new StringReader(content.toString())));
     }
 }

@@ -21,9 +21,10 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Duration;
+import java.util.LinkedList;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import nbbrd.service.ServiceProvider;
 
@@ -34,28 +35,28 @@ import nbbrd.service.ServiceProvider;
  */
 @lombok.extern.java.Log
 @ServiceProvider(Driver.class)
-public final class AdoDriver extends _Driver {
+public final class LhodDriver extends _Driver {
 
     public static final String PREFIX = "jdbc:lhod:";
 
     static {
         try {
-            DriverManager.registerDriver(new AdoDriver());
+            DriverManager.registerDriver(new LhodDriver());
         } catch (SQLException ex) {
             log.log(Level.SEVERE, "Cannot register AdoDriver", ex);
         }
     }
 
-    private final Wsh wsh;
-    private final ConcurrentMap<String, AdoContext> pool;
+    private final TabularDataExecutor executor;
+    private final LhodContextPool pool;
 
-    public AdoDriver() {
-        this(new DefaultWsh(), new ConcurrentHashMap<>());
+    public LhodDriver() {
+        this(new VbsExecutor(), LhodContextPool.of(Clock.systemDefaultZone(), Duration.ofMinutes(10), new LinkedList<>()));
     }
 
 //    @VisibleForTesting
-    AdoDriver(Wsh wsh, ConcurrentMap<String, AdoContext> pool) {
-        this.wsh = wsh;
+    LhodDriver(TabularDataExecutor executor, LhodContextPool pool) {
+        this.executor = executor;
         this.pool = pool;
     }
 
@@ -65,7 +66,7 @@ public final class AdoDriver extends _Driver {
             throw new SQLException(format("Invalid database url: '%s'", url));
         }
         String connectionString = url.trim().substring(PREFIX.length());
-        return AdoConnection.of(getOrCreate(connectionString), this::recycle);
+        return LhodConnection.of(pool.getOrCreate(executor, connectionString), pool::recycle);
     }
 
     @Override
@@ -77,15 +78,4 @@ public final class AdoDriver extends _Driver {
     public boolean jdbcCompliant() {
         return false;
     }
-
-    //<editor-fold defaultstate="collapsed" desc="Internal implementation">
-    private AdoContext getOrCreate(String connectionString) {
-        AdoContext result = pool.remove(connectionString);
-        return result != null ? result : AdoContext.of(wsh, connectionString);
-    }
-
-    private void recycle(AdoContext o) {
-        pool.put(o.getConnectionString(), o);
-    }
-    //</editor-fold>
 }

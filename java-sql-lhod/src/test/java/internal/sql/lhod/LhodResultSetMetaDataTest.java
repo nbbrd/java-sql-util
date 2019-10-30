@@ -27,15 +27,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Philippe Charles
  */
-public class AdoResultSetMetaDataTest {
+public class LhodResultSetMetaDataTest {
 
     @Test
     @SuppressWarnings("null")
     public void testFactory() throws SQLException {
         assertThat(sample()).isNotNull();
-        assertThatThrownBy(() -> AdoResultSetMetaData.of(new String[]{"A"}, new String[]{})).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> AdoResultSetMetaData.of(null, new String[]{})).isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> AdoResultSetMetaData.of(new String[]{"A"}, null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> LhodResultSetMetaData.of(new String[]{"A"}, new String[]{})).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> LhodResultSetMetaData.of(null, new String[]{})).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> LhodResultSetMetaData.of(new String[]{"A"}, (String[]) null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -62,11 +62,11 @@ public class AdoResultSetMetaDataTest {
         assertThatThrownBy(() -> md.getColumnType(3)).isInstanceOf(IndexOutOfBoundsException.class);
     }
 
-    static AdoResultSetMetaData empty() {
-        return AdoResultSetMetaData.of(new String[]{}, new String[]{});
+    static LhodResultSetMetaData empty() {
+        return LhodResultSetMetaData.of(new String[]{}, new String[]{});
     }
 
-    static AdoResultSetMetaData sample() {
-        return AdoResultSetMetaData.of(new String[]{"INT_COLUMN", "DOUBLE_COLUMN"}, new String[]{"3", "5"});
+    static LhodResultSetMetaData sample() {
+        return LhodResultSetMetaData.of(new String[]{"INT_COLUMN", "DOUBLE_COLUMN"}, new String[]{"3", "5"});
     }
 }

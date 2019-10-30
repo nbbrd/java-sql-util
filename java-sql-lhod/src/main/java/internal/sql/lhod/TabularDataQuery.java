@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 National Bank of Belgium
+ * Copyright 2019 National Bank of Belgium
  * 
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -16,17 +16,19 @@
  */
 package internal.sql.lhod;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import java.util.List;
 
 /**
  *
  * @author Philippe Charles
  */
-//@ThreadSafe
-interface Wsh {
+@lombok.Value
+@lombok.Builder(builderClassName = "Builder")
+class TabularDataQuery {
 
-    @NonNull
-    BufferedReader exec(@NonNull String scriptName, @NonNull String... args) throws IOException;
+    @lombok.NonNull
+    private String procedure;
+
+    @lombok.Singular
+    private List<String> parameters;
 }

@@ -16,7 +16,7 @@
  */
 package internal.sql.lhod;
 
-import static internal.sql.lhod.AdoConnection.of;
+import static internal.sql.lhod.LhodConnection.of;
 import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Philippe Charles
  */
-public class AdoConnectionTest {
+public class LhodConnectionTest {
 
     @Test
     @SuppressWarnings("null")
@@ -42,14 +42,14 @@ public class AdoConnectionTest {
                 .as("Factory must throw NullPointerException if context is null")
                 .isInstanceOf(NullPointerException.class);
 
-        assertThatThrownBy(() -> of(AdoContextTest.good(), null))
+        assertThatThrownBy(() -> of(LhodContextTest.good(), null))
                 .as("Factory must throw NullPointerException if onClose is null")
                 .isInstanceOf(NullPointerException.class);
     }
 
     @Test
     public void testGetContext() {
-        AdoContext context = AdoContextTest.good();
+        LhodContext context = LhodContextTest.good();
         assertThat(of(context, DO_NOTHING).getContext())
                 .as("Context must be non-null and equal to the one specified in factory")
                 .isEqualTo(context);
@@ -58,12 +58,12 @@ public class AdoConnectionTest {
     @Test
     public void testClose() throws SQLException {
         AtomicBoolean isClosed = new AtomicBoolean(false);
-        of(AdoContextTest.good(), o -> isClosed.set(true)).close();
+        of(LhodContextTest.good(), o -> isClosed.set(true)).close();
         assertThat(isClosed.get())
                 .as("Close event must be propagated to observer")
                 .isEqualTo(true);
 
-        AdoConnection conn = good();
+        LhodConnection conn = good();
         assertThat(conn.isClosed()).isFalse();
         conn.close();
         assertThat(conn.isClosed()).isTrue();
@@ -159,27 +159,27 @@ public class AdoConnectionTest {
     //<editor-fold defaultstate="collapsed" desc="Implementation details">
     static final String CONN_STRING = "MyDb";
 
-    static final Consumer<AdoContext> DO_NOTHING = o -> {
+    static final Consumer<LhodContext> DO_NOTHING = o -> {
     };
 
-    static AdoConnection good() {
-        return of(AdoContextTest.good(), DO_NOTHING);
+    static LhodConnection good() {
+        return of(LhodContextTest.good(), DO_NOTHING);
     }
 
-    static AdoConnection bad() {
-        return of(AdoContextTest.bad(), DO_NOTHING);
+    static LhodConnection bad() {
+        return of(LhodContextTest.bad(), DO_NOTHING);
     }
 
-    static AdoConnection ugly() {
-        return of(AdoContextTest.ugly(), DO_NOTHING);
+    static LhodConnection ugly() {
+        return of(LhodContextTest.ugly(), DO_NOTHING);
     }
 
-    static AdoConnection err() {
-        return of(AdoContextTest.err(), DO_NOTHING);
+    static LhodConnection err() {
+        return of(LhodContextTest.err(), DO_NOTHING);
     }
 
-    static AdoConnection closed() throws SQLException {
-        AdoConnection result = good();
+    static LhodConnection closed() throws SQLException {
+        LhodConnection result = good();
         result.close();
         return result;
     }

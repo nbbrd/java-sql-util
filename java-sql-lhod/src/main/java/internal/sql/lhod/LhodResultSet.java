@@ -33,12 +33,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @author Philippe Charles
  */
-final class AdoResultSet extends _ResultSet {
+final class LhodResultSet extends _ResultSet {
 
     @NonNull
-    static AdoResultSet of(@NonNull TsvReader tsv) throws IOException {
+    static LhodResultSet of(@NonNull TabularDataReader tsv) throws IOException {
         try {
-            return new AdoResultSet(tsv, AdoResultSetMetaData.of(tsv.getHeader(0), tsv.getHeader(1)));
+            return new LhodResultSet(tsv, LhodResultSetMetaData.of(tsv.getHeader(0), tsv.getHeader(1)));
         } catch (IllegalArgumentException ex) {
             throw new IOException("Invalid header", ex);
         }
@@ -46,13 +46,13 @@ final class AdoResultSet extends _ResultSet {
 
     private static final Locale EN_US = new Locale("en", "us");
 
-    private final TsvReader reader;
-    private final AdoResultSetMetaData metaData;
+    private final TabularDataReader reader;
+    private final LhodResultSetMetaData metaData;
     private final DateFormat dateFormat;
     private final NumberFormat numberFormat;
     private final String[] currentRow;
 
-    private AdoResultSet(TsvReader reader, AdoResultSetMetaData metaData) {
+    private LhodResultSet(TabularDataReader reader, LhodResultSetMetaData metaData) {
         this.reader = reader;
         this.metaData = metaData;
         this.dateFormat = new SimpleDateFormat("MM/dd/yyyy", EN_US);
@@ -66,8 +66,8 @@ final class AdoResultSet extends _ResultSet {
         try {
             return reader.readNextInto(currentRow);
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException("While reading next row", ex);
         }
     }

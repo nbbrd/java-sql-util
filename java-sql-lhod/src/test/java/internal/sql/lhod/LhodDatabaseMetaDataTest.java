@@ -16,8 +16,8 @@
  */
 package internal.sql.lhod;
 
-import static internal.sql.lhod.AdoConnectionTest.CONN_STRING;
-import static internal.sql.lhod.AdoDatabaseMetaData.of;
+import static internal.sql.lhod.LhodConnectionTest.CONN_STRING;
+import static internal.sql.lhod.LhodDatabaseMetaData.of;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +29,7 @@ import org.junit.Test;
  *
  * @author Philippe Charles
  */
-public class AdoDatabaseMetaDataTest {
+public class LhodDatabaseMetaDataTest {
 
     @Test
     @SuppressWarnings("null")
@@ -124,7 +124,7 @@ public class AdoDatabaseMetaDataTest {
 
     @Test
     public void testGetConnection() throws SQLException {
-        AdoConnection conn = AdoConnectionTest.good();
+        LhodConnection conn = LhodConnectionTest.good();
         assertThat(of(conn).getConnection()).isEqualTo(conn);
     }
 
@@ -144,20 +144,20 @@ public class AdoDatabaseMetaDataTest {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Implementation details">
-    static AdoDatabaseMetaData good() {
-        return of(AdoConnectionTest.good());
+    static LhodDatabaseMetaData good() {
+        return of(LhodConnectionTest.good());
     }
 
-    static AdoDatabaseMetaData bad() {
-        return of(AdoConnectionTest.bad());
+    static LhodDatabaseMetaData bad() {
+        return of(LhodConnectionTest.bad());
     }
 
-    static AdoDatabaseMetaData ugly() {
-        return of(AdoConnectionTest.ugly());
+    static LhodDatabaseMetaData ugly() {
+        return of(LhodConnectionTest.ugly());
     }
 
-    static AdoDatabaseMetaData err() {
-        return of(AdoConnectionTest.err());
+    static LhodDatabaseMetaData err() {
+        return of(LhodConnectionTest.err());
     }
     //</editor-fold>
 }

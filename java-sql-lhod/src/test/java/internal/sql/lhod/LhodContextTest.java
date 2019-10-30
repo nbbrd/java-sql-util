@@ -16,14 +16,15 @@
  */
 package internal.sql.lhod;
 
-import static internal.sql.lhod.AdoContext.CURRENT_CATALOG;
-import static internal.sql.lhod.AdoContext.IDENTIFIER_CASE_SENSITIVITY;
-import static internal.sql.lhod.AdoContext.SPECIAL_CHARACTERS;
-import static internal.sql.lhod.AdoContext.STRING_FUNCTIONS;
-import static internal.sql.lhod.AdoContext.of;
+import static internal.sql.lhod.LhodContext.DynamicProperty.CURRENT_CATALOG;
+import static internal.sql.lhod.LhodContext.DynamicProperty.IDENTIFIER_CASE_SENSITIVITY;
+import static internal.sql.lhod.LhodContext.DynamicProperty.SPECIAL_CHARACTERS;
+import static internal.sql.lhod.LhodContext.DynamicProperty.STRING_FUNCTIONS;
+import static internal.sql.lhod.LhodContext.of;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.Test;
@@ -32,41 +33,40 @@ import org.junit.Test;
  *
  * @author Philippe Charles
  */
-public class AdoContextTest {
+public class LhodContextTest {
 
     @Test
     @SuppressWarnings("null")
     public void testGetProperty() throws IOException, SQLException {
-        AdoContext c = good();
+        LhodContext c = good();
         assertThat(c.getProperty(CURRENT_CATALOG)).isEqualTo("master");
         assertThat(c.getProperty(SPECIAL_CHARACTERS)).isNotEmpty();
         assertThat(c.getProperty(IDENTIFIER_CASE_SENSITIVITY)).isEqualTo("8");
         assertThat(c.getProperty(STRING_FUNCTIONS)).isEqualTo("5242879");
-        assertThat(c.getProperty("stuff")).isNull();
 
         assertThatThrownBy(() -> good().getProperty(null)).isInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> bad().getProperty(CURRENT_CATALOG)).isInstanceOf(FileNotFoundException.class);
         assertThatThrownBy(() -> ugly().getProperty(CURRENT_CATALOG)).isInstanceOf(IOException.class);
-        assertThatThrownBy(() -> err().getProperty(CURRENT_CATALOG)).isInstanceOf(TsvReader.Err.class);
+        assertThatThrownBy(() -> err().getProperty(CURRENT_CATALOG)).isInstanceOf(TabularDataError.class);
     }
 
     //<editor-fold defaultstate="collapsed" desc="Implementation details">
     static final String CONN_STRING = "MyDb";
 
-    static AdoContext good() {
-        return of(WshTest.good(), CONN_STRING);
+    static LhodContext good() {
+        return of(Resources.good(), CONN_STRING, Instant.now());
     }
 
-    static AdoContext bad() {
-        return of(WshTest.bad(), CONN_STRING);
+    static LhodContext bad() {
+        return of(Resources.bad(), CONN_STRING, Instant.now());
     }
 
-    static AdoContext ugly() {
-        return of(WshTest.ugly(), CONN_STRING);
+    static LhodContext ugly() {
+        return of(Resources.ugly(), CONN_STRING, Instant.now());
     }
 
-    static AdoContext err() {
-        return of(WshTest.err(), CONN_STRING);
+    static LhodContext err() {
+        return of(Resources.err(), CONN_STRING, Instant.now());
     }
     //</editor-fold>
 }

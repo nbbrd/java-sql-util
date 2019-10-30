@@ -23,42 +23,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
-final class AdoPreparedStatement extends _PreparedStatement {
+@lombok.RequiredArgsConstructor(staticName = "of")
+final class LhodPreparedStatement extends _PreparedStatement {
 
-    @NonNull
-    static AdoPreparedStatement of(@NonNull AdoConnection conn, @NonNull String sql) {
-        Objects.requireNonNull(conn);
-        Objects.requireNonNull(sql);
-        return new AdoPreparedStatement(conn, sql);
-    }
+    @lombok.NonNull
+    private final LhodConnection conn;
 
-    private final AdoConnection conn;
+    @lombok.NonNull
     private final String sql;
-    private final List<String> parameters;
-    private boolean closed;
 
-    private AdoPreparedStatement(AdoConnection conn, String sql) {
-        this.conn = conn;
-        this.sql = sql;
-        this.parameters = new ArrayList<>();
-        this.closed = false;
-    }
+    private final List<String> parameters = new ArrayList<>();
+
+    private boolean closed = false;
 
     @Override
     public ResultSet executeQuery() throws SQLException {
         checkState();
         try {
-            return AdoResultSet.of(conn.getContext().preparedStatement(sql, parameters));
+            return LhodResultSet.of(conn.getContext().preparedStatement(sql, parameters));
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to execute query '%s'", sql), ex);
         }
     }
@@ -85,10 +75,9 @@ final class AdoPreparedStatement extends _PreparedStatement {
         return closed;
     }
 
-    private AdoPreparedStatement checkState() throws SQLException {
+    private void checkState() throws SQLException {
         if (closed) {
             throw new SQLException("PreparedStatement closed");
         }
-        return this;
     }
 }

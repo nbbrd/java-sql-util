@@ -16,42 +16,62 @@
  */
 package _demo;
 
-import internal.sql.lhod.AdoDriver;
+import internal.sql.lhod.LhodDriver;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcRegistry;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import nbbrd.sql.jdbc.SqlColumn;
 import nbbrd.sql.jdbc.SqlTable;
 
 /**
  *
  * @author Philippe Charles
  */
-public class AdoDriverDemo {
+public class LhodDriverDemo {
 
     public static void main(String[] args) throws IOException, SQLException {
         OdbcRegistry registry = OdbcRegistry.ofServiceLoader()
                 .orElseThrow(UnsupportedOperationException::new);
-
-        System.out.println("Using registry '" + registry.getName() + "'");
+        System.out.println("registry '" + registry.getName() + "'");
 
         OdbcDataSource source = registry.getDataSources(OdbcDataSource.Type.USER)
                 .stream()
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
+        System.out.println("source '" + source.getName() + "'");
 
-        System.out.println("Using source '" + source.getName() + "'");
+        SqlTable table = getFirstTable(source).orElseThrow(NoSuchElementException::new);
+        System.out.println(table);
 
-        System.out.println("[Tables]");
+        SqlColumn column = getFirstColumn(source, table).orElseThrow(NoSuchElementException::new);
+        System.out.println(column);
+    }
 
-        try (Connection conn = DriverManager.getConnection(AdoDriver.PREFIX + source.getName())) {
-            SqlTable.allOf(conn.getMetaData())
+    private static Optional<SqlTable> getFirstTable(OdbcDataSource source) throws SQLException {
+        try (Connection conn = DriverManager.getConnection(LhodDriver.PREFIX + source.getName())) {
+            return SqlTable.allOf(conn.getMetaData())
                     .stream()
                     .filter(table -> "TABLE".equals(table.getType()))
-                    .forEach(System.out::println);
+                    .findFirst();
+        }
+    }
+
+    private static Optional<SqlColumn> getFirstColumn(OdbcDataSource source, SqlTable table) throws SQLException {
+        try (Connection conn = DriverManager.getConnection(LhodDriver.PREFIX + source.getName())) {
+            try (Statement statement = conn.createStatement()) {
+                try (ResultSet rs = statement.executeQuery("select * from " + table.getName())) {
+                    return SqlColumn.allOf(rs.getMetaData())
+                            .stream()
+                            .findFirst();
+                }
+            }
         }
     }
 }

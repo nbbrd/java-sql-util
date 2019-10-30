@@ -16,7 +16,6 @@
  */
 package internal.sql.lhod;
 
-import static internal.sql.lhod.AdoContext.CURRENT_CATALOG;
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -24,29 +23,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.lang.String.format;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
  *
  * @author Philippe Charles
  */
-final class AdoConnection extends _Connection {
+@lombok.RequiredArgsConstructor(staticName = "of")
+final class LhodConnection extends _Connection {
 
-    @NonNull
-    static AdoConnection of(@NonNull AdoContext context, @NonNull Consumer<AdoContext> onClose) {
-        return new AdoConnection(Objects.requireNonNull(context), Objects.requireNonNull(onClose));
-    }
+    @lombok.NonNull
+    private final LhodContext context;
 
-    private final AdoContext context;
-    private final Consumer<AdoContext> onClose;
-    private boolean closed;
+    @lombok.NonNull
+    private final Consumer<LhodContext> onClose;
 
-    private AdoConnection(AdoContext context, Consumer<AdoContext> onClose) {
-        this.context = context;
-        this.onClose = onClose;
-        this.closed = false;
-    }
+    private boolean closed = false;
 
     @Override
     public void close() throws SQLException {
@@ -58,17 +50,18 @@ final class AdoConnection extends _Connection {
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-        return AdoDatabaseMetaData.of(checkState());
+        checkState();
+        return LhodDatabaseMetaData.of(this);
     }
 
     @Override
     public String getCatalog() throws SQLException {
         checkState();
         try {
-            return context.getProperty(CURRENT_CATALOG);
+            return context.getProperty(LhodContext.DynamicProperty.CURRENT_CATALOG);
         } catch (IOException ex) {
-            throw ex instanceof TsvReader.Err
-                    ? new SQLException(ex.getMessage(), "", ((TsvReader.Err) ex).getNumber())
+            throw ex instanceof TabularDataError
+                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to get catalog name of '%s'", context.getConnectionString()), ex);
         }
     }
@@ -81,12 +74,14 @@ final class AdoConnection extends _Connection {
 
     @Override
     public Statement createStatement() throws SQLException {
-        return AdoStatement.of(checkState());
+        checkState();
+        return LhodStatement.of(this);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return AdoPreparedStatement.of(checkState(), sql);
+        checkState();
+        return LhodPreparedStatement.of(this, sql);
     }
 
     @Override
@@ -101,14 +96,13 @@ final class AdoConnection extends _Connection {
     }
 
     @NonNull
-    AdoContext getContext() {
+    LhodContext getContext() {
         return context;
     }
 
-    private AdoConnection checkState() throws SQLException {
+    private void checkState() throws SQLException {
         if (closed) {
             throw new SQLException(format("Connection '%s' closed", context.getConnectionString()));
         }
-        return this;
     }
 }
