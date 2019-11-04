@@ -17,7 +17,9 @@
 package nbbrd.sql.odbc;
 
 import internal.sys.OS;
+import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import nbbrd.sql.odbc.OdbcDataSource.Type;
 import static org.assertj.core.api.Assertions.*;
 import org.assertj.core.api.Assumptions;
@@ -30,7 +32,7 @@ import org.junit.Test;
 public class OdbcRegistryTest {
 
     @Test
-    public void test() {
+    public void test() throws IOException {
         Assumptions.assumeThat(OS.NAME).isEqualTo(OS.Name.WINDOWS);
 
         Optional<OdbcRegistry> odbcReg = OdbcRegistry.ofServiceLoader();
@@ -44,5 +46,21 @@ public class OdbcRegistryTest {
         assertThatIOException()
                 .isThrownBy(() -> odbcReg.get().getDataSources(Type.FILE))
                 .withCauseInstanceOf(UnsupportedOperationException.class);
+
+        assertThat(odbcReg.get().getDataSourceNames(Type.SYSTEM, Type.USER))
+                .containsAll(odbcReg.get()
+                        .getDataSources(Type.SYSTEM, Type.USER)
+                        .stream()
+                        .map(OdbcDataSource::getName)
+                        .collect(Collectors.toList())
+                );
+
+        assertThat(odbcReg.get().getDriverNames())
+                .containsAll(odbcReg.get()
+                        .getDrivers()
+                        .stream()
+                        .map(OdbcDriver::getName)
+                        .collect(Collectors.toList())
+                );
     }
 }

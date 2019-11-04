@@ -95,6 +95,29 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
+    public List<String> getDataSourceNames(OdbcDataSource.Type[] types) throws IOException {
+        Objects.requireNonNull(types);
+
+        List<String> result;
+
+        try {
+            result = delegate.getDataSourceNames(types);
+        } catch (RuntimeException unexpected) {
+            String msg = getUnexpectedErrorMsg("getDataSourceNames");
+            onUnexpectedError.accept(msg, unexpected);
+            throw new IOException(msg, unexpected);
+        }
+
+        if (result == null) {
+            String msg = getUnexpectedNullMsg("getDataSourceNames");
+            onUnexpectedNull.accept(msg);
+            throw new IOException(msg);
+        }
+
+        return result;
+    }
+
+    @Override
     public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
         Objects.requireNonNull(types);
 
@@ -110,6 +133,27 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
 
         if (result == null) {
             String msg = getUnexpectedNullMsg("getDataSources");
+            onUnexpectedNull.accept(msg);
+            throw new IOException(msg);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<String> getDriverNames() throws IOException {
+        List<String> result;
+
+        try {
+            result = delegate.getDriverNames();
+        } catch (RuntimeException unexpected) {
+            String msg = getUnexpectedErrorMsg("getDriverNames");
+            onUnexpectedError.accept(msg, unexpected);
+            throw new IOException(msg, unexpected);
+        }
+
+        if (result == null) {
+            String msg = getUnexpectedNullMsg("getDriverNames");
             onUnexpectedNull.accept(msg);
             throw new IOException(msg);
         }

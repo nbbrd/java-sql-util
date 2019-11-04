@@ -54,12 +54,29 @@ class WinOdbcRegistryUtil {
         Map<String, Object> getValues(@NonNull Root root, @NonNull String key) throws IOException;
     }
 
-    private static final String DATA_SOURCES_KEY = "SOFTWARE\\ODBC\\ODBC.INI\\ODBC Data Sources";
-    private static final String DATA_SOURCE_KEY = "SOFTWARE\\ODBC\\ODBC.INI";
-    private static final String DRIVERS_KEY = "SOFTWARE\\ODBC\\Odbcinst.INI\\ODBC Drivers";
-    private static final String DRIVER_KEY = "SOFTWARE\\ODBC\\Odbcinst.INI";
+    public static final String DATA_SOURCES_KEY = "SOFTWARE\\ODBC\\ODBC.INI\\ODBC Data Sources";
+    public static final String DATA_SOURCE_KEY = "SOFTWARE\\ODBC\\ODBC.INI";
+    public static final String DRIVERS_KEY = "SOFTWARE\\ODBC\\Odbcinst.INI\\ODBC Drivers";
+    public static final String DRIVER_KEY = "SOFTWARE\\ODBC\\Odbcinst.INI";
 
     public static final String KEY_SEPARATOR = "\\";
+
+    public List<String> getDataSourceNames(Registry reg, OdbcDataSource.Type... types) throws IOException {
+        List<String> result = new ArrayList<>();
+        for (OdbcDataSource.Type o : types) {
+            forEachDataSourceName(reg, o, result::add);
+        }
+        return result;
+    }
+
+    private void forEachDataSourceName(Registry reg, OdbcDataSource.Type type, Consumer<String> consumer) throws IOException {
+        Registry.Root root = getRoot(type);
+        if (reg.keyExists(root, DATA_SOURCES_KEY)) {
+            for (String dataSourceName : reg.getValues(root, DATA_SOURCES_KEY).keySet()) {
+                consumer.accept(dataSourceName);
+            }
+        }
+    }
 
     public List<OdbcDataSource> getDataSources(Registry reg, OdbcDataSource.Type... types) throws IOException {
         List<OdbcDataSource> result = new ArrayList<>();
@@ -101,6 +118,13 @@ class WinOdbcRegistryUtil {
                 return Registry.Root.HKEY_CURRENT_USER;
         }
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public List<String> getDriverNames(Registry reg) throws IOException {
+        if (reg.keyExists(Registry.Root.HKEY_LOCAL_MACHINE, DRIVERS_KEY)) {
+            return new ArrayList<>(reg.getValues(Registry.Root.HKEY_LOCAL_MACHINE, DRIVERS_KEY).keySet());
+        }
+        return Collections.emptyList();
     }
 
     public List<OdbcDriver> getDrivers(Registry reg) throws IOException {

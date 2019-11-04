@@ -48,8 +48,18 @@ public final class OdbcRegistry {
     }
 
     @NonNull
+    public List<String> getDataSourceNames(OdbcDataSource.@NonNull Type... types) throws IOException {
+        return spi.getDataSourceNames(types);
+    }
+
+    @NonNull
     public List<OdbcDataSource> getDataSources(OdbcDataSource.@NonNull Type... types) throws IOException {
         return spi.getDataSources(types);
+    }
+
+    @NonNull
+    public List<String> getDriverNames() throws IOException {
+        return spi.getDriverNames();
     }
 
     @NonNull

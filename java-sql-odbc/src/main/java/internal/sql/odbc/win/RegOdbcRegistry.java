@@ -16,13 +16,14 @@
  */
 package internal.sql.odbc.win;
 
+import internal.sql.odbc.win.WinOdbcRegistryUtil.Registry;
+import internal.sql.odbc.win.WinOdbcRegistryUtil.Registry.Root;
 import internal.sys.OS;
 import internal.sys.win.RegWrapper;
 import internal.sys.win.RegWrapper.RegValue;
 import internal.sys.win.WhereWrapper;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -56,18 +57,39 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
-        Map<String, List<RegValue>> data = new HashMap<>();
+    public List<String> getDataSourceNames(OdbcDataSource.Type[] types) throws IOException {
+        MapRegistry.Builder reg = MapRegistry.builder();
         for (OdbcDataSource.Type o : types) {
-            data.putAll(RegWrapper.query(WinOdbcRegistryUtil.getRoot(o) + "\\SOFTWARE\\ODBC\\ODBC.INI", true));
+            reg.load(WinOdbcRegistryUtil.getRoot(o), WinOdbcRegistryUtil.DATA_SOURCES_KEY, false);
         }
-        return WinOdbcRegistryUtil.getDataSources(new MapRegistry(data), types);
+        return WinOdbcRegistryUtil.getDataSourceNames(reg.build(), types);
+    }
+
+    @Override
+    public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
+        MapRegistry.Builder reg = MapRegistry.builder();
+        for (OdbcDataSource.Type o : types) {
+            reg.load(WinOdbcRegistryUtil.getRoot(o), WinOdbcRegistryUtil.DATA_SOURCE_KEY, true);
+        }
+        return WinOdbcRegistryUtil.getDataSources(reg.build(), types);
+    }
+
+    @Override
+    public List<String> getDriverNames() throws IOException {
+        Registry reg = MapRegistry
+                .builder()
+                .load(Root.HKEY_LOCAL_MACHINE, WinOdbcRegistryUtil.DRIVERS_KEY, false)
+                .build();
+        return WinOdbcRegistryUtil.getDriverNames(reg);
     }
 
     @Override
     public List<OdbcDriver> getDrivers() throws IOException {
-        Map<String, List<RegValue>> data = RegWrapper.query("HKEY_LOCAL_MACHINE\\SOFTWARE\\ODBC\\Odbcinst.INI", true);
-        return WinOdbcRegistryUtil.getDrivers(new MapRegistry(data));
+        Registry reg = MapRegistry
+                .builder()
+                .load(Root.HKEY_LOCAL_MACHINE, WinOdbcRegistryUtil.DRIVER_KEY, true)
+                .build();
+        return WinOdbcRegistryUtil.getDrivers(reg);
     }
 
     private static boolean isCommandAvailable() {
@@ -79,24 +101,32 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
         }
     }
 
-    @lombok.AllArgsConstructor
+    @lombok.Builder(builderClassName = "Builder")
     private static final class MapRegistry implements WinOdbcRegistryUtil.Registry {
 
-        @lombok.NonNull
-        private final Map<String, List<RegValue>> result;
+        @lombok.Singular
+        private final Map<String, List<RegValue>> keys;
 
         @Override
-        public boolean keyExists(WinOdbcRegistryUtil.Registry.Root root, String key) throws IOException {
+        public boolean keyExists(Root root, String key) throws IOException {
             String target = root + WinOdbcRegistryUtil.KEY_SEPARATOR + key;
-            return result.keySet().stream().anyMatch(o -> o.startsWith(target));
+            return keys.keySet().stream().anyMatch(o -> o.startsWith(target));
         }
 
         @Override
-        public Map<String, Object> getValues(WinOdbcRegistryUtil.Registry.Root root, String key) throws IOException {
+        public Map<String, Object> getValues(Root root, String key) throws IOException {
             String target = root + WinOdbcRegistryUtil.KEY_SEPARATOR + key;
-            return result.containsKey(target)
-                    ? result.get(target).stream().collect(Collectors.toMap(RegValue::getName, RegValue::getValue))
+            return keys.containsKey(target)
+                    ? keys.get(target).stream().collect(Collectors.toMap(RegValue::getName, RegValue::getValue))
                     : Collections.emptySortedMap();
+        }
+
+        public static class Builder {
+
+            public Builder load(Root root, String subkey, boolean recursive) throws IOException {
+                String keyName = root + WinOdbcRegistryUtil.KEY_SEPARATOR + subkey;
+                return keys(RegWrapper.query(keyName, recursive));
+            }
         }
     }
 }
