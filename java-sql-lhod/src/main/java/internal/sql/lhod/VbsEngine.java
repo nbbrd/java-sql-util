@@ -30,18 +30,34 @@ import java.io.IOException;
  *
  * @author Philippe Charles
  */
-final class VbsExecutor implements TabularDataExecutor {
+final class VbsEngine implements TabularDataEngine {
 
-    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsExecutor.class));
+    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsEngine.class));
 
     @Override
-    public TabularDataReader exec(TabularDataQuery query) throws IOException {
-        return TabularDataReader.of(exec(query.getProcedure(), query.getParameters().toArray(new String[0])));
+    public TabularDataExecutor getExecutor() throws IOException {
+        return new VbsExecutor(scripts);
     }
 
-    private BufferedReader exec(String scriptName, String[] args) throws IOException {
-        File script = scripts.getResourceAsFile(scriptName);
-        Process process = CScriptWrapper.exec(script, NO_TIMEOUT, args);
-        return ProcessReader.newReader(process);
+    @lombok.RequiredArgsConstructor
+    private static final class VbsExecutor implements TabularDataExecutor {
+
+        @lombok.NonNull
+        private final ResourceExtractor scripts;
+
+        @Override
+        public TabularDataReader exec(TabularDataQuery query) throws IOException {
+            return TabularDataReader.of(exec(query.getProcedure() + ".vbs", query.getParameters().toArray(new String[0])));
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+
+        private BufferedReader exec(String scriptName, String[] args) throws IOException {
+            File script = scripts.getResourceAsFile(scriptName);
+            Process process = CScriptWrapper.exec(script, NO_TIMEOUT, args);
+            return ProcessReader.newReader(process);
+        }
     }
 }

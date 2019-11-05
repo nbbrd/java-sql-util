@@ -21,7 +21,6 @@ import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 
 /**
  *
@@ -33,10 +32,21 @@ final class LhodStatement extends _Statement {
     @lombok.NonNull
     private final LhodConnection conn;
 
+    private boolean closed = false;
+
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
+        checkState();
+
+        TabularDataQuery query = TabularDataQuery
+                .builder()
+                .procedure("PreparedStatement")
+                .parameter(conn.getConnectionString())
+                .parameter(sql)
+                .build();
+
         try {
-            return LhodResultSet.of(conn.getContext().preparedStatement(sql, Collections.emptyList()));
+            return LhodResultSet.of(conn.exec(query));
         } catch (IOException ex) {
             throw ex instanceof TabularDataError
                     ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
@@ -45,11 +55,24 @@ final class LhodStatement extends _Statement {
     }
 
     @Override
+    public boolean isClosed() throws SQLException {
+        return closed;
+    }
+
+    @Override
     public void close() throws SQLException {
+        closed = true;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
+        checkState();
         return conn;
+    }
+
+    private void checkState() throws SQLException {
+        if (closed) {
+            throw new SQLException("Statement closed");
+        }
     }
 }

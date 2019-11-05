@@ -16,16 +16,13 @@
  */
 package internal.sql.lhod;
 
-import java.io.Closeable;
 import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
-interface TabularDataExecutor extends Closeable {
+interface TabularDataEngine {
 
-    @NonNull
-    TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException;
+    TabularDataExecutor getExecutor() throws IOException;
 }

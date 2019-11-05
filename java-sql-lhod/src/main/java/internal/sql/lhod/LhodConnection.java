@@ -23,7 +23,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.lang.String.format;
-import java.util.function.Consumer;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  *
@@ -33,18 +39,28 @@ import java.util.function.Consumer;
 final class LhodConnection extends _Connection {
 
     @lombok.NonNull
-    private final LhodContext context;
+    private final TabularDataExecutor executor;
 
+    @lombok.Getter
     @lombok.NonNull
-    private final Consumer<LhodContext> onClose;
+    private final String connectionString;
 
     private boolean closed = false;
 
+    private EnumMap<DynamicProperty, String> lazyProperties = null;
+
+    @Override
+    public boolean isClosed() throws SQLException {
+        return closed;
+    }
+
     @Override
     public void close() throws SQLException {
-        if (!closed) {
-            onClose.accept(context);
-            closed = true;
+        closed = true;
+        try {
+            executor.close();
+        } catch (IOException ex) {
+            throw new SQLException("Failed to close executor", ex);
         }
     }
 
@@ -58,11 +74,11 @@ final class LhodConnection extends _Connection {
     public String getCatalog() throws SQLException {
         checkState();
         try {
-            return context.getProperty(LhodContext.DynamicProperty.CURRENT_CATALOG);
+            return getProperty(DynamicProperty.CURRENT_CATALOG);
         } catch (IOException ex) {
             throw ex instanceof TabularDataError
                     ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
-                    : new SQLException(format("Failed to get catalog name of '%s'", context.getConnectionString()), ex);
+                    : new SQLException(format("Failed to get catalog name of '%s'", connectionString), ex);
         }
     }
 
@@ -90,19 +106,68 @@ final class LhodConnection extends _Connection {
         return true;
     }
 
-    @Override
-    public boolean isClosed() throws SQLException {
-        return closed;
+    @Nullable
+    public String getProperty(@NonNull DynamicProperty property) throws IOException {
+        Objects.requireNonNull(property);
+        if (lazyProperties == null) {
+            lazyProperties = loadProperties();
+        }
+        return lazyProperties.get(property);
     }
 
     @NonNull
-    LhodContext getContext() {
-        return context;
+    public TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException {
+        return executor.exec(query);
+    }
+
+    private EnumMap<DynamicProperty, String> loadProperties() throws IOException {
+        TabularDataQuery query = TabularDataQuery
+                .builder()
+                .procedure("DbProperties")
+                .parameter(connectionString)
+                .parameters(
+                        Stream.of(DynamicProperty.values())
+                                .map(DynamicProperty::getKey)
+                                .collect(Collectors.toList())
+                )
+                .build();
+
+        try (TabularDataReader reader = exec(query)) {
+            String[] row = new String[reader.getHeader(0).length];
+            Map<String, String> properties = new HashMap<>();
+            while (reader.readNextInto(row)) {
+                properties.put(row[0], row[1]);
+            }
+            return getProperties(properties);
+        }
+    }
+
+    private EnumMap<DynamicProperty, String> getProperties(Map<String, String> properties) {
+        EnumMap<DynamicProperty, String> result = new EnumMap<>(DynamicProperty.class);
+        for (DynamicProperty o : DynamicProperty.values()) {
+            String value = properties.get(o.getKey());
+            if (value != null) {
+                result.put(o, value);
+            }
+        }
+        return result;
     }
 
     private void checkState() throws SQLException {
         if (closed) {
-            throw new SQLException(format("Connection '%s' closed", context.getConnectionString()));
+            throw new SQLException(format("Connection '%s' closed", connectionString));
         }
+    }
+
+    // https://msdn.microsoft.com/en-us/library/ms676695%28v=vs.85%29.aspx
+    @lombok.AllArgsConstructor
+    @lombok.Getter
+    public enum DynamicProperty {
+        CURRENT_CATALOG("Current Catalog"),
+        SPECIAL_CHARACTERS("Special Characters"),
+        IDENTIFIER_CASE_SENSITIVITY("Identifier Case Sensitivity"),
+        STRING_FUNCTIONS("String Functions");
+
+        private final String key;
     }
 }

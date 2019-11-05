@@ -37,9 +37,9 @@ public class Resources {
 
     static TabularDataExecutor good() {
         Map<String, String> map = new HashMap<>();
-        map.put("DbProperties.vbs", "MyDbConnProperties.tsv");
-        map.put("OpenSchema.vbs", "MyDbTables.tsv");
-        return query -> {
+        map.put("DbProperties", "MyDbConnProperties.tsv");
+        map.put("OpenSchema", "MyDbTables.tsv");
+        return (CustomExecutor) query -> {
             try {
                 Path path = Paths.get(Resources.class.getResource(map.get(query.getProcedure())).toURI());
                 return TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
@@ -64,19 +64,26 @@ public class Resources {
     static TabularDataExecutor ofResource(String name) {
         try {
             Path path = Paths.get(LhodConnectionTest.class.getResource(name).toURI());
-            return query -> TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
+            return (CustomExecutor) query -> TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
     }
 
     static TabularDataExecutor ofException(Supplier<? extends IOException> supplier) {
-        return query -> {
+        return (CustomExecutor) query -> {
             throw supplier.get();
         };
     }
 
     static TabularDataExecutor ofContent(CharSequence content) {
-        return query -> TabularDataReader.of(new BufferedReader(new StringReader(content.toString())));
+        return (CustomExecutor) query -> TabularDataReader.of(new BufferedReader(new StringReader(content.toString())));
+    }
+
+    private interface CustomExecutor extends TabularDataExecutor {
+
+        @Override
+        default void close() throws IOException {
+        }
     }
 }

@@ -44,13 +44,27 @@ final class LhodPreparedStatement extends _PreparedStatement {
     @Override
     public ResultSet executeQuery() throws SQLException {
         checkState();
+
+        TabularDataQuery query = TabularDataQuery
+                .builder()
+                .procedure("PreparedStatement")
+                .parameter(conn.getConnectionString())
+                .parameter(sql)
+                .parameters(parameters)
+                .build();
+
         try {
-            return LhodResultSet.of(conn.getContext().preparedStatement(sql, parameters));
+            return LhodResultSet.of(conn.exec(query));
         } catch (IOException ex) {
             throw ex instanceof TabularDataError
                     ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
                     : new SQLException(format("Failed to execute query '%s'", sql), ex);
         }
+    }
+
+    @Override
+    public boolean isClosed() throws SQLException {
+        return closed;
     }
 
     @Override
@@ -68,11 +82,6 @@ final class LhodPreparedStatement extends _PreparedStatement {
     public Connection getConnection() throws SQLException {
         checkState();
         return conn;
-    }
-
-    @Override
-    public boolean isClosed() throws SQLException {
-        return closed;
     }
 
     private void checkState() throws SQLException {

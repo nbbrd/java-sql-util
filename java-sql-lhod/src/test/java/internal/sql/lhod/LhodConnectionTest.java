@@ -17,12 +17,12 @@
 package internal.sql.lhod;
 
 import static internal.sql.lhod.LhodConnection.of;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.Test;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -38,27 +38,30 @@ public class LhodConnectionTest {
                 .as("Factory must return a non-null connection")
                 .isNotNull();
 
-        assertThatThrownBy(() -> of(null, DO_NOTHING))
-                .as("Factory must throw NullPointerException if context is null")
+        assertThatThrownBy(() -> of(null, CONN_STRING))
+                .as("Factory must throw NullPointerException if executor is null")
                 .isInstanceOf(NullPointerException.class);
 
-        assertThatThrownBy(() -> of(LhodContextTest.good(), null))
-                .as("Factory must throw NullPointerException if onClose is null")
+        assertThatThrownBy(() -> of(Resources.good(), null))
+                .as("Factory must throw NullPointerException if connectionString is null")
                 .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    public void testGetContext() {
-        LhodContext context = LhodContextTest.good();
-        assertThat(of(context, DO_NOTHING).getContext())
-                .as("Context must be non-null and equal to the one specified in factory")
-                .isEqualTo(context);
     }
 
     @Test
     public void testClose() throws SQLException {
         AtomicBoolean isClosed = new AtomicBoolean(false);
-        of(LhodContextTest.good(), o -> isClosed.set(true)).close();
+        TabularDataExecutor executor = new TabularDataExecutor() {
+            @Override
+            public TabularDataReader exec(TabularDataQuery query) throws IOException {
+                throw new UnsupportedOperationException("Not supported yet."); 
+            }
+
+            @Override
+            public void close() throws IOException {
+                isClosed.set(true);
+            }
+        };
+        of(executor, "").close();
         assertThat(isClosed.get())
                 .as("Close event must be propagated to observer")
                 .isEqualTo(true);
@@ -156,26 +159,38 @@ public class LhodConnectionTest {
                 .hasMessageContaining(CONN_STRING);
     }
 
+    @Test
+    @SuppressWarnings("null")
+    public void testGetProperty() throws IOException, SQLException {
+        LhodConnection c = good();
+        assertThat(c.getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isEqualTo("master");
+        assertThat(c.getProperty(LhodConnection.DynamicProperty.SPECIAL_CHARACTERS)).isNotEmpty();
+        assertThat(c.getProperty(LhodConnection.DynamicProperty.IDENTIFIER_CASE_SENSITIVITY)).isEqualTo("8");
+        assertThat(c.getProperty(LhodConnection.DynamicProperty.STRING_FUNCTIONS)).isEqualTo("5242879");
+
+        assertThatThrownBy(() -> good().getProperty(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> bad().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(FileNotFoundException.class);
+        assertThatThrownBy(() -> ugly().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(IOException.class);
+        assertThatThrownBy(() -> err().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(TabularDataError.class);
+    }
+
     //<editor-fold defaultstate="collapsed" desc="Implementation details">
     static final String CONN_STRING = "MyDb";
 
-    static final Consumer<LhodContext> DO_NOTHING = o -> {
-    };
-
     static LhodConnection good() {
-        return of(LhodContextTest.good(), DO_NOTHING);
+        return of(Resources.good(), CONN_STRING);
     }
 
     static LhodConnection bad() {
-        return of(LhodContextTest.bad(), DO_NOTHING);
+        return of(Resources.bad(), CONN_STRING);
     }
 
     static LhodConnection ugly() {
-        return of(LhodContextTest.ugly(), DO_NOTHING);
+        return of(Resources.ugly(), CONN_STRING);
     }
 
     static LhodConnection err() {
-        return of(LhodContextTest.err(), DO_NOTHING);
+        return of(Resources.err(), CONN_STRING);
     }
 
     static LhodConnection closed() throws SQLException {

@@ -16,14 +16,12 @@
  */
 package internal.sql.lhod;
 
+import java.io.IOException;
 import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.Clock;
-import java.time.Duration;
-import java.util.LinkedList;
 import java.util.Properties;
 import java.util.logging.Level;
 import nbbrd.service.ServiceProvider;
@@ -47,17 +45,15 @@ public final class LhodDriver extends _Driver {
         }
     }
 
-    private final TabularDataExecutor executor;
-    private final LhodContextPool pool;
+    private final TabularDataEngine engine;
 
     public LhodDriver() {
-        this(new VbsExecutor(), LhodContextPool.of(Clock.systemDefaultZone(), Duration.ofMinutes(10), new LinkedList<>()));
+        this(new VbsEngine());
     }
 
 //    @VisibleForTesting
-    LhodDriver(TabularDataExecutor executor, LhodContextPool pool) {
-        this.executor = executor;
-        this.pool = pool;
+    LhodDriver(TabularDataEngine engine) {
+        this.engine = engine;
     }
 
     @Override
@@ -65,8 +61,12 @@ public final class LhodDriver extends _Driver {
         if (!acceptsURL(url)) {
             throw new SQLException(format("Invalid database url: '%s'", url));
         }
-        String connectionString = url.trim().substring(PREFIX.length());
-        return LhodConnection.of(pool.getOrCreate(executor, connectionString), pool::recycle);
+
+        try {
+            return LhodConnection.of(engine.getExecutor(), getConnectionString(url));
+        } catch (IOException ex) {
+            throw new SQLException(format("Cannot instantiate executor: '%s'", url), ex);
+        }
     }
 
     @Override
@@ -77,5 +77,9 @@ public final class LhodDriver extends _Driver {
     @Override
     public boolean jdbcCompliant() {
         return false;
+    }
+
+    private String getConnectionString(String url) {
+        return url.trim().substring(PREFIX.length());
     }
 }

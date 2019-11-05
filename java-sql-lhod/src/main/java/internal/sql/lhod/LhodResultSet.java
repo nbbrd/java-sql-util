@@ -52,6 +52,8 @@ final class LhodResultSet extends _ResultSet {
     private final NumberFormat numberFormat;
     private final String[] currentRow;
 
+    private boolean closed = false;
+
     private LhodResultSet(TabularDataReader reader, LhodResultSetMetaData metaData) {
         this.reader = reader;
         this.metaData = metaData;
@@ -63,6 +65,7 @@ final class LhodResultSet extends _ResultSet {
 
     @Override
     public boolean next() throws SQLException {
+        checkState();
         try {
             return reader.readNextInto(currentRow);
         } catch (IOException ex) {
@@ -73,7 +76,13 @@ final class LhodResultSet extends _ResultSet {
     }
 
     @Override
+    public boolean isClosed() throws SQLException {
+        return closed;
+    }
+
+    @Override
     public void close() throws SQLException {
+        closed = true;
         try {
             reader.close();
         } catch (IOException ex) {
@@ -83,6 +92,7 @@ final class LhodResultSet extends _ResultSet {
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
+        checkState();
         return metaData;
     }
 
@@ -136,7 +146,6 @@ final class LhodResultSet extends _ResultSet {
         return new BigDecimal(currentRow[columnIndex - 1]);
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Implementation details">
     private java.util.Date parseDate(int columnIndex) throws SQLException {
         try {
             return dateFormat.parse(currentRow[columnIndex - 1]);
@@ -152,5 +161,10 @@ final class LhodResultSet extends _ResultSet {
             throw new SQLException("While parsing number", ex);
         }
     }
-    //</editor-fold>
+
+    private void checkState() throws SQLException {
+        if (closed) {
+            throw new SQLException("ResultSet closed");
+        }
+    }
 }
