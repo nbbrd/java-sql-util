@@ -42,7 +42,7 @@ public class LhodConnectionTest {
                 .as("Factory must throw NullPointerException if executor is null")
                 .isInstanceOf(NullPointerException.class);
 
-        assertThatThrownBy(() -> of(Resources.good(), null))
+        assertThatThrownBy(() -> of(Resources.goodExecutor(), null))
                 .as("Factory must throw NullPointerException if connectionString is null")
                 .isInstanceOf(NullPointerException.class);
     }
@@ -53,7 +53,7 @@ public class LhodConnectionTest {
         TabularDataExecutor executor = new TabularDataExecutor() {
             @Override
             public TabularDataReader exec(TabularDataQuery query) throws IOException {
-                throw new UnsupportedOperationException("Not supported yet."); 
+                throw new UnsupportedOperationException("Not supported yet.");
             }
 
             @Override
@@ -169,7 +169,7 @@ public class LhodConnectionTest {
         assertThat(c.getProperty(LhodConnection.DynamicProperty.STRING_FUNCTIONS)).isEqualTo("5242879");
 
         assertThatThrownBy(() -> good().getProperty(null)).isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> bad().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(FileNotFoundException.class);
+        assertThatThrownBy(() -> bad().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(Resources.ExecIOException.class);
         assertThatThrownBy(() -> ugly().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(IOException.class);
         assertThatThrownBy(() -> err().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(TabularDataError.class);
     }
@@ -178,19 +178,19 @@ public class LhodConnectionTest {
     static final String CONN_STRING = "MyDb";
 
     static LhodConnection good() {
-        return of(Resources.good(), CONN_STRING);
+        return of(Resources.goodExecutor(), CONN_STRING);
     }
 
     static LhodConnection bad() {
-        return of(Resources.bad(), CONN_STRING);
+        return of(Resources.badExecutor(), CONN_STRING);
     }
 
     static LhodConnection ugly() {
-        return of(Resources.ugly(), CONN_STRING);
+        return of(Resources.uglyExecutor(), CONN_STRING);
     }
 
     static LhodConnection err() {
-        return of(Resources.err(), CONN_STRING);
+        return of(Resources.errExecutor(), CONN_STRING);
     }
 
     static LhodConnection closed() throws SQLException {

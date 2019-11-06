@@ -25,6 +25,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.lang.String.format;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -125,11 +126,7 @@ final class LhodConnection extends _Connection {
                 .builder()
                 .procedure("DbProperties")
                 .parameter(connectionString)
-                .parameters(
-                        Stream.of(DynamicProperty.values())
-                                .map(DynamicProperty::getKey)
-                                .collect(Collectors.toList())
-                )
+                .parameters(DYNAMIC_PROPERTY_KEYS)
                 .build();
 
         try (TabularDataReader reader = exec(query)) {
@@ -158,6 +155,8 @@ final class LhodConnection extends _Connection {
             throw new SQLException(format("Connection '%s' closed", connectionString));
         }
     }
+
+    static final List<String> DYNAMIC_PROPERTY_KEYS = Stream.of(DynamicProperty.values()).map(DynamicProperty::getKey).collect(Collectors.toList());
 
     // https://msdn.microsoft.com/en-us/library/ms676695%28v=vs.85%29.aspx
     @lombok.AllArgsConstructor

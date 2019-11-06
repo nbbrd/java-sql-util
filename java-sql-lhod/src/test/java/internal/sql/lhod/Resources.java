@@ -19,71 +19,134 @@ package internal.sql.lhod;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Philippe Charles
  */
-public class Resources {
+class Resources {
 
-    static TabularDataExecutor good() {
-        Map<String, String> map = new HashMap<>();
-        map.put("DbProperties", "MyDbConnProperties.tsv");
-        map.put("OpenSchema", "MyDbTables.tsv");
-        return (CustomExecutor) query -> {
-            try {
-                Path path = Paths.get(Resources.class.getResource(map.get(query.getProcedure())).toURI());
-                return TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
+    @lombok.RequiredArgsConstructor
+    static final class FailingEngine implements TabularDataEngine {
+
+        @lombok.NonNull
+        private final Supplier<? extends IOException> onGetExecutor;
+
+        @Override
+        public TabularDataExecutor getExecutor() throws IOException {
+            throw onGetExecutor.get();
+        }
+    }
+
+    @lombok.RequiredArgsConstructor
+    static final class FailingExecutor implements TabularDataExecutor {
+
+        @lombok.NonNull
+        private final Supplier<? extends IOException> onExec;
+
+        @lombok.NonNull
+        private final Supplier<? extends IOException> onClose;
+
+        @Override
+        public TabularDataReader exec(TabularDataQuery query) throws IOException {
+            throw onExec.get();
+        }
+
+        @Override
+        public void close() throws IOException {
+            throw onClose.get();
+        }
+    }
+
+    @lombok.RequiredArgsConstructor
+    static final class FakeExecutor implements TabularDataExecutor {
+
+        @lombok.NonNull
+        private final Function<TabularDataQuery, String> queries;
+
+        private boolean closed = false;
+
+        @Override
+        public TabularDataReader exec(TabularDataQuery query) throws IOException {
+            if (closed) {
+                throw new IOException("Executor closed");
             }
-        };
+
+            String content = queries.apply(query);
+            if (content == null) {
+                throw new FileNotFoundException(query.toString());
+            }
+
+            return TabularDataReader.of(new BufferedReader(new StringReader(content)));
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+        }
     }
 
-    static TabularDataExecutor bad() {
-        return ofException(FileNotFoundException::new);
+    static final TabularDataQuery GOOD_PROPERTIES_QUERY = TabularDataQuery
+            .builder()
+            .procedure("DbProperties")
+            .parameter("MyDb")
+            .parameters(LhodConnection.DYNAMIC_PROPERTY_KEYS)
+            .build();
+
+    static final TabularDataQuery GOOD_SCHEMA_QUERY = TabularDataQuery
+            .builder()
+            .procedure("OpenSchema")
+            .parameter("MyDb")
+            .parameter("\"\"")
+            .parameter("\"\"")
+            .parameter("\"\"")
+            .build();
+
+    static final Map<TabularDataQuery, String> GOOD_QUERIES = loadGoodQueries();
+
+    private static Map<TabularDataQuery, String> loadGoodQueries() {
+        Map<TabularDataQuery, String> result = new HashMap<>();
+        result.put(GOOD_PROPERTIES_QUERY, load("MyDbConnProperties.tsv"));
+        result.put(GOOD_SCHEMA_QUERY, load("MyDbTables.tsv"));
+        return Collections.unmodifiableMap(result);
     }
 
-    static TabularDataExecutor ugly() {
-        return ofContent("helloworld");
+    static FakeExecutor goodExecutor() {
+        return new FakeExecutor(GOOD_QUERIES::get);
     }
 
-    static TabularDataExecutor err() {
-        return ofResource("MyDbErr.tsv");
+    static TabularDataExecutor badExecutor() {
+        return new FailingExecutor(ExecIOException::new, CloseIOException::new);
     }
 
-    static TabularDataExecutor ofResource(String name) {
-        try {
-            Path path = Paths.get(LhodConnectionTest.class.getResource(name).toURI());
-            return (CustomExecutor) query -> TabularDataReader.of(Files.newBufferedReader(path, StandardCharsets.UTF_8));
-        } catch (URISyntaxException ex) {
+    static TabularDataExecutor uglyExecutor() {
+        return new FakeExecutor(query -> "helloworld");
+    }
+
+    static TabularDataExecutor errExecutor() {
+        return new FakeExecutor(query -> load("MyDbErr.tsv"));
+    }
+
+    private static String load(String resourceName) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Resources.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
+            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    static TabularDataExecutor ofException(Supplier<? extends IOException> supplier) {
-        return (CustomExecutor) query -> {
-            throw supplier.get();
-        };
+    static final class ExecIOException extends IOException {
     }
 
-    static TabularDataExecutor ofContent(CharSequence content) {
-        return (CustomExecutor) query -> TabularDataReader.of(new BufferedReader(new StringReader(content.toString())));
-    }
-
-    private interface CustomExecutor extends TabularDataExecutor {
-
-        @Override
-        default void close() throws IOException {
-        }
+    static final class CloseIOException extends IOException {
     }
 }

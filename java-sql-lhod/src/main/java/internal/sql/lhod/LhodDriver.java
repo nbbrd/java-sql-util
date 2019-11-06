@@ -45,6 +45,7 @@ public final class LhodDriver extends _Driver {
         }
     }
 
+    @lombok.NonNull
     private final TabularDataEngine engine;
 
     public LhodDriver() {
@@ -59,9 +60,8 @@ public final class LhodDriver extends _Driver {
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
         if (!acceptsURL(url)) {
-            throw new SQLException(format("Invalid database url: '%s'", url));
+            return null;
         }
-
         try {
             return LhodConnection.of(engine.getExecutor(), getConnectionString(url));
         } catch (IOException ex) {
@@ -71,7 +71,10 @@ public final class LhodDriver extends _Driver {
 
     @Override
     public boolean acceptsURL(String url) throws SQLException {
-        return url != null && url.toLowerCase().startsWith(PREFIX);
+        if (url == null) {
+            throw new SQLException("URL cannot be null");
+        }
+        return url.toLowerCase().startsWith(PREFIX);
     }
 
     @Override
