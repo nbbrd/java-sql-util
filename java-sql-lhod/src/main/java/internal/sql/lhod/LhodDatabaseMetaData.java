@@ -40,6 +40,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
     @Override
     public boolean storesUpperCaseIdentifiers() throws SQLException {
+        conn.checkState();
         try {
             return getIdentifierCaseType() == IdentifierCaseType.UPPER;
         } catch (IOException ex) {
@@ -51,6 +52,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
     @Override
     public boolean storesLowerCaseIdentifiers() throws SQLException {
+        conn.checkState();
         try {
             return getIdentifierCaseType() == IdentifierCaseType.LOWER;
         } catch (IOException ex) {
@@ -62,6 +64,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
     @Override
     public boolean storesMixedCaseIdentifiers() throws SQLException {
+        conn.checkState();
         try {
             return getIdentifierCaseType() == IdentifierCaseType.MIXED;
         } catch (IOException ex) {
@@ -73,16 +76,19 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
     @Override
     public String getIdentifierQuoteString() throws SQLException {
+        conn.checkState();
         return null;
     }
 
     @Override
     public String getSQLKeywords() throws SQLException {
+        conn.checkState();
         return "";
     }
 
     @Override
     public String getStringFunctions() throws SQLException {
+        conn.checkState();
         try {
             return getStringFunctionStream()
                     .map(o -> o.getLabel())
@@ -97,6 +103,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
     @Override
     public String getExtraNameCharacters() throws SQLException {
+        conn.checkState();
         try {
             return conn.getProperty(LhodConnection.DynamicProperty.SPECIAL_CHARACTERS);
         } catch (IOException ex) {
@@ -108,6 +115,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
 
     @Override
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
+        conn.checkState();
+
         TabularDataQuery query = TabularDataQuery
                 .builder()
                 .procedure("OpenSchema")
@@ -123,17 +132,19 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabularDataError
                     ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
-                    : new SQLException(format("Failed to list tables with catalog='%s', schemaPattern='%s', tableNamePattern='%s', types='%s'", catalog, schemaPattern, tableNamePattern, types != null ? Arrays.toString(types) : null), ex);
+                    : new SQLException(format("Failed to list tables with catalog='%s', schemaPattern='%s', tableNamePattern='%s', types='%s' of '%s'", catalog, schemaPattern, tableNamePattern, types != null ? Arrays.toString(types) : null, conn.getConnectionString()), ex);
         }
     }
 
     @Override
     public Connection getConnection() throws SQLException {
+        conn.checkState();
         return conn;
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
+        conn.checkState();
         return conn.isReadOnly();
     }
 

@@ -46,18 +46,19 @@ final class LhodConnection extends _Connection {
     @lombok.NonNull
     private final String connectionString;
 
-    private boolean closed = false;
-
     private EnumMap<DynamicProperty, String> lazyProperties = null;
 
     @Override
     public boolean isClosed() throws SQLException {
-        return closed;
+        try {
+            return executor.isClosed();
+        } catch (IOException ex) {
+            throw new SQLException("Failed to check executor state", ex);
+        }
     }
 
     @Override
     public void close() throws SQLException {
-        closed = true;
         try {
             executor.close();
         } catch (IOException ex) {
@@ -108,7 +109,7 @@ final class LhodConnection extends _Connection {
     }
 
     @Nullable
-    public String getProperty(@NonNull DynamicProperty property) throws IOException {
+    String getProperty(@NonNull DynamicProperty property) throws IOException {
         Objects.requireNonNull(property);
         if (lazyProperties == null) {
             lazyProperties = loadProperties();
@@ -117,7 +118,7 @@ final class LhodConnection extends _Connection {
     }
 
     @NonNull
-    public TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException {
+    TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException {
         return executor.exec(query);
     }
 
@@ -150,8 +151,8 @@ final class LhodConnection extends _Connection {
         return result;
     }
 
-    private void checkState() throws SQLException {
-        if (closed) {
+    void checkState() throws SQLException {
+        if (isClosed()) {
             throw new SQLException(format("Connection '%s' closed", connectionString));
         }
     }
@@ -161,7 +162,7 @@ final class LhodConnection extends _Connection {
     // https://msdn.microsoft.com/en-us/library/ms676695%28v=vs.85%29.aspx
     @lombok.AllArgsConstructor
     @lombok.Getter
-    public enum DynamicProperty {
+    enum DynamicProperty {
         CURRENT_CATALOG("Current Catalog"),
         SPECIAL_CHARACTERS("Special Characters"),
         IDENTIFIER_CASE_SENSITIVITY("Identifier Case Sensitivity"),

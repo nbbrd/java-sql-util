@@ -16,13 +16,17 @@
  */
 package internal.sql.lhod;
 
-import static internal.sql.lhod.LhodConnectionTest.CONN_STRING;
+import static _test.SQLExceptions.*;
 import static internal.sql.lhod.LhodDatabaseMetaData.of;
+import static internal.sql.lhod.Resources.CONN_STRING;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.stream.Stream;
+import nbbrd.sql.jdbc.SqlFunc;
+import static org.assertj.core.api.Assertions.*;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -31,10 +35,32 @@ import org.junit.Test;
  */
 public class LhodDatabaseMetaDataTest {
 
+    private LhodConnection good, bad, ugly, err, closed;
+
+    @Before
+    public void before() {
+        good = LhodConnection.of(Resources.goodExecutor(), CONN_STRING);
+        bad = LhodConnection.of(Resources.badExecutor(), CONN_STRING);
+        ugly = LhodConnection.of(Resources.uglyExecutor(), CONN_STRING);
+        err = LhodConnection.of(Resources.errExecutor(), CONN_STRING);
+        closed = LhodConnection.of(Resources.closedExecutor(), CONN_STRING);
+    }
+
+    @After
+    public void after() {
+        Stream.of(good, bad, ugly, err, closed)
+                .forEach(conn -> {
+                    try {
+                        conn.close();
+                    } catch (SQLException ex) {
+                    }
+                });
+    }
+
     @Test
     @SuppressWarnings("null")
     public void testFactory() throws SQLException {
-        assertThat(good())
+        assertThat(of(good))
                 .as("Factory must return a non-null DataBaseMetaData")
                 .isNotNull();
 
@@ -45,92 +71,62 @@ public class LhodDatabaseMetaDataTest {
 
     @Test
     public void testStoresUpperCaseIdentifiers() throws SQLException {
-        assertThat(good().storesUpperCaseIdentifiers()).isFalse();
-        assertThatThrownBy(bad()::storesUpperCaseIdentifiers).isInstanceOf(SQLException.class);
-        assertThatThrownBy(ugly()::storesUpperCaseIdentifiers).isInstanceOf(SQLException.class);
-        assertThatThrownBy(err()::storesUpperCaseIdentifiers).isInstanceOf(SQLException.class);
+        testAllExceptions("storesUpperCaseIdentifiers", LhodDatabaseMetaData::storesUpperCaseIdentifiers);
+
+        assertThat(of(good).storesUpperCaseIdentifiers()).isFalse();
     }
 
     @Test
     public void testStoresLowerCaseIdentifiers() throws SQLException {
-        assertThat(good().storesLowerCaseIdentifiers()).isFalse();
-        assertThatThrownBy(bad()::storesLowerCaseIdentifiers).isInstanceOf(SQLException.class);
-        assertThatThrownBy(ugly()::storesLowerCaseIdentifiers).isInstanceOf(SQLException.class);
-        assertThatThrownBy(err()::storesLowerCaseIdentifiers).isInstanceOf(SQLException.class);
+        testAllExceptions("storesLowerCaseIdentifiers", LhodDatabaseMetaData::storesLowerCaseIdentifiers);
+
+        assertThat(of(good).storesLowerCaseIdentifiers()).isFalse();
     }
 
     @Test
     public void testStoresMixedCaseIdentifiers() throws SQLException {
-        assertThat(good().storesMixedCaseIdentifiers()).isTrue();
-        assertThatThrownBy(bad()::storesMixedCaseIdentifiers).isInstanceOf(SQLException.class);
-        assertThatThrownBy(ugly()::storesMixedCaseIdentifiers).isInstanceOf(SQLException.class);
-        assertThatThrownBy(err()::storesMixedCaseIdentifiers).isInstanceOf(SQLException.class);
+        testAllExceptions("storesMixedCaseIdentifiers", LhodDatabaseMetaData::storesMixedCaseIdentifiers);
+
+        assertThat(of(good).storesMixedCaseIdentifiers()).isTrue();
     }
 
     @Test
-    public void testGetExtraNameCharacters() throws SQLException {
-        assertThat(good().getExtraNameCharacters())
-                .as("ExtraNameCharacters must return expected value")
-                .isNotEmpty();
+    public void testGetIdentifierQuoteString() throws SQLException {
+        testCloseException("getIdentifierQuoteString", LhodDatabaseMetaData::getIdentifierQuoteString);
 
-        assertThatThrownBy(bad()::getExtraNameCharacters)
-                .as("ExtraNameCharacters must throw SQLException if IOException is raised")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING)
-                .hasCauseInstanceOf(IOException.class);
-
-        assertThatThrownBy(ugly()::getExtraNameCharacters)
-                .as("ExtraNameCharacters must throw SQLException if content is invalid")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING)
-                .hasCauseInstanceOf(IOException.class);
-
-        assertThatThrownBy(err()::getExtraNameCharacters)
-                .as("ExtraNameCharacters must throw SQLException if underlying exception is raised")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining("name not found")
-                .hasNoCause();
+        assertThat(of(good).getIdentifierQuoteString()).isNull();
     }
 
     @Test
     public void testGetSQLKeywords() throws SQLException {
-        assertThat(good().getSQLKeywords()).isNotNull();
+        testCloseException("getSQLKeywords", LhodDatabaseMetaData::getSQLKeywords);
+
+        assertThat(of(good).getSQLKeywords()).isNotNull();
     }
 
     @Test
     public void testGetStringFunctions() throws SQLException {
-        assertThat(good().getStringFunctions().split(",", -1))
+        testAllExceptions("getStringFunctions", LhodDatabaseMetaData::getStringFunctions);
+
+        assertThat(of(good).getStringFunctions().split(",", -1))
                 .as("StringFunctions must return expected value")
                 .containsOnly("CONCAT", "INSERT", "LEFT", "LTRIM", "LENGTH", "LOCATE", "LCASE", "REPEAT", "REPLACE", "RIGHT", "RTRIM", "SUBSTRING", "UCASE", "ASCII", "CHAR", "DIFFERENCE", "LOCATE_2", "SOUNDEX", "SPACE", "BIT_LENGTH", "OCTET_LENGTH");
-
-        assertThatThrownBy(bad()::getStringFunctions)
-                .as("StringFunctions must throw SQLException if IOException is raised")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING)
-                .hasCauseInstanceOf(IOException.class);
-
-        assertThatThrownBy(ugly()::getStringFunctions)
-                .as("StringFunctions must throw SQLException if content is invalid")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING)
-                .hasCauseInstanceOf(IOException.class);
-
-        assertThatThrownBy(err()::getStringFunctions)
-                .as("StringFunctions must throw SQLException if underlying exception is raised")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining("name not found")
-                .hasNoCause();
     }
 
     @Test
-    public void testGetConnection() throws SQLException {
-        LhodConnection conn = LhodConnectionTest.good();
-        assertThat(of(conn).getConnection()).isEqualTo(conn);
+    public void testGetExtraNameCharacters() throws SQLException {
+        testAllExceptions("getExtraNameCharacters", LhodDatabaseMetaData::getExtraNameCharacters);
+
+        assertThat(of(good).getExtraNameCharacters())
+                .as("getExtraNameCharacters must return expected value")
+                .isNotEmpty();
     }
 
     @Test
     public void testGetTables() throws SQLException {
-        try (ResultSet rs = good().getTables(null, null, null, null)) {
+        testAllExceptions("getTables", md -> md.getTables(null, null, null, null));
+
+        try (ResultSet rs = of(good).getTables(null, null, null, null)) {
             int index = 0;
             while (rs.next()) {
                 switch (index++) {
@@ -143,21 +139,53 @@ public class LhodDatabaseMetaDataTest {
         }
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Implementation details">
-    static LhodDatabaseMetaData good() {
-        return of(LhodConnectionTest.good());
+    @Test
+    public void testGetConnection() throws SQLException {
+        testCloseException("getConnection", LhodDatabaseMetaData::getConnection);
+
+        assertThat(of(good).getConnection()).isEqualTo(good);
     }
 
-    static LhodDatabaseMetaData bad() {
-        return of(LhodConnectionTest.bad());
+    @Test
+    public void testIsReadOnly() throws SQLException {
+        testCloseException("isReadOnly", LhodDatabaseMetaData::isReadOnly);
+
+        assertThat(of(good).isReadOnly()).isEqualTo(good.isReadOnly());
     }
 
-    static LhodDatabaseMetaData ugly() {
-        return of(LhodConnectionTest.ugly());
+    private void testCloseException(String methodName, SqlFunc<LhodDatabaseMetaData, ?> method) {
+        assertThatSQLException()
+                .as("%s must throw SQLException if called on a closed connection", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(closed)))
+                .withMessageContaining(closed.getConnectionString())
+                .satisfies(withoutErrorCode());
     }
 
-    static LhodDatabaseMetaData err() {
-        return of(LhodConnectionTest.err());
+    private void testAllExceptions(String methodName, SqlFunc<LhodDatabaseMetaData, ?> method) {
+        assertThatCode(() -> method.applyWithSql(of(good)))
+                .doesNotThrowAnyException();
+
+        assertThatSQLException()
+                .as("%s must throw SQLException if IOException is raised", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(bad)))
+                .withMessageContaining(bad.getConnectionString())
+                .withCauseInstanceOf(Resources.ExecIOException.class)
+                .satisfies(withoutErrorCode());
+
+        assertThatSQLException()
+                .as("%s must throw SQLException if content is invalid", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(ugly)))
+                .withMessageContaining(ugly.getConnectionString())
+                .withCauseInstanceOf(IOException.class)
+                .satisfies(withoutErrorCode());
+
+        assertThatSQLException()
+                .as("%s must throw SQLException if underlying exception is raised", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(err)))
+                .withMessageContaining("name not found")
+                .withNoCause()
+                .satisfies(withErrorCode(-2147467259));
+
+        testCloseException(methodName, method);
     }
-    //</editor-fold>
 }

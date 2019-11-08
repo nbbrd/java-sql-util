@@ -65,6 +65,11 @@ class Resources {
         public void close() throws IOException {
             throw onClose.get();
         }
+
+        @Override
+        public boolean isClosed() throws IOException {
+            return false;
+        }
     }
 
     @lombok.RequiredArgsConstructor
@@ -92,6 +97,11 @@ class Resources {
         @Override
         public void close() throws IOException {
             closed = true;
+        }
+
+        @Override
+        public boolean isClosed() throws IOException {
+            return closed;
         }
     }
 
@@ -136,6 +146,16 @@ class Resources {
         return new FakeExecutor(query -> load("MyDbErr.tsv"));
     }
 
+    static TabularDataExecutor closedExecutor() {
+        FakeExecutor result = new FakeExecutor(query -> "");
+        try {
+            result.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        return result;
+    }
+
     private static String load(String resourceName) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Resources.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining(System.lineSeparator()));
@@ -149,4 +169,6 @@ class Resources {
 
     static final class CloseIOException extends IOException {
     }
+
+    static final String CONN_STRING = "MyDb";
 }

@@ -28,4 +28,6 @@ interface TabularDataExecutor extends Closeable {
 
     @NonNull
     TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException;
+
+    boolean isClosed() throws IOException;
 }

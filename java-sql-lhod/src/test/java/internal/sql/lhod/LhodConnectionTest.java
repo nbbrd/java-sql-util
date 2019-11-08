@@ -16,14 +16,17 @@
  */
 package internal.sql.lhod;
 
+import static _test.SQLExceptions.*;
 import static internal.sql.lhod.LhodConnection.of;
-import java.io.FileNotFoundException;
+import static internal.sql.lhod.Resources.CONN_STRING;
 import java.sql.SQLException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import org.junit.Test;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.stream.Stream;
+import nbbrd.sql.jdbc.SqlFunc;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  *
@@ -31,172 +34,186 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class LhodConnectionTest {
 
-    @Test
-    @SuppressWarnings("null")
-    public void testFactory() {
-        assertThat(good())
-                .as("Factory must return a non-null connection")
-                .isNotNull();
+    private TabularDataExecutor good, bad, ugly, err, closed;
 
-        assertThatThrownBy(() -> of(null, CONN_STRING))
-                .as("Factory must throw NullPointerException if executor is null")
-                .isInstanceOf(NullPointerException.class);
+    @Before
+    public void before() {
+        good = Resources.goodExecutor();
+        bad = Resources.badExecutor();
+        ugly = Resources.uglyExecutor();
+        err = Resources.errExecutor();
+        closed = Resources.closedExecutor();
+    }
 
-        assertThatThrownBy(() -> of(Resources.goodExecutor(), null))
-                .as("Factory must throw NullPointerException if connectionString is null")
-                .isInstanceOf(NullPointerException.class);
+    @After
+    public void after() {
+        Stream.of(good, bad, ugly, err, closed)
+                .forEach(conn -> {
+                    try {
+                        conn.close();
+                    } catch (IOException ex) {
+                    }
+                });
     }
 
     @Test
-    public void testClose() throws SQLException {
-        AtomicBoolean isClosed = new AtomicBoolean(false);
-        TabularDataExecutor executor = new TabularDataExecutor() {
-            @Override
-            public TabularDataReader exec(TabularDataQuery query) throws IOException {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
+    @SuppressWarnings("null")
+    public void testFactory() {
+        assertThatNullPointerException()
+                .as("Factory must throw NullPointerException if executor is null")
+                .isThrownBy(() -> of(null, CONN_STRING));
 
-            @Override
-            public void close() throws IOException {
-                isClosed.set(true);
-            }
-        };
-        of(executor, "").close();
-        assertThat(isClosed.get())
-                .as("Close event must be propagated to observer")
-                .isEqualTo(true);
+        assertThatNullPointerException()
+                .as("Factory must throw NullPointerException if connectionString is null")
+                .isThrownBy(() -> of(Resources.goodExecutor(), null));
+    }
 
-        LhodConnection conn = good();
-        assertThat(conn.isClosed()).isFalse();
-        conn.close();
-        assertThat(conn.isClosed()).isTrue();
-        conn.close(); // no-op
+    @Test
+    public void testIsClosed() throws SQLException, IOException {
+        try (LhodConnection conn = of(good, CONN_STRING)) {
+            assertThat(conn.isClosed())
+                    .as("IsClosed must return false if close() method not called")
+                    .isFalse();
+            conn.close();
+            assertThat(conn.isClosed())
+                    .as("IsClosed must return true if close() method has been called")
+                    .isTrue();
+        }
+    }
+
+    @Test
+    public void testClose() throws SQLException, IOException {
+        try (TabularDataExecutor executor = Resources.goodExecutor()) {
+            try (LhodConnection conn = of(executor, CONN_STRING)) {
+            }
+            assertThat(executor.isClosed())
+                    .as("Close event must be propagated to executor")
+                    .isEqualTo(true);
+        }
+
+        try (LhodConnection conn = of(good, CONN_STRING)) {
+            assertThatCode(conn::close)
+                    .as("First close does not throw exception")
+                    .doesNotThrowAnyException();
+            assertThatCode(conn::close)
+                    .as("Subsequent close does not throw exception")
+                    .doesNotThrowAnyException();
+        }
     }
 
     @Test
     public void testGetMetaData() throws SQLException {
-        assertThat(good().getMetaData())
+        testCloseException("getMetaData", LhodConnection::getMetaData);
+
+        assertThat(of(good, CONN_STRING).getMetaData())
                 .as("MetaData must be non-null")
                 .isNotNull();
-
-        assertThatThrownBy(closed()::getMetaData)
-                .as("MetaData must throw SQLException if called on a closed connection")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING);
     }
 
     @Test
     public void testGetCatalog() throws SQLException {
-        assertThat(good().getCatalog())
+        testAllExceptions("getCatalog", LhodConnection::getCatalog);
+
+        assertThat(of(good, CONN_STRING).getCatalog())
                 .as("Catalog must return expected value")
                 .isEqualTo("master");
-
-        assertThatThrownBy(bad()::getCatalog)
-                .as("Catalog must throw SQLException if IOException is raised")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING)
-                .hasCauseInstanceOf(IOException.class);
-
-        assertThatThrownBy(ugly()::getCatalog)
-                .as("Catalog must throw SQLException if content is invalid")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING)
-                .hasCauseInstanceOf(IOException.class);
-
-        assertThatThrownBy(err()::getCatalog)
-                .as("Catalog must throw SQLException if underlying exception is raised")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining("name not found")
-                .hasNoCause();
-
-        assertThatThrownBy(closed()::getCatalog)
-                .as("Catalog must throw SQLException if called on a closed connection")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING);
     }
 
     @Test
-    public void testSchema() throws SQLException {
-        assertThatThrownBy(closed()::getSchema)
-                .as("Schema must throw SQLException if called on a closed connection")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING);
+    public void testGetSchema() throws SQLException {
+        testCloseException("getSchema", LhodConnection::getSchema);
     }
 
     @Test
     public void testCreateStatement() throws SQLException {
-        assertThat(good().createStatement())
+        testCloseException("createStatement", LhodConnection::createStatement);
+
+        assertThat(of(good, CONN_STRING).createStatement())
                 .as("Statement must be non-null")
                 .isNotNull();
-
-        assertThatThrownBy(closed()::createStatement)
-                .as("Statement must throw SQLException if called on a closed connection")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING);
     }
 
     @Test
     public void testPrepareStatement() throws SQLException {
-        assertThat(good().prepareStatement(""))
+        testCloseException("prepareStatement", conn -> conn.prepareStatement(""));
+
+        assertThat(of(good, CONN_STRING).prepareStatement(""))
                 .as("PreparedStatement must be non-null")
                 .isNotNull();
-
-        assertThatThrownBy(() -> closed().prepareStatement(""))
-                .as("PreparedStatement must throw SQLException if called on a closed connection")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING);
     }
 
     @Test
     public void testIsReadOnly() throws SQLException {
-        assertThat(good().isReadOnly())
+        testCloseException("isReadOnly", LhodConnection::isReadOnly);
+
+        assertThat(of(good, CONN_STRING).isReadOnly())
                 .as("ReadOnly must return expected value")
                 .isEqualTo(true);
-
-        assertThatThrownBy(closed()::isReadOnly)
-                .as("ReadOnly must throw SQLException if called on a closed connection")
-                .isInstanceOf(SQLException.class)
-                .hasMessageContaining(CONN_STRING);
     }
 
     @Test
     @SuppressWarnings("null")
     public void testGetProperty() throws IOException, SQLException {
-        LhodConnection c = good();
-        assertThat(c.getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isEqualTo("master");
-        assertThat(c.getProperty(LhodConnection.DynamicProperty.SPECIAL_CHARACTERS)).isNotEmpty();
-        assertThat(c.getProperty(LhodConnection.DynamicProperty.IDENTIFIER_CASE_SENSITIVITY)).isEqualTo("8");
-        assertThat(c.getProperty(LhodConnection.DynamicProperty.STRING_FUNCTIONS)).isEqualTo("5242879");
+        assertThatNullPointerException()
+                .isThrownBy(() -> of(good, CONN_STRING).getProperty(null));
 
-        assertThatThrownBy(() -> good().getProperty(null)).isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> bad().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(Resources.ExecIOException.class);
-        assertThatThrownBy(() -> ugly().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(IOException.class);
-        assertThatThrownBy(() -> err().getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG)).isInstanceOf(TabularDataError.class);
+        assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
+                .isEqualTo("master");
+
+        assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.SPECIAL_CHARACTERS))
+                .isNotEmpty();
+
+        assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.IDENTIFIER_CASE_SENSITIVITY))
+                .isEqualTo("8");
+
+        assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.STRING_FUNCTIONS))
+                .isEqualTo("5242879");
+
+        assertThatIOException()
+                .isThrownBy(() -> of(bad, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
+                .isInstanceOf(Resources.ExecIOException.class);
+
+        assertThatIOException()
+                .isThrownBy(() -> of(ugly, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG));
+
+        assertThatIOException()
+                .isThrownBy(() -> of(err, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
+                .isInstanceOf(TabularDataError.class);
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Implementation details">
-    static final String CONN_STRING = "MyDb";
-
-    static LhodConnection good() {
-        return of(Resources.goodExecutor(), CONN_STRING);
+    private void testCloseException(String methodName, SqlFunc<LhodConnection, ?> method) {
+        assertThatSQLException()
+                .as("%s must throw SQLException if called on a closed executor", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(closed, CONN_STRING)))
+                .withMessageContaining(CONN_STRING)
+                .satisfies(withoutErrorCode());
     }
 
-    static LhodConnection bad() {
-        return of(Resources.badExecutor(), CONN_STRING);
-    }
+    private void testAllExceptions(String methodName, SqlFunc<LhodConnection, ?> method) {
+        assertThatCode(() -> method.applyWithSql(of(good, CONN_STRING)))
+                .doesNotThrowAnyException();
 
-    static LhodConnection ugly() {
-        return of(Resources.uglyExecutor(), CONN_STRING);
-    }
+        assertThatSQLException()
+                .as("%s must throw SQLException if IOException is raised", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(bad, CONN_STRING)))
+                .withMessageContaining(CONN_STRING)
+                .withCauseInstanceOf(Resources.ExecIOException.class)
+                .satisfies(withoutErrorCode());
 
-    static LhodConnection err() {
-        return of(Resources.errExecutor(), CONN_STRING);
-    }
+        assertThatSQLException()
+                .as("%s must throw SQLException if content is invalid", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(ugly, CONN_STRING)))
+                .withMessageContaining(CONN_STRING)
+                .withCauseInstanceOf(IOException.class)
+                .satisfies(withoutErrorCode());
 
-    static LhodConnection closed() throws SQLException {
-        LhodConnection result = good();
-        result.close();
-        return result;
+        assertThatSQLException()
+                .as("%s must throw SQLException if underlying exception is raised", methodName)
+                .isThrownBy(() -> method.applyWithSql(of(err, CONN_STRING)))
+                .withMessageContaining("name not found")
+                .withNoCause()
+                .satisfies(withErrorCode(-2147467259));
+
+        testCloseException(methodName, method);
     }
-    //</editor-fold>
 }
