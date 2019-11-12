@@ -22,7 +22,7 @@ import java.io.IOException;
  *
  * @author Philippe Charles
  */
-interface TabularDataEngine {
+interface TabDataEngine {
 
-    TabularDataExecutor getExecutor() throws IOException;
+    TabDataExecutor getExecutor() throws IOException;
 }

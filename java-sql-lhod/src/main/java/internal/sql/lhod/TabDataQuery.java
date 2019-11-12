@@ -16,21 +16,19 @@
  */
 package internal.sql.lhod;
 
-import internal.sys.CachedResourceExtractor;
-import internal.sys.DefaultResourceExtractor;
-import internal.sys.ResourceExtractor;
-import java.io.IOException;
+import java.util.List;
 
 /**
  *
  * @author Philippe Charles
  */
-final class VbsEngine implements TabDataEngine {
+@lombok.Value
+@lombok.Builder(builderClassName = "Builder")
+class TabDataQuery {
 
-    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsEngine.class));
+    @lombok.NonNull
+    private String procedure;
 
-    @Override
-    public TabDataExecutor getExecutor() throws IOException {
-        return new VbsExecutor(scripts);
-    }
+    @lombok.Singular
+    private List<String> parameters;
 }

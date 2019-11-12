@@ -62,8 +62,8 @@ public class LhodDriverTest {
         assertThat(x.acceptsURL("jdbc:lhod:hello")).isTrue();
     }
 
-    private final TabularDataEngine engine = () -> Resources.goodExecutor();
-    private final TabularDataEngine failingEngine = new Resources.FailingEngine(CustomError::new);
+    private final TabDataEngine engine = () -> Resources.goodExecutor();
+    private final TabDataEngine failingEngine = new Resources.FailingEngine(CustomError::new);
 
     private static final class CustomError extends IOException {
     }

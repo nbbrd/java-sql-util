@@ -38,7 +38,7 @@ final class LhodStatement extends _Statement {
     public ResultSet executeQuery(String sql) throws SQLException {
         checkState();
 
-        TabularDataQuery query = TabularDataQuery
+        TabDataQuery query = TabDataQuery
                 .builder()
                 .procedure("PreparedStatement")
                 .parameter(conn.getConnectionString())
@@ -48,8 +48,8 @@ final class LhodStatement extends _Statement {
         try {
             return LhodResultSet.of(conn.exec(query));
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to execute query '%s'", sql), ex);
         }
     }
@@ -71,6 +71,7 @@ final class LhodStatement extends _Statement {
     }
 
     private void checkState() throws SQLException {
+        conn.checkState();
         if (closed) {
             throw new SQLException("Statement closed");
         }

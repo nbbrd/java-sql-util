@@ -16,19 +16,13 @@
  */
 package internal.sql.lhod;
 
-import java.util.List;
-
 /**
  *
  * @author Philippe Charles
  */
 @lombok.Value
-@lombok.Builder(builderClassName = "Builder")
-class TabularDataQuery {
+class TabDataColumn {
 
-    @lombok.NonNull
-    private String procedure;
-
-    @lombok.Singular
-    private List<String> parameters;
+    private String name;
+    private int type;
 }

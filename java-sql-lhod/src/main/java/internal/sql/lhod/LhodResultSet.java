@@ -27,62 +27,43 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
+@lombok.RequiredArgsConstructor(staticName = "of")
 final class LhodResultSet extends _ResultSet {
 
-    @NonNull
-    static LhodResultSet of(@NonNull TabularDataReader tsv) throws IOException {
-        try {
-            return new LhodResultSet(tsv, LhodResultSetMetaData.of(tsv.getHeader(0), tsv.getHeader(1)));
-        } catch (IllegalArgumentException ex) {
-            throw new IOException("Invalid header", ex);
-        }
-    }
+    @lombok.NonNull
+    private final TabDataReader reader;
 
-    private static final Locale EN_US = new Locale("en", "us");
-
-    private final TabularDataReader reader;
-    private final LhodResultSetMetaData metaData;
-    private final DateFormat dateFormat;
-    private final NumberFormat numberFormat;
-    private final String[] currentRow;
-
-    private boolean closed = false;
-
-    private LhodResultSet(TabularDataReader reader, LhodResultSetMetaData metaData) {
-        this.reader = reader;
-        this.metaData = metaData;
-        this.dateFormat = new SimpleDateFormat("MM/dd/yyyy", EN_US);
-        dateFormat.setLenient(false);
-        this.numberFormat = NumberFormat.getInstance(EN_US);
-        this.currentRow = new String[metaData.getColumnCount()];
-    }
+    private final DateFormat dateFormat = newDateFormat();
+    private final NumberFormat numberFormat = newNumberFormat();
 
     @Override
     public boolean next() throws SQLException {
         checkState();
         try {
-            return reader.readNextInto(currentRow);
+            return reader.readNextRow();
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException("While reading next row", ex);
         }
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        return closed;
+        try {
+            return reader.isClosed();
+        } catch (IOException ex) {
+            throw new SQLException("Failed to check reader state", ex);
+        }
     }
 
     @Override
     public void close() throws SQLException {
-        closed = true;
         try {
             reader.close();
         } catch (IOException ex) {
@@ -93,17 +74,17 @@ final class LhodResultSet extends _ResultSet {
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
         checkState();
-        return metaData;
+        return LhodResultSetMetaData.of(reader.getColumns());
     }
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return currentRow[columnIndex - 1];
+        return get(columnIndex);
     }
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return currentRow[columnIndex - 1];
+        return get(columnIndex);
     }
 
     @Override
@@ -143,12 +124,12 @@ final class LhodResultSet extends _ResultSet {
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return new BigDecimal(currentRow[columnIndex - 1]);
+        return new BigDecimal(get(columnIndex));
     }
 
     private java.util.Date parseDate(int columnIndex) throws SQLException {
         try {
-            return dateFormat.parse(currentRow[columnIndex - 1]);
+            return dateFormat.parse(get(columnIndex));
         } catch (ParseException ex) {
             throw new SQLException("While parsing date", ex);
         }
@@ -156,15 +137,31 @@ final class LhodResultSet extends _ResultSet {
 
     private Number parseNumber(int columnIndex) throws SQLException {
         try {
-            return numberFormat.parse(currentRow[columnIndex - 1]);
+            return numberFormat.parse(get(columnIndex));
         } catch (ParseException ex) {
             throw new SQLException("While parsing number", ex);
         }
     }
 
+    private String get(int columnIndex) {
+        return reader.get(columnIndex - 1);
+    }
+
     private void checkState() throws SQLException {
-        if (closed) {
+        if (isClosed()) {
             throw new SQLException("ResultSet closed");
         }
+    }
+
+    private static final Locale EN_US = new Locale("en", "us");
+
+    private static DateFormat newDateFormat() {
+        DateFormat result = new SimpleDateFormat("MM/dd/yyyy", EN_US);
+        result.setLenient(false);
+        return result;
+    }
+
+    private static NumberFormat newNumberFormat() {
+        return NumberFormat.getInstance(EN_US);
     }
 }

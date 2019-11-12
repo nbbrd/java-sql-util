@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Philippe Charles
  */
 @lombok.RequiredArgsConstructor
-final class VbsExecutor implements TabularDataExecutor {
+final class VbsExecutor implements TabDataExecutor {
 
     @lombok.NonNull
     private final ResourceExtractor scripts;
@@ -36,11 +36,11 @@ final class VbsExecutor implements TabularDataExecutor {
     private boolean closed = false;
 
     @Override
-    public TabularDataReader exec(TabularDataQuery query) throws IOException {
+    public TabDataReader exec(TabDataQuery query) throws IOException {
         if (closed) {
             throw new IOException("Executor closed");
         }
-        return TabularDataReader.of(exec(query.getProcedure() + ".vbs", query.getParameters().toArray(new String[0])));
+        return TabDataReader.of(exec(query.getProcedure() + ".vbs", query.getParameters().toArray(new String[0])));
     }
 
     @Override

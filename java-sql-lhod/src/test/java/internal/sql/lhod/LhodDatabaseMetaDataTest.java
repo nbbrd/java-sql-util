@@ -87,7 +87,7 @@ public class LhodDatabaseMetaDataTest {
     public void testStoresMixedCaseIdentifiers() throws SQLException {
         testAllExceptions("storesMixedCaseIdentifiers", LhodDatabaseMetaData::storesMixedCaseIdentifiers);
 
-        assertThat(of(good).storesMixedCaseIdentifiers()).isTrue();
+        assertThat(of(good).storesMixedCaseIdentifiers()).isFalse();
     }
 
     @Test
@@ -110,7 +110,21 @@ public class LhodDatabaseMetaDataTest {
 
         assertThat(of(good).getStringFunctions().split(",", -1))
                 .as("StringFunctions must return expected value")
-                .containsOnly("CONCAT", "INSERT", "LEFT", "LTRIM", "LENGTH", "LOCATE", "LCASE", "REPEAT", "REPLACE", "RIGHT", "RTRIM", "SUBSTRING", "UCASE", "ASCII", "CHAR", "DIFFERENCE", "LOCATE_2", "SOUNDEX", "SPACE", "BIT_LENGTH", "OCTET_LENGTH");
+                .containsOnly(
+                        "ASCII",
+                        "CHAR",
+                        "CONCAT",
+                        "LCASE",
+                        "LEFT",
+                        "LENGTH",
+                        "LOCATE",
+                        "LOCATE_2",
+                        "LTRIM",
+                        "RIGHT",
+                        "RTRIM",
+                        "SPACE",
+                        "SUBSTRING",
+                        "UCASE");
     }
 
     @Test
@@ -131,11 +145,11 @@ public class LhodDatabaseMetaDataTest {
             while (rs.next()) {
                 switch (index++) {
                     case 0:
-                        assertThat(rs.getString(3)).isEqualTo("sysmatrixageforget");
+                        assertThat(rs.getString(3)).isEqualTo("MSysAccessStorage");
                         break;
                 }
             }
-            assertThat(index).isEqualTo(13);
+            assertThat(index).isEqualTo(15);
         }
     }
 

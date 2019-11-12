@@ -19,6 +19,8 @@ package internal.sql.lhod;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
+import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,9 +35,7 @@ public class LhodResultSetMetaDataTest {
     @SuppressWarnings("null")
     public void testFactory() throws SQLException {
         assertThat(sample()).isNotNull();
-        assertThatThrownBy(() -> LhodResultSetMetaData.of(new String[]{"A"}, new String[]{})).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> LhodResultSetMetaData.of(null, new String[]{})).isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> LhodResultSetMetaData.of(new String[]{"A"}, (String[]) null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> LhodResultSetMetaData.of(null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -63,10 +63,10 @@ public class LhodResultSetMetaDataTest {
     }
 
     static LhodResultSetMetaData empty() {
-        return LhodResultSetMetaData.of(new String[]{}, new String[]{});
+        return LhodResultSetMetaData.of(Collections.emptyList());
     }
 
     static LhodResultSetMetaData sample() {
-        return LhodResultSetMetaData.of(new String[]{"INT_COLUMN", "DOUBLE_COLUMN"}, new String[]{"3", "5"});
+        return LhodResultSetMetaData.of(Arrays.asList(new TabDataColumn("INT_COLUMN", 3), new TabDataColumn("DOUBLE_COLUMN", 5)));
     }
 }

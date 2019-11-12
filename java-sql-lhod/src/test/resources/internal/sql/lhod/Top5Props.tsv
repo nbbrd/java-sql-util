@@ -1,0 +1,94 @@
+Name	Value
+200	200
+Current Catalog	C:\Temp\Top5-Table.mdb
+Reset Datasource	
+Active Sessions	64
+Asynchable Commit	False
+Catalog Location	1
+Catalog Term	DATABASE
+Catalog Usage	13
+Column Definition	0
+NULL Concatenation Behavior	1
+Data Source Name	Top5
+Read-Only Data Source	True
+DBMS Name	ACCESS
+DBMS Version	04.00.0000
+GROUP BY Support	2
+Heterogeneous Table Support	0
+Identifier Case Sensitivity	4
+Maximum Index Size	255
+Maximum Row Size	4052
+Maximum Row Size Includes BLOB	False
+Maximum Tables in SELECT	16
+Multiple Storage Objects	False
+Multi-Table Update	False
+NULL Collation Order	4
+OLE Object Support	1
+ORDER BY Columns in Select List	False
+Prepare Abort Behavior	2
+Prepare Commit Behavior	2
+Procedure Term	QUERY
+Provider Name	MSDASQL.DLL
+OLE DB Version	02.00
+Provider Version	10.00.16299
+Quoted Identifier Sensitivity	8
+Schema Term	
+Schema Usage	0
+SQL Support	257
+Structured Storage	1
+Subquery Support	31
+Isolation Levels	4096
+Isolation Retention	0
+Table Term	TABLE
+User Name	admin
+Pass By Ref Accessors	True
+Transaction DDL	8
+Asynchable Abort	False
+Data Source Object Threading Model	1
+Output Parameter Availability	4
+Persistent ID Type	4
+Multiple Parameter Sets	True
+Rowset Conversions on Command	True
+Multiple Results	0
+Provider Friendly Name	Microsoft OLE DB Provider for ODBC Drivers
+Connection Status	1
+Server Name	ACCESS
+Open Rowset Support	0
+Accessible Procedures	True
+Accessible Tables	True
+Integrity Enhancement Facility	False
+Outer Join Capabilities	83
+Stored Procedures	True
+Driver Name	ACEODBC.DLL
+Driver Version	Microsoft Access database engine
+Driver ODBC Version	03.51
+Like Escape Clause	N
+Special Characters	~@#$%^&*_-+=\}{"';:?/><,.![]|
+Max Columns in Group By	10
+Max Columns in Index	10
+Max Columns in Order By	10
+Max Columns in Select	255
+Max Columns in Table	255
+Numeric Functions	5439337
+SQL Grammar Support	0
+Outer Joins	Y
+String Functions	360061
+System Functions	0
+Time/Date Functions	106495
+File Usage	2
+Active Statements	0
+Password	
+Persist Security Info	
+User ID	
+Data Source	Top5
+Window Handle	
+Location	
+Mode	1
+Prompt	4
+Connect Timeout	15
+Extended Properties	DSN=Top5;DBQ=C:\Temp\Top5-Table.mdb;DriverId=25;FIL=MS Access;MaxBufferSize=2048;PageTimeout=5;
+Locale Identifier	2060
+Initial Catalog	
+OLE DB Services	-7
+General Timeout	
+Autocommit Isolation Levels	4096

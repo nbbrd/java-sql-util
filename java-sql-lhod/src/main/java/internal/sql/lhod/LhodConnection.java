@@ -40,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 final class LhodConnection extends _Connection {
 
     @lombok.NonNull
-    private final TabularDataExecutor executor;
+    private final TabDataExecutor executor;
 
     @lombok.Getter
     @lombok.NonNull
@@ -78,8 +78,8 @@ final class LhodConnection extends _Connection {
         try {
             return getProperty(DynamicProperty.CURRENT_CATALOG);
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to get catalog name of '%s'", connectionString), ex);
         }
     }
@@ -118,23 +118,22 @@ final class LhodConnection extends _Connection {
     }
 
     @NonNull
-    TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException {
+    TabDataReader exec(@NonNull TabDataQuery query) throws IOException {
         return executor.exec(query);
     }
 
     private EnumMap<DynamicProperty, String> loadProperties() throws IOException {
-        TabularDataQuery query = TabularDataQuery
+        TabDataQuery query = TabDataQuery
                 .builder()
                 .procedure("DbProperties")
                 .parameter(connectionString)
                 .parameters(DYNAMIC_PROPERTY_KEYS)
                 .build();
 
-        try (TabularDataReader reader = exec(query)) {
-            String[] row = new String[reader.getHeader(0).length];
+        try (TabDataReader reader = exec(query)) {
             Map<String, String> properties = new HashMap<>();
-            while (reader.readNextInto(row)) {
-                properties.put(row[0], row[1]);
+            while (reader.readNextRow()) {
+                properties.put(reader.get(0), reader.get(1));
             }
             return getProperties(properties);
         }

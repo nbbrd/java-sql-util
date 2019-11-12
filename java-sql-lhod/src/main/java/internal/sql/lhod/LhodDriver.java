@@ -46,14 +46,14 @@ public final class LhodDriver extends _Driver {
     }
 
     @lombok.NonNull
-    private final TabularDataEngine engine;
+    private final TabDataEngine engine;
 
     public LhodDriver() {
         this(new VbsEngine());
     }
 
 //    @VisibleForTesting
-    LhodDriver(TabularDataEngine engine) {
+    LhodDriver(TabDataEngine engine) {
         this.engine = engine;
     }
 

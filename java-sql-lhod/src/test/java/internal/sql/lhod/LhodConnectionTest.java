@@ -34,7 +34,7 @@ import org.junit.Before;
  */
 public class LhodConnectionTest {
 
-    private TabularDataExecutor good, bad, ugly, err, closed;
+    private TabDataExecutor good, bad, ugly, err, closed;
 
     @Before
     public void before() {
@@ -70,12 +70,12 @@ public class LhodConnectionTest {
 
     @Test
     public void testIsClosed() throws SQLException, IOException {
-        try (LhodConnection conn = of(good, CONN_STRING)) {
-            assertThat(conn.isClosed())
+        try (LhodConnection closeable = of(good, CONN_STRING)) {
+            assertThat(closeable.isClosed())
                     .as("IsClosed must return false if close() method not called")
                     .isFalse();
-            conn.close();
-            assertThat(conn.isClosed())
+            closeable.close();
+            assertThat(closeable.isClosed())
                     .as("IsClosed must return true if close() method has been called")
                     .isTrue();
         }
@@ -83,19 +83,19 @@ public class LhodConnectionTest {
 
     @Test
     public void testClose() throws SQLException, IOException {
-        try (TabularDataExecutor executor = Resources.goodExecutor()) {
-            try (LhodConnection conn = of(executor, CONN_STRING)) {
+        try (TabDataExecutor resource = Resources.goodExecutor()) {
+            try (LhodConnection closeable = of(resource, CONN_STRING)) {
             }
-            assertThat(executor.isClosed())
+            assertThat(resource.isClosed())
                     .as("Close event must be propagated to executor")
                     .isEqualTo(true);
         }
 
-        try (LhodConnection conn = of(good, CONN_STRING)) {
-            assertThatCode(conn::close)
+        try (LhodConnection closeable = of(good, CONN_STRING)) {
+            assertThatCode(closeable::close)
                     .as("First close does not throw exception")
                     .doesNotThrowAnyException();
-            assertThatCode(conn::close)
+            assertThatCode(closeable::close)
                     .as("Subsequent close does not throw exception")
                     .doesNotThrowAnyException();
         }
@@ -116,7 +116,7 @@ public class LhodConnectionTest {
 
         assertThat(of(good, CONN_STRING).getCatalog())
                 .as("Catalog must return expected value")
-                .isEqualTo("master");
+                .isEqualTo("C:\\Temp\\Top5-Table.mdb");
     }
 
     @Test
@@ -158,16 +158,16 @@ public class LhodConnectionTest {
                 .isThrownBy(() -> of(good, CONN_STRING).getProperty(null));
 
         assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
-                .isEqualTo("master");
+                .isEqualTo("C:\\Temp\\Top5-Table.mdb");
 
         assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.SPECIAL_CHARACTERS))
                 .isNotEmpty();
 
         assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.IDENTIFIER_CASE_SENSITIVITY))
-                .isEqualTo("8");
+                .isEqualTo("4");
 
         assertThat(of(good, CONN_STRING).getProperty(LhodConnection.DynamicProperty.STRING_FUNCTIONS))
-                .isEqualTo("5242879");
+                .isEqualTo("360061");
 
         assertThatIOException()
                 .isThrownBy(() -> of(bad, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
@@ -178,7 +178,7 @@ public class LhodConnectionTest {
 
         assertThatIOException()
                 .isThrownBy(() -> of(err, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
-                .isInstanceOf(TabularDataError.class);
+                .isInstanceOf(TabDataRemoteError.class);
     }
 
     private void testCloseException(String methodName, SqlFunc<LhodConnection, ?> method) {

@@ -16,21 +16,25 @@
  */
 package internal.sql.lhod;
 
-import internal.sys.CachedResourceExtractor;
-import internal.sys.DefaultResourceExtractor;
-import internal.sys.ResourceExtractor;
-import java.io.IOException;
+import static org.assertj.core.api.Assertions.*;
+import org.junit.Test;
 
 /**
  *
  * @author Philippe Charles
  */
-final class VbsEngine implements TabDataEngine {
+public class TabDataReaderTest {
 
-    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsEngine.class));
+    @Test
+    public void testFactory() {
+        assertThatNullPointerException()
+                .isThrownBy(() -> TabDataReader.of(null));
+    }
 
-    @Override
-    public TabDataExecutor getExecutor() throws IOException {
-        return new VbsExecutor(scripts);
+    @Test
+    public void test() {
+        assertThatIOException()
+                .isThrownBy(() -> TabDataReader.of(Resources.Sample.MYDB_ERR.newReader()))
+                .isInstanceOf(TabDataRemoteError.class);
     }
 }

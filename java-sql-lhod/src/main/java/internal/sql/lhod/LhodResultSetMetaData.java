@@ -17,7 +17,7 @@
 package internal.sql.lhod;
 
 import java.sql.Types;
-import java.util.Arrays;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -28,11 +28,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 final class LhodResultSetMetaData extends _ResultSetMetaData {
 
     @NonNull
-    static LhodResultSetMetaData of(@NonNull String[] names, @NonNull String[] dataTypes) throws IllegalArgumentException {
-        if (names.length != dataTypes.length) {
-            throw new IllegalArgumentException(String.format("Invalid data type length: expected '%s', found '%s'", names.length, dataTypes.length));
+    static LhodResultSetMetaData of(@NonNull List<TabDataColumn> columns) {
+        String[] names = new String[columns.size()];
+        DataTypeEnum[] types = new DataTypeEnum[columns.size()];
+        for (int i = 0; i < columns.size(); i++) {
+            names[i] = columns.get(i).getName();
+            types[i] = DataTypeEnum.parse(columns.get(i).getType());
         }
-        return new LhodResultSetMetaData(names, Arrays.stream(dataTypes).mapToInt(Integer::parseInt).mapToObj(DataTypeEnum::parse).toArray(DataTypeEnum[]::new));
+        return new LhodResultSetMetaData(names, types);
     }
 
     @lombok.NonNull
@@ -77,7 +80,8 @@ final class LhodResultSetMetaData extends _ResultSetMetaData {
         return types[column - 1].name();
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Implementation details">
+    @lombok.AllArgsConstructor
+    @lombok.Getter
     private enum DataTypeEnum {
 
         adEmpty(0, Types.OTHER),
@@ -124,11 +128,6 @@ final class LhodResultSetMetaData extends _ResultSetMetaData {
         private final int value;
         private final int sqlType;
 
-        private DataTypeEnum(int value, int sqlType) {
-            this.value = value;
-            this.sqlType = sqlType;
-        }
-
         public static DataTypeEnum parse(int value) {
             for (DataTypeEnum o : values()) {
                 if (o.value == value) {
@@ -138,5 +137,4 @@ final class LhodResultSetMetaData extends _ResultSetMetaData {
             return DataTypeEnum.adIUnknown;
         }
     }
-    //</editor-fold>
 }

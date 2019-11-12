@@ -24,10 +24,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @author Philippe Charles
  */
-interface TabularDataExecutor extends Closeable {
+interface TabDataExecutor extends Closeable {
 
     @NonNull
-    TabularDataReader exec(@NonNull TabularDataQuery query) throws IOException;
+    TabDataReader exec(@NonNull TabDataQuery query) throws IOException;
 
     boolean isClosed() throws IOException;
 }

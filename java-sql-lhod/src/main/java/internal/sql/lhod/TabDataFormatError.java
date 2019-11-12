@@ -22,13 +22,13 @@ import java.io.IOException;
  *
  * @author Philippe Charles
  */
-final class TabularDataError extends IOException {
+final class TabDataFormatError extends IOException {
 
-    @lombok.Getter
-    private final int number;
-
-    public TabularDataError(String description, int number) {
+    public TabDataFormatError(String description) {
         super(description);
-        this.number = number;
+    }
+
+    public TabDataFormatError(String description, Throwable cause) {
+        super(description, cause);
     }
 }

@@ -44,8 +44,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         try {
             return getIdentifierCaseType() == IdentifierCaseType.UPPER;
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
         }
     }
@@ -56,8 +56,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         try {
             return getIdentifierCaseType() == IdentifierCaseType.LOWER;
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
         }
     }
@@ -68,8 +68,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         try {
             return getIdentifierCaseType() == IdentifierCaseType.MIXED;
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
         }
     }
@@ -95,8 +95,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
                     .sorted()
                     .collect(Collectors.joining(","));
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to get string functions of '%s'", conn.getConnectionString()), ex);
         }
     }
@@ -107,8 +107,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         try {
             return conn.getProperty(LhodConnection.DynamicProperty.SPECIAL_CHARACTERS);
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to get extra name chars of '%s'", conn.getConnectionString()), ex);
         }
     }
@@ -117,7 +117,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
         conn.checkState();
 
-        TabularDataQuery query = TabularDataQuery
+        TabDataQuery query = TabDataQuery
                 .builder()
                 .procedure("OpenSchema")
                 .parameter(conn.getConnectionString())
@@ -130,8 +130,8 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         try {
             return LhodResultSet.of(conn.exec(query));
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to list tables with catalog='%s', schemaPattern='%s', tableNamePattern='%s', types='%s' of '%s'", catalog, schemaPattern, tableNamePattern, types != null ? Arrays.toString(types) : null, conn.getConnectionString()), ex);
         }
     }

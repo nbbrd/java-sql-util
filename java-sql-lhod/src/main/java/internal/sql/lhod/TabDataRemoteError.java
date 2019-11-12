@@ -16,21 +16,19 @@
  */
 package internal.sql.lhod;
 
-import internal.sys.CachedResourceExtractor;
-import internal.sys.DefaultResourceExtractor;
-import internal.sys.ResourceExtractor;
 import java.io.IOException;
 
 /**
  *
  * @author Philippe Charles
  */
-final class VbsEngine implements TabDataEngine {
+final class TabDataRemoteError extends IOException {
 
-    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsEngine.class));
+    @lombok.Getter
+    private final int number;
 
-    @Override
-    public TabDataExecutor getExecutor() throws IOException {
-        return new VbsExecutor(scripts);
+    public TabDataRemoteError(String description, int number) {
+        super(description);
+        this.number = number;
     }
 }

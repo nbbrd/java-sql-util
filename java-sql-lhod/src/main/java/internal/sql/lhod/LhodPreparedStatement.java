@@ -21,8 +21,11 @@ import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -37,7 +40,7 @@ final class LhodPreparedStatement extends _PreparedStatement {
     @lombok.NonNull
     private final String sql;
 
-    private final List<String> parameters = new ArrayList<>();
+    private final Map<Integer, String> parameters = new HashMap<>();
 
     private boolean closed = false;
 
@@ -45,19 +48,19 @@ final class LhodPreparedStatement extends _PreparedStatement {
     public ResultSet executeQuery() throws SQLException {
         checkState();
 
-        TabularDataQuery query = TabularDataQuery
+        TabDataQuery query = TabDataQuery
                 .builder()
                 .procedure("PreparedStatement")
                 .parameter(conn.getConnectionString())
                 .parameter(sql)
-                .parameters(parameters)
+                .parameters(getParameterList())
                 .build();
 
         try {
             return LhodResultSet.of(conn.exec(query));
         } catch (IOException ex) {
-            throw ex instanceof TabularDataError
-                    ? new SQLException(ex.getMessage(), "", ((TabularDataError) ex).getNumber())
+            throw ex instanceof TabDataRemoteError
+                    ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
                     : new SQLException(format("Failed to execute query '%s'", sql), ex);
         }
     }
@@ -75,7 +78,8 @@ final class LhodPreparedStatement extends _PreparedStatement {
     @Override
     public void setString(int parameterIndex, String x) throws SQLException {
         checkState();
-        parameters.add(parameterIndex - 1, x);
+        chechParameterIndex(parameterIndex);
+        parameters.put(parameterIndex, x);
     }
 
     @Override
@@ -84,9 +88,25 @@ final class LhodPreparedStatement extends _PreparedStatement {
         return conn;
     }
 
+    List<String> getParameterList() {
+        return parameters
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+    }
+
     private void checkState() throws SQLException {
+        conn.checkState();
         if (closed) {
             throw new SQLException("PreparedStatement closed");
+        }
+    }
+
+    private void chechParameterIndex(int parameterIndex) throws SQLException {
+        if (parameterIndex < 1) {
+            throw new SQLException("Parameter index out of bounds: " + parameterIndex);
         }
     }
 }
