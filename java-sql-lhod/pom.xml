@@ -48,4 +48,97 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <!-- Repack single-file-lib -->
+        <profile>
+            <id>repack-single-file-lib</id>
+            <activation>
+                <property>
+                    <name>!skipRepackSingleFileLib</name>
+                </property>
+            </activation>
+            <properties>
+                <repack.basedir>${project.build.directory}/unpack</repack.basedir>
+                <repack.prefix>internal</repack.prefix>
+                <repack.pacdir>${project.build.directory}/repack</repack.pacdir>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- Step 1: unpack source code -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>repack-step1</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>be.nbb.rd</groupId>
+                                            <artifactId>picocsv</artifactId>
+                                            <version>1.0.0</version>
+                                            <classifier>sources</classifier>
+                                            <includes>**/Csv.java</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${repack.basedir}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 2: move files to right folder and replace package declaration & imports -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <id>repack-step2</id>
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <target>
+                                        <move todir="${repack.pacdir}/${repack.prefix}">
+                                            <fileset dir="${repack.basedir}" />
+                                        </move>
+                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace="\1 ${repack.prefix}.nbbrd.picocsv">
+                                            <fileset dir="${repack.pacdir}/${repack.prefix}"/>
+                                        </replaceregexp>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Step 3: add repacked folder as source folder -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>repack-step3</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${repack.pacdir}</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

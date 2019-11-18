@@ -22,8 +22,8 @@ import java.io.IOException;
 import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.List;
+import internal.nbbrd.picocsv.Csv;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  *
@@ -34,13 +34,14 @@ final class TabDataReader implements Closeable {
 
     @NonNull
     static TabDataReader of(@NonNull BufferedReader reader) throws IOException {
-        List<TabDataColumn> columns = readColumnHeaders(reader);
-        return new TabDataReader(reader, columns, new String[columns.size()]);
+        Csv.Reader x = Csv.Reader.of(reader, Csv.Format.RFC4180.toBuilder().delimiter('\t').build());
+        List<TabDataColumn> columns = readColumnHeaders(x);
+        return new TabDataReader(x, columns, new String[columns.size()]);
     }
 
     private static final String DELIMITER = "\t";
 
-    private final BufferedReader reader;
+    private final Csv.Reader reader;
 
     @lombok.Getter
     private final List<TabDataColumn> columns;
@@ -54,9 +55,15 @@ final class TabDataReader implements Closeable {
     }
 
     public boolean readNextRow() throws IOException {
-        String line = readNextLine(reader);
-        if (line != null) {
-            splitInto(line, currentRow);
+        if (reader.readLine()) {
+            if (!reader.readField()) {
+                throw parseError(reader);
+            }
+            int idx = 0;
+            currentRow[idx++] = reader.toString();
+            while (reader.readField()) {
+                currentRow[idx++] = reader.toString();
+            }
             return true;
         }
         return false;
@@ -72,56 +79,40 @@ final class TabDataReader implements Closeable {
         reader.close();
     }
 
-    private static String[] split(String line) {
-        return line.split(DELIMITER, -1);
-    }
-
-    private static void splitInto(String line, String[] array) {
-        int start = 0;
-        for (int i = 0; i < array.length - 1; i++) {
-            int stop = line.indexOf(DELIMITER, start);
-            array[i] = line.substring(start, stop);
-            start = stop + DELIMITER.length();
+    private static TabDataRemoteError parseError(Csv.Reader reader) throws IOException {
+        if (!reader.readLine()) {
+            throw new TabDataFormatError("Expected error on next row");
         }
-        array[array.length - 1] = line.substring(start);
-    }
 
-    @Nullable
-    private static String readNextLine(@NonNull BufferedReader reader) throws IOException {
-        String line = reader.readLine();
-        if (line != null && line.isEmpty()) {
-            throw parseError(reader);
+        if (!reader.readField()) {
+            throw new TabDataFormatError("Expected error code on next field");
         }
-        return line;
-    }
+        String errorCode = reader.toString();
 
-    private static TabDataRemoteError parseError(@NonNull BufferedReader reader) throws IOException {
-        String line = reader.readLine();
-        if (line != null && !line.isEmpty()) {
-            int index = line.indexOf(DELIMITER);
-            if (index != -1) {
-                try {
-                    return new TabDataRemoteError(line.substring(index + DELIMITER.length()), Integer.parseInt(line.substring(0, index)));
-                } catch (NumberFormatException ex) {
-                    throw new TabDataFormatError("Cannot parse error code", ex);
-                }
-            }
+        if (!reader.readField()) {
+            throw new TabDataFormatError("Expected error description on next field");
         }
-        throw new TabDataFormatError("Expected error description on next row");
+        String errorMessage = reader.toString();
+
+        try {
+            return new TabDataRemoteError(errorMessage, Integer.parseInt(errorCode));
+        } catch (NumberFormatException ex) {
+            throw new TabDataFormatError("Cannot parse error code", ex);
+        }
     }
 
-    private static List<TabDataColumn> readColumnHeaders(BufferedReader reader) throws IOException {
-        String[] names = readHeader(reader, "names");
-        String[] types = readHeader(reader, "types");
+    private static List<TabDataColumn> readColumnHeaders(Csv.Reader reader) throws IOException {
+        List<String> names = readHeader(reader, "names");
+        List<String> types = readHeader(reader, "types");
 
-        if (names.length != types.length) {
-            throw new TabDataFormatError(format("Invalid data type length: expected '%s', found '%s'", names.length, types.length));
+        if (names.size() != types.size()) {
+            throw new TabDataFormatError(format("Invalid data type length: expected '%s', found '%s'", names.size(), types.size()));
         }
 
         List<TabDataColumn> result = new ArrayList<>();
-        for (int i = 0; i < names.length; i++) {
+        for (int i = 0; i < names.size(); i++) {
             try {
-                result.add(new TabDataColumn(names[i], Integer.parseInt(types[i])));
+                result.add(new TabDataColumn(names.get(i), Integer.parseInt(types.get(i))));
             } catch (NumberFormatException ex) {
                 throw new TabDataFormatError("Cannot parse type code", ex);
             }
@@ -129,14 +120,18 @@ final class TabDataReader implements Closeable {
         return result;
     }
 
-    private static String[] readHeader(BufferedReader reader, String id) throws IOException {
-        String header = readNextLine(reader);
-        if (header == null) {
+    private static List<String> readHeader(Csv.Reader reader, String id) throws IOException {
+        if (!reader.readLine()) {
             throw new TabDataFormatError(format("Expected header %s", id));
         }
-        if (header.isEmpty()) {
+        if (!reader.readField()) {
             throw parseError(reader);
         }
-        return split(header);
+        List<String> result = new ArrayList<>();
+        result.add(reader.toString());
+        while (reader.readField()) {
+            result.add(reader.toString());
+        }
+        return result;
     }
 }
