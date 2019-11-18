@@ -204,7 +204,7 @@ class Resources {
 
         private static String load(String resourceName) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Resources.class.getResourceAsStream(resourceName), StandardCharsets.UTF_8))) {
-                return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+                return reader.lines().collect(Collectors.joining("\r\n"));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
