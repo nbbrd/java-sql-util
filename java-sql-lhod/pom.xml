@@ -82,7 +82,7 @@
                                         <artifactItem>
                                             <groupId>be.nbb.rd</groupId>
                                             <artifactId>picocsv</artifactId>
-                                            <version>1.0.0</version>
+                                            <version>1.0.1</version>
                                             <classifier>sources</classifier>
                                             <includes>**/Csv.java</includes>
                                         </artifactItem>
