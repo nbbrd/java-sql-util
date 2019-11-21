@@ -7,43 +7,109 @@ Const adModeRead = 1
 
 SetLocale(en_US)
 
+Dim connectionString : connectionString = Wscript.Arguments.Item(0)
+Dim dynamicPropertyKeys : dynamicPropertyKeys = GetArgs(1, Wscript.Arguments.Count)
+
+Dim csv : Set csv = new CsvWriter
+
 Dim conn : Set conn = CreateObject("ADODB.Connection")
 conn.Mode = adModeRead
-conn.Open Wscript.Arguments.Item(0)
-CheckErr()
+conn.Open connectionString
+Call CheckErr(csv)
 
-PrintProperties(conn.Properties)
-CheckErr()
+Call PrintHead(csv)
+Call PrintBody(csv, conn.Properties, dynamicPropertyKeys)
+Call CheckErr(csv)
 
 conn.Close : Set conn = Nothing
 
-Sub PrintProperties(properties)
-  Wscript.StdOut.WriteLine "Name" & vbTab & "Value"
-  Wscript.StdOut.WriteLine adVarChar & vbTab & adVarChar
-  Dim x
-  If Wscript.Arguments.Count = 1 Then
-    For Each x In properties
-      PrintProperty(x)
+' --- specific code ---
+  
+Sub PrintHead(csv)
+  csv.WriteField("Name")
+  csv.WriteField("Value")
+  csv.WriteEndOfLine()
+
+  csv.WriteField(adVarChar)
+  csv.WriteField(adVarChar)
+  csv.WriteEndOfLine()
+End Sub
+
+Sub PrintBody(csv, properties, dynamicPropertyKeys)
+  Dim prop
+  If UBound(dynamicPropertyKeys) = 0 Then
+    For Each prop In properties
+      Call PrintProperty(csv, prop)
     Next
   Else
-    For Each x In properties
-      Dim i : For i = 1 to Wscript.Arguments.Count - 1
-        If StrComp(x.Name, Wscript.Arguments(i)) = 0 Then
-          PrintProperty(x)
-          Exit For
-        End If
-      Next
+    For Each prop In properties
+	  If IsRequiredProperty(prop, dynamicPropertyKeys) Then
+        Call PrintProperty(csv, prop)
+      End If
     Next
   End If
 End Sub
 
-Sub PrintProperty(x)
-  Wscript.StdOut.WriteLine x.Name & vbTab & x.Value
+Function IsRequiredProperty(prop, dynamicPropertyKeys)
+  IsRequiredProperty = false
+  Dim item : For Each item in dynamicPropertyKeys
+    If StrComp(prop.Name, item) = 0 Then
+	  IsRequiredProperty = true
+	  Exit For
+    End If
+  Next
+End Function
+
+Sub PrintProperty(csv, prop)
+  csv.WriteField(prop.Name)
+  csv.WriteField(prop.Value)
+  csv.WriteEndOfline()
 End Sub
 
-Sub CheckErr()
+' --- generic code ---
+
+Sub CheckErr(csv)
   If Err.Number <> 0 Then
-    WScript.StdOut.WriteLine vbCrLf & Err.Number & vbTab & Err.Description
+    csv.WriteEndOfLine()
+	csv.WriteField(Err.Number)
+	csv.WriteField(Err.Description)
     Wscript.quit(1)
   End If
 End Sub
+
+Class CsvWriter
+  private quote
+  private requiresDelimiter
+  
+  Private Sub Class_Initialize()
+    quote = Chr(34)
+    requiresDelimiter = false
+  End Sub
+  
+  Public Sub WriteField(field)
+    If requiresDelimiter Then
+	  WScript.StdOut.Write vbTab
+	End If
+	requiresDelimiter = true
+	WScript.StdOut.Write field & ""
+  End Sub
+  
+  Public Sub WriteEndOfLine()
+    WScript.StdOut.Write vbCrLf
+	requiresDelimiter = false
+  End Sub
+End Class
+
+Function GetArgs(starting, ending)
+  Dim out_array
+  out_array = Array()
+
+  If ending >= starting Then
+    ReDim Preserve out_array(ending - starting)
+    Dim i : For i = starting To ending - 1
+      out_array(i - starting) = Wscript.Arguments.Item(i)
+    Next
+  End If
+
+  GetArgs = out_array
+End Function
