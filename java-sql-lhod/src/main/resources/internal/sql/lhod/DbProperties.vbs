@@ -71,33 +71,119 @@ End Sub
 Sub CheckErr(csv)
   If Err.Number <> 0 Then
     csv.WriteEndOfLine()
-	csv.WriteField(Err.Number)
-	csv.WriteField(Err.Description)
+    csv.WriteField(Err.Number)
+    csv.WriteField(Err.Description)
     Wscript.quit(1)
   End If
 End Sub
 
 Class CsvWriter
-  private quote
-  private requiresDelimiter
+  Private STATE_NO_FIELD, STATE_SINGLE_EMPTY_FIELD, STATE_MULTI_FIELD
+  Private QUOTING_NONE, QUOTING_PARTIAL, QUOTING_FULL
+
+  Private quote
+  Private delimiter
+  Private endOfLine
+
+  Private state
   
   Private Sub Class_Initialize()
-    quote = Chr(34)
-    requiresDelimiter = false
+    ' State enum
+    STATE_NO_FIELD = 0
+    STATE_SINGLE_EMPTY_FIELD = 1
+    STATE_MULTI_FIELD = 2
+    ' Quoting enum
+    QUOTING_NONE = 0
+    QUOTING_PARTIAL = 1
+    QUOTING_FULL = 2
+    ' Csv format
+    quote = Chr(34) ' double quotes
+    delimiter = vbTab
+    endOfLine = vbCrLf
+    ' Initiol state
+    state = STATE_NO_FIELD
   End Sub
   
   Public Sub WriteField(field)
-    If requiresDelimiter Then
-	  WScript.StdOut.Write vbTab
-	End If
-	requiresDelimiter = true
-	WScript.StdOut.Write field & ""
+    Select Case state
+      Case STATE_NO_FIELD
+        If (IsNonEmptyField(field)) Then
+          state = STATE_MULTI_FIELD
+          WriteNonEmptyField(field)
+        Else
+          state = STATE_SINGLE_EMPTY_FIELD
+        End If
+      Case STATE_SINGLE_EMPTY_FIELD
+        state = STATE_MULTI_FIELD
+        WScript.StdOut.Write delimiter
+        If (IsNonEmptyField(field)) Then
+          WriteNonEmptyField(field)
+        End If
+      Case STATE_MULTI_FIELD
+        WScript.StdOut.Write delimiter
+        If (IsNonEmptyField(field)) Then
+          WriteNonEmptyField(field)
+        End If
+    End Select
   End Sub
   
   Public Sub WriteEndOfLine()
-    WScript.StdOut.Write vbCrLf
-	requiresDelimiter = false
+    FlushField()
+    WScript.StdOut.Write endOfLine
   End Sub
+
+  Private Function IsNonEmptyField(field)
+    IsNonEmptyField = Len(field & "") > 0
+  End Function
+
+  Private Sub WriteNonEmptyField(field)
+    Select Case GetQuoting(field)
+      Case QUOTING_NONE
+        WScript.StdOut.Write field
+      Case QUOTING_PARTIAL
+        WScript.StdOut.Write quote
+        WScript.StdOut.Write field
+        WScript.StdOut.Write quote
+      Case QUOTING_FULL
+        WScript.StdOut.Write quote
+        Dim c
+        Dim i : For i = 1 To Len(field)
+          c = Mid(field, i, 1)
+          If (c = quote) Then
+            WScript.StdOut.Write quote
+          End If
+          WScript.StdOut.Write c
+        Next
+        WScript.StdOut.Write quote
+    End Select
+  End Sub
+
+  Private Sub FlushField()
+    If (state = STATE_SINGLE_EMPTY_FIELD) Then
+      WScript.StdOut.Write quote
+      WScript.StdOut.Write quote
+    End If
+    state = STATE_NO_FIELD
+  End Sub
+
+  Private Function GetQuoting(field)
+    GetQuoting = QUOTING_NONE
+    Dim c
+    Dim i : For i = 1 To Len(field)
+      c = Mid(field, i, 1)
+      If (c = quote) Then
+        GetQuoting = QUOTING_FULL
+        Exit Function
+      End If
+      If ((c = delimiter) Or IsNewLine(c)) Then
+        GetQuoting = QUOTING_PARTIAL
+      End If
+    Next
+  End Function
+
+  Private Function IsNewLine(c)
+    IsNewLine = (c = vbCr) Or (c = vbLf)
+  End Function
 End Class
 
 Function GetArgs(starting, ending)
