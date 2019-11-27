@@ -108,6 +108,7 @@ Class CsvWriter
   End Sub
   
   Public Sub WriteField(field)
+    field =  field & ""
     Select Case state
       Case STATE_NO_FIELD
         If (IsNonEmptyField(field)) Then
@@ -136,7 +137,7 @@ Class CsvWriter
   End Sub
 
   Private Function IsNonEmptyField(field)
-    IsNonEmptyField = Len(field & "") > 0
+    IsNonEmptyField = Len(field) > 0
   End Function
 
   Private Sub WriteNonEmptyField(field)
