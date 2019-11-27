@@ -20,7 +20,6 @@ import internal.sys.OS;
 import java.sql.Connection;
 import java.sql.SQLException;
 import nbbrd.service.ServiceProvider;
-import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
 
 /**
@@ -30,20 +29,16 @@ import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
 @ServiceProvider(OdbcConnectionSupplierSpi.class)
 public final class LhodConnectionSupplier implements OdbcConnectionSupplierSpi {
 
-    private static final String DRIVER_CLASS_NAME = LhodDriver.class.getName();
-
-    private final SqlConnectionSupplier delegate = SqlConnectionSupplier.ofDriverManager(DRIVER_CLASS_NAME, o -> LhodDriver.PREFIX + o);
+    private final LhodDriver driver = new LhodDriver();
 
     @Override
     public String getName() {
-        return DRIVER_CLASS_NAME;
+        return driver.getClass().getName();
     }
 
     @Override
     public boolean isAvailable() {
-        return OS.NAME == OS.Name.WINDOWS
-                && SqlConnectionSupplier.isDriverLoadable(DRIVER_CLASS_NAME)
-                && SqlConnectionSupplier.isDriverRegistered(DRIVER_CLASS_NAME);
+        return OS.NAME == OS.Name.WINDOWS;
     }
 
     @Override
@@ -53,6 +48,6 @@ public final class LhodConnectionSupplier implements OdbcConnectionSupplierSpi {
 
     @Override
     public Connection getConnection(String connectionString) throws SQLException {
-        return delegate.getConnection(connectionString);
+        return driver.connect(LhodDriver.PREFIX + connectionString, null);
     }
 }

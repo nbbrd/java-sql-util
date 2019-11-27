@@ -67,6 +67,7 @@ public interface SqlConnectionSupplier {
         return NoOpSupplier.INSTANCE;
     }
 
+//    @jdk.internal.reflect.CallerSensitive
     static boolean isDriverLoadable(@NonNull String driverClassName) {
         try {
             return Driver.class.isAssignableFrom(Class.forName(driverClassName));
@@ -75,6 +76,7 @@ public interface SqlConnectionSupplier {
         }
     }
 
+//    @jdk.internal.reflect.CallerSensitive
     static boolean isDriverRegistered(@NonNull String driverClassName) {
         return Collections
                 .list(DriverManager.getDrivers())
