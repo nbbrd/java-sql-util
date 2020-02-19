@@ -19,14 +19,15 @@ package internal.sql.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Hashtable;
+import java.util.stream.Stream;
 import javax.naming.Binding;
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import nbbrd.sql.jdbc.InMemoryDriver;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.Test;
 
@@ -41,10 +42,10 @@ public class JndiSupplierTest {
         assertThatExceptionOfType(SQLException.class)
                 .isThrownBy(() -> new JndiSupplier(() -> {
             throw new Exception("error");
-        }).getConnection("mem:test"))
+        }).getConnection(InMemoryDriver.HSQLDB.name()))
                 .withMessageContaining("Cannot retrieve context");
 
-        JndiSupplier x = new JndiSupplier(CustomContext::new);
+        JndiSupplier x = new JndiSupplier(InMemoryDriverContext::new);
 
         assertThatNullPointerException()
                 .isThrownBy(() -> x.getConnection(null));
@@ -53,12 +54,12 @@ public class JndiSupplierTest {
                 .isThrownBy(() -> x.getConnection(""));
 
         assertThatCode(() -> {
-            try (Connection conn = x.getConnection("mem:test")) {
+            try (Connection conn = x.getConnection(InMemoryDriver.HSQLDB.name())) {
             }
         }).doesNotThrowAnyException();
     }
 
-    private static final class CustomContext implements Context {
+    private static final class InMemoryDriverContext implements Context {
 
         @Override
         public Object lookup(Name name) throws NamingException {
@@ -67,11 +68,11 @@ public class JndiSupplierTest {
 
         @Override
         public Object lookup(String name) throws NamingException {
-            switch (name) {
-                case "mem:test":
-                    return DataSourceBasedSupplierTest.newDataSource("jdbc:hsqldb:mem:test");
-            }
-            throw new NamingException("Not supported yet.");
+            return Stream.of(InMemoryDriver.values())
+                    .filter(driver -> driver.name().equals(name))
+                    .map(driver -> DataSourceBasedSupplierTest.newDataSource(driver.getUrl()))
+                    .findFirst()
+                    .orElseThrow(NamingException::new);
         }
 
         @Override

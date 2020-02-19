@@ -32,11 +32,7 @@ public class DataSourceBasedSupplierTest {
 
     @Test
     public void testGetConnection() {
-        assertThatExceptionOfType(SQLException.class)
-                .isThrownBy(() -> new DriverManagerSupplier("abc", o -> "jdbc:hsqldb:" + o).getConnection("mem:test"))
-                .withMessageContaining("abc");
-
-        DataSourceBasedSupplier x = new DataSourceBasedSupplier(o -> newDataSource("jdbc:hsqldb:" + o));
+        DataSourceBasedSupplier x = new DataSourceBasedSupplier(connectionString -> newDataSource("jdbc:hsqldb:" + connectionString));
 
         assertThatNullPointerException()
                 .isThrownBy(() -> x.getConnection(null));
