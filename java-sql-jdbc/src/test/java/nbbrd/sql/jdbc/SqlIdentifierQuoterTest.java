@@ -33,9 +33,9 @@ public class SqlIdentifierQuoterTest {
     public void testFactory() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> SqlIdentifierQuoter.of(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
+        try (Connection conn = getHsqldbConnection()) {
             assertThat(SqlIdentifierQuoter.of(conn.getMetaData()))
-                    .isEqualTo(SqlIdentifierQuoter.builder().sqlKeywords(SqlKeywords.SQL2003_RESERVED_WORDS.getKeywords()).build());
+                    .isEqualTo(SqlIdentifierQuoter.builder().sqlKeywords(SqlKeywords.LATEST_RESERVED_WORDS.getKeywords()).build());
         }
     }
 
@@ -43,7 +43,7 @@ public class SqlIdentifierQuoterTest {
     public void testLoadIdentifierQuoteString() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> loadIdentifierQuoteString(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
+        try (Connection conn = getHsqldbConnection()) {
             assertThat(loadIdentifierQuoteString(conn.getMetaData()))
                     .isEqualTo("\"");
         }
@@ -53,9 +53,9 @@ public class SqlIdentifierQuoterTest {
     public void testLoadSqlKeywords() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> loadSqlKeywords(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
+        try (Connection conn = getHsqldbConnection()) {
             assertThat(loadSqlKeywords(conn.getMetaData()))
-                    .containsAll(SqlKeywords.SQL2003_RESERVED_WORDS.getKeywords())
+                    .containsAll(SqlKeywords.LATEST_RESERVED_WORDS.getKeywords())
                     .doesNotContain("");
         }
     }
@@ -64,7 +64,7 @@ public class SqlIdentifierQuoterTest {
     public void testLoadExtraNameCharacters() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> loadExtraNameCharacters(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:tests")) {
+        try (Connection conn = getHsqldbConnection()) {
             assertThat(loadExtraNameCharacters(conn.getMetaData()))
                     .isEmpty();
         }
@@ -168,5 +168,9 @@ public class SqlIdentifierQuoterTest {
         assertThat(x.quote("a bc")).isEqualTo("'a bc'");
         assertThat(x.quote("a bc", false)).isEqualTo("'a bc'");
         assertThat(x.quote("a bc", true)).isEqualTo("'a bc'");
+    }
+
+    private static Connection getHsqldbConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:hsqldb:mem:test");
     }
 }
