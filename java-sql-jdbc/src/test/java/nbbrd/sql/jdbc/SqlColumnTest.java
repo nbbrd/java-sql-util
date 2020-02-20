@@ -17,7 +17,6 @@
 package nbbrd.sql.jdbc;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -42,14 +41,18 @@ public class SqlColumnTest {
 
     @Test
     public void testAllOfMetaData() throws SQLException {
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
-            try (Statement statement = conn.createStatement()) {
-                try (ResultSet rs = statement.executeQuery("select * from INFORMATION_SCHEMA.COLUMNS")) {
-                    ResultSetMetaData metaData = rs.getMetaData();
+        for (InMemoryDriver driver : InMemoryDriver.not(InMemoryDriver.DERBY, InMemoryDriver.SQLITE)) {
+            try (Connection conn = driver.getConnection()) {
+                try (Statement statement = conn.createStatement()) {
+                    try (ResultSet rs = statement.executeQuery("select * from INFORMATION_SCHEMA.COLUMNS")) {
+                        ResultSetMetaData metaData = rs.getMetaData();
 
-                    assertThat(SqlColumn.allOf(metaData))
-                            .isNotEmpty()
-                            .contains(tableNameColumn);
+                        assertThat(SqlColumn.allOf(metaData))
+                                .filteredOn(column -> column.getName().equals("TABLE_NAME"))
+                                .hasSize(1)
+                                .first()
+                                .isEqualToComparingOnlyGivenFields(tableNameColumn, "className", "label", "name", "type", "typeName");
+                    }
                 }
             }
         }

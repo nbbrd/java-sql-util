@@ -18,8 +18,8 @@ package nbbrd.sql.jdbc;
 
 import static nbbrd.sql.jdbc.SqlIdentifierQuoter.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Set;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.Test;
 
@@ -33,9 +33,29 @@ public class SqlIdentifierQuoterTest {
     public void testFactory() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> SqlIdentifierQuoter.of(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
-            assertThat(SqlIdentifierQuoter.of(conn.getMetaData()))
-                    .isEqualTo(SqlIdentifierQuoter.builder().sqlKeywords(SqlKeywords.SQL2003_RESERVED_WORDS.getKeywords()).build());
+        for (InMemoryDriver driver : InMemoryDriver.values()) {
+            try (Connection conn = driver.getConnection()) {
+                SqlIdentifierQuoter quoter = SqlIdentifierQuoter.of(conn.getMetaData());
+
+                assertThat(quoter.getQuoteString())
+                        .isEqualTo(driver.getQuoteString());
+
+                if (driver.isCustomKeywords()) {
+                    assertThat(quoter.getSqlKeywords())
+                            .containsAll(latestKeywords)
+                            .hasSizeGreaterThan(latestKeywords.size())
+                            .doesNotContain("");
+                } else {
+                    assertThat(quoter.getSqlKeywords())
+                            .containsExactlyElementsOf(latestKeywords);
+                }
+
+                assertThat(quoter.getUnquotedStorageRule())
+                        .isEqualTo(driver.getStorageRule());
+
+                assertThat(quoter.getExtraNameCharacters())
+                        .isEqualTo(driver.getExtraNameCharacters());
+            }
         }
     }
 
@@ -43,9 +63,11 @@ public class SqlIdentifierQuoterTest {
     public void testLoadIdentifierQuoteString() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> loadIdentifierQuoteString(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
-            assertThat(loadIdentifierQuoteString(conn.getMetaData()))
-                    .isEqualTo("\"");
+        for (InMemoryDriver driver : InMemoryDriver.values()) {
+            try (Connection conn = driver.getConnection()) {
+                assertThat(loadIdentifierQuoteString(conn.getMetaData()))
+                        .isEqualTo(driver.getQuoteString());
+            }
         }
     }
 
@@ -53,10 +75,18 @@ public class SqlIdentifierQuoterTest {
     public void testLoadSqlKeywords() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> loadSqlKeywords(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:test")) {
-            assertThat(loadSqlKeywords(conn.getMetaData()))
-                    .containsAll(SqlKeywords.SQL2003_RESERVED_WORDS.getKeywords())
-                    .doesNotContain("");
+        for (InMemoryDriver driver : InMemoryDriver.values()) {
+            try (Connection conn = driver.getConnection()) {
+                if (driver.isCustomKeywords()) {
+                    assertThat(loadSqlKeywords(conn.getMetaData()))
+                            .containsAll(latestKeywords)
+                            .hasSizeGreaterThan(latestKeywords.size())
+                            .doesNotContain("");
+                } else {
+                    assertThat(loadSqlKeywords(conn.getMetaData()))
+                            .containsExactlyElementsOf(latestKeywords);
+                }
+            }
         }
     }
 
@@ -64,9 +94,11 @@ public class SqlIdentifierQuoterTest {
     public void testLoadExtraNameCharacters() throws SQLException {
         assertThatNullPointerException().isThrownBy(() -> loadExtraNameCharacters(null));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:mem:tests")) {
-            assertThat(loadExtraNameCharacters(conn.getMetaData()))
-                    .isEmpty();
+        for (InMemoryDriver driver : InMemoryDriver.values()) {
+            try (Connection conn = driver.getConnection()) {
+                assertThat(loadExtraNameCharacters(conn.getMetaData()))
+                        .isEqualTo(driver.getExtraNameCharacters());
+            }
         }
     }
 
@@ -169,4 +201,6 @@ public class SqlIdentifierQuoterTest {
         assertThat(x.quote("a bc", false)).isEqualTo("'a bc'");
         assertThat(x.quote("a bc", true)).isEqualTo("'a bc'");
     }
+
+    private final Set<String> latestKeywords = SqlKeywords.LATEST_RESERVED_WORDS.getKeywords();
 }

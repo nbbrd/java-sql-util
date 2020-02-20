@@ -31,7 +31,7 @@ public class DriverManagerSupplierTest {
     @Test
     public void testGetConnection() {
         assertThatExceptionOfType(SQLException.class)
-                .isThrownBy(() -> new DriverManagerSupplier("abc", o -> "jdbc:hsqldb:" + o).getConnection("mem:test"))
+                .isThrownBy(() -> new DriverManagerSupplier("abc", connectionString -> "jdbc:hsqldb:" + connectionString).getConnection("mem:test"))
                 .withMessageContaining("abc");
         
         DriverManagerSupplier x = new DriverManagerSupplier(JDBCDriver.class.getName(), o -> "jdbc:hsqldb:" + o);

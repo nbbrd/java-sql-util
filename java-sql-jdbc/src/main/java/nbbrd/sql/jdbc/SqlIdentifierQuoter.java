@@ -187,8 +187,7 @@ public final class SqlIdentifierQuoter {
 
     @NonNull
     static Stream<String> getStandardKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
-        // FIXME: should it be LATEST_RESERVED_WORDS instead?
-        return SqlKeywords.SQL2003_RESERVED_WORDS.getKeywords().stream();
+        return SqlKeywords.LATEST_RESERVED_WORDS.getKeywords().stream();
     }
 
     @NonNull
