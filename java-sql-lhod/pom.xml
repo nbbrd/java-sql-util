@@ -82,7 +82,7 @@
                                         <artifactItem>
                                             <groupId>be.nbb.rd</groupId>
                                             <artifactId>picocsv</artifactId>
-                                            <version>1.1.0</version>
+                                            <version>1.2.0</version>
                                             <classifier>sources</classifier>
                                             <includes>**/Csv.java</includes>
                                         </artifactItem>
@@ -106,7 +106,7 @@
                                         <move todir="${repack.pacdir}/${repack.prefix}">
                                             <fileset dir="${repack.basedir}" />
                                         </move>
-                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace=" ${repack.prefix}.nbbrd.picocsv">
+                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace="\1 ${repack.prefix}.nbbrd.picocsv">
                                             <fileset dir="${repack.pacdir}/${repack.prefix}"/>
                                         </replaceregexp>
                                     </target>
