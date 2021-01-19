@@ -24,6 +24,7 @@ module nbbrd.sql.odbc {
 
     // required dependencies
     requires transitive nbbrd.sql.jdbc;
+    requires transitive nbbrd.io.win;
 
     // public api
     exports nbbrd.sql.odbc;
@@ -39,5 +40,4 @@ module nbbrd.sql.odbc {
 
     // private api
     exports internal.sys to nbbrd.sql.lhod;
-    exports internal.sys.win to nbbrd.sql.lhod;
 }

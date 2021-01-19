@@ -35,6 +35,11 @@
             <artifactId>java-sql-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>be.nbb.rd</groupId>
+            <artifactId>java-io-win</artifactId>
+            <version>0.0.10</version>
+        </dependency>
         
         <!-- test only -->
         <dependency>

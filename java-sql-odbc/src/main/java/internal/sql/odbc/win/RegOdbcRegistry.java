@@ -1,40 +1,39 @@
 /*
  * Copyright 2018 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.odbc.win;
 
 import internal.sql.odbc.win.WinOdbcRegistryUtil.Registry;
 import internal.sql.odbc.win.WinOdbcRegistryUtil.Registry.Root;
-import internal.sys.OS;
-import internal.sys.win.RegWrapper;
-import internal.sys.win.RegWrapper.RegValue;
-import internal.sys.win.WhereWrapper;
+import nbbrd.io.sys.OS;
+import nbbrd.io.win.RegWrapper;
+import nbbrd.io.win.WhereWrapper;
+import nbbrd.service.ServiceProvider;
+import nbbrd.sql.odbc.OdbcDataSource;
+import nbbrd.sql.odbc.OdbcDriver;
+import nbbrd.sql.odbc.OdbcRegistrySpi;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import nbbrd.service.ServiceProvider;
-import nbbrd.sql.odbc.OdbcDataSource;
-import nbbrd.sql.odbc.OdbcDriver;
-import nbbrd.sql.odbc.OdbcRegistrySpi;
 
 /**
- *
  * @author Philippe Charles
  */
 @lombok.extern.java.Log
@@ -105,7 +104,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     private static final class MapRegistry implements WinOdbcRegistryUtil.Registry {
 
         @lombok.Singular
-        private final Map<String, List<RegValue>> keys;
+        private final Map<String, List<RegWrapper.RegValue>> keys;
 
         @Override
         public boolean keyExists(Root root, String key) throws IOException {
@@ -117,7 +116,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
         public Map<String, Object> getValues(Root root, String key) throws IOException {
             String target = root + WinOdbcRegistryUtil.KEY_SEPARATOR + key;
             return keys.containsKey(target)
-                    ? keys.get(target).stream().collect(Collectors.toMap(RegValue::getName, RegValue::getValue))
+                    ? keys.get(target).stream().collect(Collectors.toMap(RegWrapper.RegValue::getName, RegWrapper.RegValue::getValue))
                     : Collections.emptySortedMap();
         }
 
@@ -125,7 +124,15 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
 
             public Builder load(Root root, String subkey, boolean recursive) throws IOException {
                 String keyName = root + WinOdbcRegistryUtil.KEY_SEPARATOR + subkey;
-                return keys(RegWrapper.query(keyName, recursive));
+                try {
+                    return keys(RegWrapper.query(keyName, recursive));
+                } catch (IOException ex) {
+                    // FIXME: "ERROR: The system was unable to find the specified registry key or value."
+                    if (ex.getMessage().contains("Invalid exit value: 1")) {
+                        return this;
+                    }
+                    throw ex;
+                }
             }
         }
     }
