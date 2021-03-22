@@ -34,7 +34,7 @@ final class TabDataReader implements Closeable {
 
     @NonNull
     static TabDataReader of(@NonNull BufferedReader reader) throws IOException {
-        Csv.Reader x = Csv.Reader.of(reader, Csv.Format.RFC4180.toBuilder().delimiter('\t').build());
+        Csv.Reader x = Csv.Reader.of(Csv.Format.RFC4180.toBuilder().delimiter('\t').build(), Csv.ReaderOptions.DEFAULT, reader, Csv.DEFAULT_CHAR_BUFFER_SIZE);
         List<TabDataColumn> columns = readColumnHeaders(x);
         return new TabDataReader(x, columns, new String[columns.size()]);
     }

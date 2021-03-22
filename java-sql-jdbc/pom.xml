@@ -3,14 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>be.nbb.rd</groupId>
+        <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
         <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>java-sql-jdbc</artifactId>
     <packaging>jar</packaging>
-    
+
+    <name>java-sql-jdbc</name>
+    <description>Java SQL utilities - JDBC</description>
+    <url>https://github.com/nbbrd/java-sql-util</url>
+
     <dependencies>
         <!-- compile only -->
         <dependency>
@@ -24,7 +28,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>be.nbb.rd</groupId>
+            <groupId>com.github.nbbrd.java-service-util</groupId>
             <artifactId>java-service-processor</artifactId>
             <scope>provided</scope>
         </dependency>

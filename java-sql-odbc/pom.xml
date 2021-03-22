@@ -3,14 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>be.nbb.rd</groupId>
+        <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
         <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>java-sql-odbc</artifactId>
     <packaging>jar</packaging>
-    
+
+    <name>java-sql-odbc</name>
+    <description>Java SQL utilities - ODBC</description>
+    <url>https://github.com/nbbrd/java-sql-util</url>
+
     <dependencies>
         <!-- compile only -->
         <dependency>
@@ -24,21 +28,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>be.nbb.rd</groupId>
+            <groupId>com.github.nbbrd.java-service-util</groupId>
             <artifactId>java-service-processor</artifactId>
             <scope>provided</scope>
         </dependency>
         
         <!-- compile and runtime -->
         <dependency>
-            <groupId>be.nbb.rd</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>java-sql-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>be.nbb.rd</groupId>
+            <groupId>com.github.nbbrd.java-io-util</groupId>
             <artifactId>java-io-win</artifactId>
-            <version>0.0.11</version>
+            <version>0.0.12</version>
         </dependency>
         
         <!-- test only -->
