@@ -44,10 +44,10 @@ public interface OdbcRegistrySpi {
     int getCost();
 
     @NonNull
-    List<String> getDataSourceNames(OdbcDataSource.@NonNull Type[] types) throws IOException;
+    List<String> getDataSourceNames(OdbcDataSource./*@NonNull*/ Type[] types) throws IOException;
 
     @NonNull
-    List<OdbcDataSource> getDataSources(OdbcDataSource.@NonNull Type[] types) throws IOException;
+    List<OdbcDataSource> getDataSources(OdbcDataSource./*@NonNull*/ Type[] types) throws IOException;
 
     @NonNull
     List<OdbcDriver> getDrivers() throws IOException;

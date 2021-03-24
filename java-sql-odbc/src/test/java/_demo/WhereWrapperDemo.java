@@ -16,7 +16,8 @@
  */
 package _demo;
 
-import internal.sys.win.WhereWrapper;
+import nbbrd.io.win.WhereWrapper;
+
 import java.io.IOException;
 
 /**

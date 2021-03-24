@@ -17,8 +17,9 @@
 package internal.sql.odbc;
 
 import internal.sql.odbc.win.RegOdbcRegistry;
-import internal.sys.OS;
 import java.util.ServiceLoader;
+
+import nbbrd.io.sys.OS;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
