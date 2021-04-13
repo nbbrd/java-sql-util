@@ -28,7 +28,7 @@ import java.nio.file.StandardCopyOption;
  * @author Philippe Charles
  */
 @lombok.Value
-@lombok.Builder(builderClassName = "Builder")
+@lombok.Builder
 public final class DefaultResourceExtractor implements ResourceExtractor {
 
     @lombok.NonNull

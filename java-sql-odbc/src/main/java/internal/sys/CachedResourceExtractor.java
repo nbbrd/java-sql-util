@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author Philippe Charles
  */
 @lombok.RequiredArgsConstructor
-@lombok.Builder(builderClassName = "Builder")
+@lombok.Builder
 public final class CachedResourceExtractor implements ResourceExtractor {
 
     @lombok.NonNull

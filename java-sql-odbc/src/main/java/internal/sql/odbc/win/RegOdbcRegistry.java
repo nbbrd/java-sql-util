@@ -100,7 +100,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
         }
     }
 
-    @lombok.Builder(builderClassName = "Builder")
+    @lombok.Builder
     private static final class MapRegistry implements WinOdbcRegistryUtil.Registry {
 
         @lombok.Singular

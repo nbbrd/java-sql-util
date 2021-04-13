@@ -24,7 +24,7 @@ import java.io.File;
  * @author charphi
  */
 @lombok.Value
-@lombok.Builder(builderClassName = "Builder")
+@lombok.Builder
 public class OdbcDataSource {
 
     public enum Type {
