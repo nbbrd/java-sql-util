@@ -51,7 +51,9 @@ public class SqlColumnTest {
                                 .filteredOn(column -> column.getName().equals("TABLE_NAME"))
                                 .hasSize(1)
                                 .first()
-                                .isEqualToComparingOnlyGivenFields(tableNameColumn, "className", "label", "name", "type", "typeName");
+                                .usingRecursiveComparison()
+                                .ignoringFields("typeName", "displaySize")
+                                .isEqualTo(tableNameColumn);
                     }
                 }
             }
