@@ -1,29 +1,32 @@
 /*
  * Copyright 2013 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package nbbrd.sql.jdbc;
 
 import internal.sql.jdbc.JdbcUtil;
+import nbbrd.design.StaticFactoryMethod;
+import nbbrd.design.VisibleForTesting;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A class that quotes identifiers in SQL queries.
@@ -34,8 +37,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @lombok.Builder
 public class SqlIdentifierQuoter {
 
-    @NonNull
-    public static SqlIdentifierQuoter of(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @StaticFactoryMethod
+    public static @NonNull SqlIdentifierQuoter of(@NonNull DatabaseMetaData metaData) throws SQLException {
         return new SqlIdentifierQuoter(
                 loadIdentifierQuoteString(metaData),
                 loadSqlKeywords(metaData),
@@ -44,8 +47,7 @@ public class SqlIdentifierQuoter {
         );
     }
 
-    @NonNull
-    public static Builder builder() {
+    public static @NonNull Builder builder() {
         return new Builder()
                 .quoteString(DEFAULT_IDENTIFIER_QUOTE_STRING)
                 .unquotedStorageRule(SqlIdentifierStorageRule.UPPER)
@@ -66,13 +68,11 @@ public class SqlIdentifierQuoter {
     @lombok.NonNull
     String extraNameCharacters;
 
-    @NonNull
-    public String quote(@NonNull String identifier) {
+    public @NonNull String quote(@NonNull String identifier) {
         return quote(identifier, false);
     }
 
-    @NonNull
-    public String quote(@NonNull String identifier, boolean force) {
+    public @NonNull String quote(@NonNull String identifier, boolean force) {
         if (isProperlyQuoted(identifier)) {
             return identifier;
         }
@@ -153,8 +153,8 @@ public class SqlIdentifierQuoter {
     private static final String DEFAULT_IDENTIFIER_QUOTE_STRING = "\"";
     private static final String NOT_SUPPORTED_IDENTIFIER_QUOTE_STRING = " ";
 
-    @NonNull
-    static String loadIdentifierQuoteString(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @VisibleForTesting
+    static @NonNull String loadIdentifierQuoteString(@NonNull DatabaseMetaData metaData) throws SQLException {
         String identifierQuoteString = JdbcUtil.unexpectedNullToBlank(metaData.getIdentifierQuoteString(), "getIdentifierQuoteString");
 
         if (identifierQuoteString.equals(NOT_SUPPORTED_IDENTIFIER_QUOTE_STRING)) {
@@ -168,48 +168,49 @@ public class SqlIdentifierQuoter {
         return identifierQuoteString;
     }
 
+    @VisibleForTesting
     static boolean isUnexpectedIdentifierQuoteString(@NonNull String identifierQuoteString) {
         return identifierQuoteString.trim().isEmpty();
     }
 
-    @NonNull
-    static Set<String> loadSqlKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @VisibleForTesting
+    static @NonNull Set<String> loadSqlKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
         return Stream
                 .concat(getSpecificKeywords(metaData), getStandardKeywords(metaData))
                 .collect(Collectors.toSet());
     }
 
-    @NonNull
-    static Stream<String> getSpecificKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @VisibleForTesting
+    static @NonNull Stream<String> getSpecificKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
         String specificKeywords = JdbcUtil.unexpectedNullToBlank(metaData.getSQLKeywords(), "getSQLKeywords");
         return getSpecificKeywords(specificKeywords);
     }
 
-    @NonNull
-    static Stream<String> getStandardKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @VisibleForTesting
+    static @NonNull Stream<String> getStandardKeywords(@NonNull DatabaseMetaData metaData) throws SQLException {
         return SqlKeywords.LATEST_RESERVED_WORDS.getKeywords().stream();
     }
 
-    @NonNull
-    static Stream<String> getSpecificKeywords(@NonNull CharSequence input) {
+    @VisibleForTesting
+    static @NonNull Stream<String> getSpecificKeywords(@NonNull CharSequence input) {
         return JdbcUtil.splitToStream(',', input)
                 .map(String::trim)
                 .filter(o -> !o.isEmpty())
                 .map(SqlIdentifierQuoter::normalizeKeyword);
     }
 
-    @NonNull
-    static String normalizeKeyword(String input) {
+    @VisibleForTesting
+    static @NonNull String normalizeKeyword(String input) {
         return input.toUpperCase(Locale.ROOT);
     }
 
-    @NonNull
-    static String loadExtraNameCharacters(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @VisibleForTesting
+    static @NonNull String loadExtraNameCharacters(@NonNull DatabaseMetaData metaData) throws SQLException {
         return JdbcUtil.unexpectedNullToBlank(metaData.getExtraNameCharacters(), "getExtraNameCharacters");
     }
 
-    @NonNull
-    static SqlIdentifierStorageRule loadUnquotedIdentifierStorageRule(@NonNull DatabaseMetaData metaData) throws SQLException {
+    @VisibleForTesting
+    static @NonNull SqlIdentifierStorageRule loadUnquotedIdentifierStorageRule(@NonNull DatabaseMetaData metaData) throws SQLException {
         if (metaData.storesUpperCaseIdentifiers()) {
             return SqlIdentifierStorageRule.UPPER;
         }

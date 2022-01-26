@@ -17,7 +17,7 @@
 package nbbrd.sql.odbc;
 
 import nbbrd.design.RepresentableAsInt;
-import nbbrd.design.RepresentableAsString;
+import nbbrd.design.StaticFactoryMethod;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -107,6 +107,7 @@ public class OdbcDriver {
             return value;
         }
 
+        @StaticFactoryMethod
         public static @NonNull ApiLevel parse(int value) throws IllegalArgumentException {
             for (ApiLevel o : values()) {
                 if (o.value == value) {
@@ -138,6 +139,7 @@ public class OdbcDriver {
             return value;
         }
 
+        @StaticFactoryMethod
         public static @NonNull FileUsage parse(int value) throws IllegalArgumentException {
             for (FileUsage o : values()) {
                 if (o.value == value) {
@@ -165,6 +167,7 @@ public class OdbcDriver {
             return value;
         }
 
+        @StaticFactoryMethod
         public static @NonNull SqlLevel parse(int value) throws IllegalArgumentException {
             for (SqlLevel o : values()) {
                 if (o.value == value) {
@@ -175,7 +178,7 @@ public class OdbcDriver {
         }
     }
 
-//    @RepresentableAsString
+    //    @RepresentableAsString
     @lombok.Value(staticConstructor = "of")
     public static class ConnectFunctions {
 
@@ -186,6 +189,7 @@ public class OdbcDriver {
             return (sqlConnect ? "Y" : "N") + (sqlDriverConnect ? "Y" : "N") + (sqlBrowseConnect ? "Y" : "N");
         }
 
+        @StaticFactoryMethod
         public static @NonNull ConnectFunctions parse(@NonNull CharSequence input) throws IllegalArgumentException {
             if (!INPUT_PATTERN.matcher(input).matches()) {
                 throw new IllegalArgumentException("Cannot parse '" + input + "'");
@@ -194,8 +198,8 @@ public class OdbcDriver {
         }
 
         @Deprecated
-        @Nullable
-        public static ConnectFunctions parse(@NonNull CharSequence input, @Nullable ConnectFunctions defaultValue) {
+        @StaticFactoryMethod
+        public static @Nullable ConnectFunctions parse(@NonNull CharSequence input, @Nullable ConnectFunctions defaultValue) {
             return INPUT_PATTERN.matcher(input).matches()
                     ? new ConnectFunctions(input.charAt(0) == 'Y', input.charAt(1) == 'Y', input.charAt(2) == 'Y')
                     : defaultValue;

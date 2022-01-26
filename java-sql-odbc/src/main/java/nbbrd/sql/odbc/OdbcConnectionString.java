@@ -1,33 +1,31 @@
 /*
  * Copyright 2018 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package nbbrd.sql.odbc;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AccessLevel;
+import nbbrd.design.RepresentableAsString;
+import nbbrd.design.StaticFactoryMethod;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * https://msdn.microsoft.com/en-us/library/system.data.odbc.odbcconnection.connectionstring.aspx
@@ -36,23 +34,19 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @author Philippe Charles
  */
+@RepresentableAsString
 @lombok.Value
+@lombok.AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OdbcConnectionString {
 
     @lombok.NonNull
     Map<String, String> attributes;
 
-    private OdbcConnectionString(Map<String, String> attributes) {
-        this.attributes = attributes;
-    }
-
-    @Nullable
-    public String getDriver() {
+    public @Nullable String getDriver() {
         return get(DRIVER_KEYWORD);
     }
 
-    @Nullable
-    public String get(@NonNull String key) {
+    public @Nullable String get(@NonNull String key) {
         return attributes
                 .entrySet()
                 .stream()
@@ -88,8 +82,8 @@ public class OdbcConnectionString {
         }
     }
 
-    @NonNull
-    public static OdbcConnectionString parse(@NonNull CharSequence input) {
+    @StaticFactoryMethod
+    public static @NonNull OdbcConnectionString parse(@NonNull CharSequence input) {
         OdbcConnectionString.Builder result = OdbcConnectionString.builder();
         Matcher m = KEY_VALUE.matcher(input);
         while (m.find()) {
@@ -98,8 +92,7 @@ public class OdbcConnectionString {
         return result.build();
     }
 
-    @NonNull
-    public static Builder builder() {
+    public static @NonNull Builder builder() {
         return new Builder();
     }
 
@@ -109,15 +102,13 @@ public class OdbcConnectionString {
         private final LinkedHashSet<String> order = new LinkedHashSet<>();
         private final TreeMap<String, String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        @NonNull
-        public Builder with(@NonNull String key, @NonNull String value) {
+        public @NonNull Builder with(@NonNull String key, @NonNull String value) {
             order.add(key);
             attributes.put(key, value);
             return this;
         }
 
-        @NonNull
-        public OdbcConnectionString build() {
+        public @NonNull OdbcConnectionString build() {
             LinkedHashMap<String, String> result = new LinkedHashMap<>();
             order.forEach(o -> result.put(o, attributes.get(o)));
             return new OdbcConnectionString(Collections.unmodifiableMap(result));
@@ -127,10 +118,10 @@ public class OdbcConnectionString {
     private static final String DRIVER_KEYWORD = "DRIVER";
     private static final Pattern KEY_VALUE = Pattern.compile(
             "(\\w+)"
-            + "="
-            + "\\{*"
-            + "((?<=\\{)[^\\{\\}]+(?=\\})|[^\\s;]+)"
-            + "\\}*"
-            + ";?"
+                    + "="
+                    + "\\{*"
+                    + "((?<=\\{)[^\\{\\}]+(?=\\})|[^\\s;]+)"
+                    + "\\}*"
+                    + ";?"
     );
 }

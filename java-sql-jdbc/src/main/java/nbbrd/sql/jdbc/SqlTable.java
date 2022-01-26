@@ -1,36 +1,31 @@
 /*
  * Copyright 2013 National Bank of Belgium
  *
- * Licensed under the EUPL, Version 1.1 or – as soon they will be approved 
+ * Licensed under the EUPL, Version 1.1 or – as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
  *
  * http://ec.europa.eu/idabc/eupl
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package nbbrd.sql.jdbc;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.*;
 
 /**
- *
  * @author Philippe Charles
  */
 @lombok.Value
@@ -46,8 +41,7 @@ public class SqlTable {
      * @see DatabaseMetaData#getTables(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String[])
      */
-    @NonNull
-    public static List<SqlTable> allOf(@NonNull DatabaseMetaData md) throws SQLException {
+    public static @NonNull List<SqlTable> allOf(@NonNull DatabaseMetaData md) throws SQLException {
         return allOf(md, ALL_CATALOGS, ALL_SCHEMAS, ALL_TABLE_NAMES, ALL_TYPES);
     }
 
@@ -59,27 +53,26 @@ public class SqlTable {
     /**
      * Creates a partial list of tables in a database by using patterns.
      *
-     * @param md a non-null database metadata
-     * @param catalog a catalog name; must match the catalog name as it is
-     * stored in the database; "" retrieves those without a catalog;
-     * <code>null</code> means that the catalog name should not be used to
-     * narrow the search
-     * @param schemaPattern a schema name pattern; must match the schema name as
-     * it is stored in the database; "" retrieves those without a schema;
-     * <code>null</code> means that the schema name should not be used to narrow
-     * the search
+     * @param md               a non-null database metadata
+     * @param catalog          a catalog name; must match the catalog name as it is
+     *                         stored in the database; "" retrieves those without a catalog;
+     *                         <code>null</code> means that the catalog name should not be used to
+     *                         narrow the search
+     * @param schemaPattern    a schema name pattern; must match the schema name as
+     *                         it is stored in the database; "" retrieves those without a schema;
+     *                         <code>null</code> means that the schema name should not be used to narrow
+     *                         the search
      * @param tableNamePattern a table name pattern; must match the table name
-     * as it is stored in the database
-     * @param types a list of table types, which must be from the list of table
-     * types returned from {@link #getTableTypes},to include; <code>null</code>
-     * returns all types
+     *                         as it is stored in the database
+     * @param types            a list of table types, which must be from the list of table
+     *                         types returned from {@link #getTableTypes},to include; <code>null</code>
+     *                         returns all types
      * @return a non-null list of tables
      * @throws SQLException if a database access error occurs
      * @see DatabaseMetaData#getTables(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String[])
      */
-    @NonNull
-    public static List<SqlTable> allOf(
+    public static @NonNull List<SqlTable> allOf(
             @NonNull DatabaseMetaData md,
             @Nullable String catalog,
             @Nullable String schemaPattern,
@@ -118,8 +111,7 @@ public class SqlTable {
         return columnNames;
     }
 
-    @NonNull
-    private static SqlTable fromMap(@NonNull Map<String, String> map) {
+    private static @NonNull SqlTable fromMap(@NonNull Map<String, String> map) {
         return new SqlTable(
                 get(map, "TABLE_CAT", "TABLE_CATALOG"),
                 get(map, "TABLE_SCHEM", "TABLE_SCHEMA"),
@@ -133,13 +125,11 @@ public class SqlTable {
                 get(map, "REF_GENERATION"));
     }
 
-    @NonNull
-    private static String nullToEmpty(@Nullable String o) {
+    private static @NonNull String nullToEmpty(@Nullable String o) {
         return (o == null) ? "" : o;
     }
 
-    @Nullable
-    private static String get(@NonNull Map<String, String> map, String... keys) {
+    private static @Nullable String get(@NonNull Map<String, String> map, String... keys) {
         for (String key : keys) {
             String result = map.get(key);
             if (result != null) {

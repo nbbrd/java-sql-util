@@ -1,17 +1,17 @@
 /*
  * Copyright 2015 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package nbbrd.sql.jdbc;
@@ -20,13 +20,15 @@ import internal.sql.jdbc.DataSourceBasedSupplier;
 import internal.sql.jdbc.DriverManagerSupplier;
 import internal.sql.jdbc.JndiSupplier;
 import internal.sql.jdbc.NoOpSupplier;
+import nbbrd.design.StaticFactoryMethod;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import javax.naming.InitialContext;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Collections;
-import javax.naming.InitialContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A class that supplies opened connections to databases.
@@ -44,30 +46,29 @@ public interface SqlConnectionSupplier {
      * @return A new opened connection.
      * @throws SQLException
      */
-    @NonNull
-    Connection getConnection(@NonNull String connectionString) throws SQLException;
+    @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException;
 
-    @NonNull
-    static SqlConnectionSupplier ofDriverManager(@NonNull String driverClassName, @NonNull SqlFunc<String, String> toUrl) {
+    @StaticFactoryMethod
+    static @NonNull SqlConnectionSupplier ofDriverManager(@NonNull String driverClassName, @NonNull SqlFunc<String, String> toUrl) {
         return new DriverManagerSupplier(driverClassName, toUrl);
     }
 
-    @NonNull
-    static SqlConnectionSupplier ofDataSource(@NonNull SqlFunc<String, javax.sql.DataSource> toDataSource) {
+    @StaticFactoryMethod
+    static @NonNull SqlConnectionSupplier ofDataSource(@NonNull SqlFunc<String, javax.sql.DataSource> toDataSource) {
         return new DataSourceBasedSupplier(toDataSource);
     }
 
-    @NonNull
-    static SqlConnectionSupplier ofJndi() {
+    @StaticFactoryMethod
+    static @NonNull SqlConnectionSupplier ofJndi() {
         return new JndiSupplier(InitialContext::new);
     }
 
-    @NonNull
-    static SqlConnectionSupplier noOp() {
+    @StaticFactoryMethod
+    static @NonNull SqlConnectionSupplier noOp() {
         return NoOpSupplier.INSTANCE;
     }
 
-//    @jdk.internal.reflect.CallerSensitive
+    //    @jdk.internal.reflect.CallerSensitive
     static boolean isDriverLoadable(@NonNull String driverClassName) {
         try {
             return Driver.class.isAssignableFrom(Class.forName(driverClassName));
@@ -76,7 +77,7 @@ public interface SqlConnectionSupplier {
         }
     }
 
-//    @jdk.internal.reflect.CallerSensitive
+    //    @jdk.internal.reflect.CallerSensitive
     static boolean isDriverRegistered(@NonNull String driverClassName) {
         return Collections
                 .list(DriverManager.getDrivers())
