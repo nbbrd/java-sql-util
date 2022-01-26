@@ -17,22 +17,17 @@
 package internal.sql.odbc.win;
 
 import nbbrd.sql.odbc.OdbcDataSource;
-import static nbbrd.sql.odbc.OdbcDataSource.Type.SYSTEM;
-import static nbbrd.sql.odbc.OdbcDataSource.Type.USER;
 import nbbrd.sql.odbc.OdbcDriver;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.IntSupplier;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -145,14 +140,14 @@ class WinOdbcRegistryUtil {
         return OdbcDriver
                 .builder()
                 .name(driverName)
-                .apiLevel(toEnum(details.get("APILevel"), OdbcDriver.ApiLevel.class).orElse(OdbcDriver.ApiLevel.NONE))
+                .apiLevel(toEnum(details.get("APILevel"), OdbcDriver.ApiLevel::parse).orElse(OdbcDriver.ApiLevel.NONE))
                 .connectFunctions(toConnectFunctions(details.get("ConnectFunctions"), null))
                 .driverPath(toFile(details.get("Driver"), null))
                 .driverOdbcVer(toString(details.get("DriverOdbcVer"), null))
                 .fileExtensions(toFileExtensions(details.get("FileExtns")))
-                .fileUsage(toEnum(details.get("FileUsage"), OdbcDriver.FileUsage.class).orElse(OdbcDriver.FileUsage.NONE))
+                .fileUsage(toEnum(details.get("FileUsage"), OdbcDriver.FileUsage::parse).orElse(OdbcDriver.FileUsage.NONE))
                 .setupPath(toFile(details.get("Setup"), null))
-                .sqlLevel(toEnum(details.get("SQLLevel"), OdbcDriver.SqlLevel.class).orElse(OdbcDriver.SqlLevel.SQL_92_ENTRY))
+                .sqlLevel(toEnum(details.get("SQLLevel"), OdbcDriver.SqlLevel::parse).orElse(OdbcDriver.SqlLevel.SQL_92_ENTRY))
                 .usageCount(toInt(details.get("UsageCount"), -1))
                 .build();
     }
@@ -169,25 +164,16 @@ class WinOdbcRegistryUtil {
         return obj instanceof Integer ? (Integer) obj : defaultValue;
     }
 
-    private <Z extends Enum<Z> & IntSupplier> Optional<Z> toEnum(Object obj, Class<Z> enumType) {
+    private <Z extends Enum<Z>> Optional<Z> toEnum(Object obj, IntFunction<Z> parser) {
         if (obj == null) {
             return Optional.empty();
         }
         try {
             int value = Integer.parseInt(obj.toString());
-            return toEnum(value, enumType);
-        } catch (NumberFormatException ex) {
+            return Optional.of(parser.apply(value));
+        } catch (RuntimeException ex) {
             return Optional.empty();
         }
-    }
-
-    private static <Z extends Enum<Z> & IntSupplier> Optional<Z> toEnum(int value, Class<Z> enumType) {
-        for (Z o : enumType.getEnumConstants()) {
-            if (o.getAsInt() == value) {
-                return Optional.of(o);
-            }
-        }
-        return Optional.empty();
     }
 
     private List<String> toFileExtensions(Object obj) {

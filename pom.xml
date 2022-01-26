@@ -113,6 +113,7 @@
             <properties>
                 <lombok.version>1.18.22</lombok.version>
                 <java-service.version>1.4.0</java-service.version>
+                <java-design.version>1.2.1</java-design.version>
             </properties>
             <dependencyManagement>
                 <dependencies>
@@ -130,6 +131,16 @@
                         <groupId>com.github.nbbrd.java-service-util</groupId>
                         <artifactId>java-service-processor</artifactId>
                         <version>${java-service.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.github.nbbrd.java-design-util</groupId>
+                        <artifactId>java-design-annotation</artifactId>
+                        <version>${java-design.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.github.nbbrd.java-design-util</groupId>
+                        <artifactId>java-design-processor</artifactId>
+                        <version>${java-design.version}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -149,6 +160,11 @@
                                     <groupId>com.github.nbbrd.java-service-util</groupId>
                                     <artifactId>java-service-processor</artifactId>
                                     <version>${java-service.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.github.nbbrd.java-design-util</groupId>
+                                    <artifactId>java-design-processor</artifactId>
+                                    <version>${java-design.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>

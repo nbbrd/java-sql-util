@@ -20,6 +20,8 @@ import java.io.File;
 import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.regex.Pattern;
+
+import nbbrd.design.RepresentableAsInt;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -87,52 +89,88 @@ public class OdbcDriver {
 
     private final int usageCount;
 
+    @RepresentableAsInt
+    @lombok.AllArgsConstructor
     public enum ApiLevel implements IntSupplier {
 
         NONE(0), LEVEL1(1), LEVEL2(2);
         final int value;
 
-        private ApiLevel(int value) {
-            this.value = value;
-        }
-
+        @Deprecated
         @Override
         public int getAsInt() {
+            return toInt();
+        }
+
+        public int toInt() {
             return value;
+        }
+
+        public static @NonNull ApiLevel parse(int value) throws IllegalArgumentException {
+            for (ApiLevel o : values()) {
+                if (o.value == value) {
+                    return o;
+                }
+            }
+            throw new IllegalArgumentException("Cannot parse " + value);
         }
     };
 
+    @RepresentableAsInt
+    @lombok.AllArgsConstructor
     public enum FileUsage implements IntSupplier {
 
         NONE(0), TABLE(1), CATALOG(2);
         final int value;
 
-        private FileUsage(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public int getAsInt() {
-            return value;
-        }
-
         public boolean isFileBased() {
             return this != NONE;
         }
+
+        @Deprecated
+        @Override
+        public int getAsInt() {
+            return toInt();
+        }
+
+        public int toInt() {
+            return value;
+        }
+
+        public static @NonNull FileUsage parse(int value) throws IllegalArgumentException {
+            for (FileUsage o : values()) {
+                if (o.value == value) {
+                    return o;
+                }
+            }
+            throw new IllegalArgumentException("Cannot parse " + value);
+        }
     };
 
+    @RepresentableAsInt
+    @lombok.AllArgsConstructor
     public enum SqlLevel implements IntSupplier {
 
         SQL_92_ENTRY(0), FIPS127_2_TRANSACTIONAL(1), SQL_92_INTERMEDIATE(2), SQL_92_FULL(3);
         final int value;
 
-        private SqlLevel(int value) {
-            this.value = value;
-        }
-
+        @Deprecated
         @Override
         public int getAsInt() {
+            return toInt();
+        }
+
+        public int toInt() {
             return value;
+        }
+
+        public static @NonNull SqlLevel parse(int value) throws IllegalArgumentException {
+            for (SqlLevel o : values()) {
+                if (o.value == value) {
+                    return o;
+                }
+            }
+            throw new IllegalArgumentException("Cannot parse " + value);
         }
     };
 
