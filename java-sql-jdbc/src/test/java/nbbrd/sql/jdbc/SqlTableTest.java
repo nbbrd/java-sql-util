@@ -63,7 +63,7 @@ public class SqlTableTest {
 
                 assertThat(SqlTable.allOf(metaData))
                         .isNotEmpty()
-                        .filteredOn(table -> table.getName().toLowerCase().equals("table1"))
+                        .filteredOn(table -> table.getName().equalsIgnoreCase("table1"))
                         .hasSize(1)
                         .first()
                         .extracting(SqlTable::getType)

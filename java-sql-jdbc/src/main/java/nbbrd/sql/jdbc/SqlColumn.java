@@ -70,14 +70,14 @@ public class SqlColumn {
      *
      * @see ResultSetMetaData#getColumnClassName(int)
      */
-    private String className;
+    String className;
 
     /**
      * The column's normal maximum width in characters.
      *
      * @see ResultSetMetaData#getColumnDisplaySize(int)
      */
-    private int displaySize;
+    int displaySize;
 
     /**
      * The column's suggested title for use in printouts and displays. The
@@ -88,26 +88,26 @@ public class SqlColumn {
      *
      * @see ResultSetMetaData#getColumnLabel(int)
      */
-    private String label;
+    String label;
 
     /**
      * The column's name.
      *
      * @see ResultSetMetaData#getColumnName(int)
      */
-    private String name;
+    String name;
 
     /**
      * The column's SQL type.
      *
      * @see ResultSetMetaData#getColumnType(int)
      */
-    private int type;
+    int type;
 
     /**
      * The column's database-specific type name.
      *
      * @see ResultSetMetaData#getColumnTypeName(int)
      */
-    private String typeName;
+    String typeName;
 }

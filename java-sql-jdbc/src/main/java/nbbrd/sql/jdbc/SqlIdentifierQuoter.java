@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @lombok.Value
 @lombok.Builder
-public final class SqlIdentifierQuoter {
+public class SqlIdentifierQuoter {
 
     @NonNull
     public static SqlIdentifierQuoter of(@NonNull DatabaseMetaData metaData) throws SQLException {
@@ -55,16 +55,16 @@ public final class SqlIdentifierQuoter {
     public static final SqlIdentifierQuoter DEFAULT = builder().build();
 
     @lombok.NonNull
-    private final String quoteString;
+    String quoteString;
 
     @lombok.Singular
-    private final Set<String> sqlKeywords;
+    Set<String> sqlKeywords;
 
     @lombok.NonNull
-    private final SqlIdentifierStorageRule unquotedStorageRule;
+    SqlIdentifierStorageRule unquotedStorageRule;
 
     @lombok.NonNull
-    private final String extraNameCharacters;
+    String extraNameCharacters;
 
     @NonNull
     public String quote(@NonNull String identifier) {

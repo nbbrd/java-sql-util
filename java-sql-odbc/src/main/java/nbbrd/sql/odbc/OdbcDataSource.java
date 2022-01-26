@@ -33,34 +33,34 @@ public class OdbcDataSource {
     }
 
     @lombok.NonNull
-    private final Type type;
+    Type type;
 
     /**
      * The data source name (DSN).
      */
     @lombok.NonNull
-    private final String name;
+    String name;
 
     /**
      * Optional description of the data source.
      */
-    private final String description;
+    String description;
 
     /**
      * Name defined by the driver developer. It is usually the name of the DBMS
      * associated with the driver.
      */
     @lombok.NonNull
-    private final String driverName;
+    String driverName;
 
     /**
      * Driver DLL path.
      */
     @lombok.NonNull
-    private final File driverPath;
+    File driverPath;
 
     /**
      * Optional server name.
      */
-    private final String serverName;
+    String serverName;
 }

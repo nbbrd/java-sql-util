@@ -152,55 +152,55 @@ public class SqlTable {
     /**
      * table catalog (may be <code>null</code>)
      */
-    private String catalog;
+    String catalog;
 
     /**
      * table schema (may be <code>null</code>)
      */
-    private String schema;
+    String schema;
 
     /**
      * table name
      */
     @lombok.NonNull
-    private String name;
+    String name;
 
     /**
      * table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL
      * TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
      */
     @NonNull
-    private String type;
+    String type;
 
     /**
      * explanatory comment on the table
      */
-    private String remarks;
+    String remarks;
 
     /**
      * the types catalog (may be <code>null</code>)
      */
-    private String typesCatalog;
+    String typesCatalog;
 
     /**
      * the types schema (may be <code>null</code>)
      */
-    private String typesSchema;
+    String typesSchema;
 
     /**
      * type name (may be <code>null</code>)
      */
-    private String typeName;
+    String typeName;
 
     /**
      * String => name of the designated "identifier" column of a typed table
      * (may be <code>null</code>)
      */
-    private String selfReferencingColumnName;
+    String selfReferencingColumnName;
 
     /**
      * specifies how values in SELF_REFERENCING_COL_NAME are created. Values are
      * "SYSTEM", "USER", "DERIVED". (may be <code>null</code>)
      */
-    private String refGeneration;
+    String refGeneration;
 }

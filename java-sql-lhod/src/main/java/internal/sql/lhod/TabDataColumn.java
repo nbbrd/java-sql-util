@@ -23,6 +23,6 @@ package internal.sql.lhod;
 @lombok.Value
 class TabDataColumn {
 
-    private String name;
-    private int type;
+    String name;
+    int type;
 }

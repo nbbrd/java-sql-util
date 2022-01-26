@@ -44,7 +44,7 @@ public enum SqlKeywords {
     @lombok.Getter
     private final Set<String> keywords;
 
-    private SqlKeywords(String resourceName) {
+    SqlKeywords(String resourceName) {
         keywords = loadWords(resourceName);
     }
 

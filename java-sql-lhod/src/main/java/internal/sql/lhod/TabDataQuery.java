@@ -27,8 +27,8 @@ import java.util.List;
 class TabDataQuery {
 
     @lombok.NonNull
-    private String procedure;
+    String procedure;
 
     @lombok.Singular
-    private List<String> parameters;
+    List<String> parameters;
 }

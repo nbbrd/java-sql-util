@@ -39,8 +39,7 @@ public class OdbcConnectionStringTest {
                 .with("Server", "(local)")
                 .with("Trusted_Connection", "Yes")
                 .with("Database", "AdventureWorks")
-                .build()
-                .toString() + ";"
+                .build() + ";"
         ).isEqualTo(s1);
 
         assertThat(OdbcConnectionString

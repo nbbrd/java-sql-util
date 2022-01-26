@@ -69,11 +69,11 @@ public final class CachedResourceExtractor implements ResourceExtractor {
     }
 
     @lombok.Value
-    public static final class Entry {
+    public static class Entry {
 
-        private final File file;
-        private final long size;
-        private final FileTime lastModified;
+        File file;
+        long size;
+        FileTime lastModified;
 
         public boolean isValidFile() throws IOException {
             return file.exists() && file.isFile() && file.canRead()

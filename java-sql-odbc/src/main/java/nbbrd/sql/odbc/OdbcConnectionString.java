@@ -40,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class OdbcConnectionString {
 
     @lombok.NonNull
-    private final Map<String, String> attributes;
+    Map<String, String> attributes;
 
     private OdbcConnectionString(Map<String, String> attributes) {
         this.attributes = attributes;

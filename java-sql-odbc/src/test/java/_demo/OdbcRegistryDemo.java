@@ -30,17 +30,17 @@ public class OdbcRegistryDemo {
         OdbcRegistry registry = OdbcRegistry.ofServiceLoader().orElseThrow(UnsupportedOperationException::new);
 
         System.out.println("Using registry '" + registry.getName() + "'");
-        System.out.println("");
+        System.out.println();
 
         registry
                 .getDataSources(OdbcDataSource.Type.USER)
                 .forEach(System.out::println);
-        System.out.println("");
+        System.out.println();
 
         registry
                 .getDrivers()
                 .forEach(System.out::println);
-        System.out.println("");
+        System.out.println();
 
         registry
                 .getDrivers()

@@ -91,7 +91,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         conn.checkState();
         try {
             return getStringFunctionStream()
-                    .map(o -> o.getLabel())
+                    .map(SqlStringFunction::getLabel)
                     .sorted()
                     .collect(Collectors.joining(","));
         } catch (IOException ex) {

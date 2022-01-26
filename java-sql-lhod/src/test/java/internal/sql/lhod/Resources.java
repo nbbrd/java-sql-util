@@ -194,7 +194,7 @@ class Resources {
         @lombok.Getter
         private final String content;
 
-        private Sample(String resourceName) {
+        Sample(String resourceName) {
             this.content = load(resourceName);
         }
 

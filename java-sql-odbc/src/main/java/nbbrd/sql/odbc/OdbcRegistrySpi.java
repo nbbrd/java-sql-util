@@ -55,7 +55,7 @@ public interface OdbcRegistrySpi {
     @NonNull
     List<String> getDriverNames() throws IOException;
 
-    static final int NO_COST = 0;
-    static final int LOW_COST = 100;
-    static final int HIGH_COST = 1000;
+    int NO_COST = 0;
+    int LOW_COST = 100;
+    int HIGH_COST = 1000;
 }

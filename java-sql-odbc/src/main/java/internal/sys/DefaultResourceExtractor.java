@@ -29,15 +29,13 @@ import java.nio.file.StandardCopyOption;
  */
 @lombok.Value
 @lombok.Builder
-public final class DefaultResourceExtractor implements ResourceExtractor {
+public class DefaultResourceExtractor implements ResourceExtractor {
 
-    @lombok.NonNull
-    private final File repository;
+    @lombok.NonNull File repository;
 
-    private final boolean persist;
+    boolean persist;
 
-    @lombok.NonNull
-    private final Class<?> anchor;
+    @lombok.NonNull Class<?> anchor;
 
     @Override
     public File getResourceAsFile(String resourceName) throws IOException {

@@ -1,17 +1,17 @@
 /*
  * Copyright 2013 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.odbc.win;
@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- *
  * @author Philippe Charles
  */
 @lombok.experimental.UtilityClass
@@ -38,7 +37,7 @@ class WinOdbcRegistryUtil {
 
     public interface Registry {
 
-        static enum Root {
+        enum Root {
 
             HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER
         }
@@ -179,9 +178,9 @@ class WinOdbcRegistryUtil {
     private List<String> toFileExtensions(Object obj) {
         return obj != null
                 ? splitToStream(",", obj.toString())
-                        .map(WinOdbcRegistryUtil::getFileExtension)
-                        .filter(o -> !o.isEmpty())
-                        .collect(Collectors.toList())
+                .map(WinOdbcRegistryUtil::getFileExtension)
+                .filter(o -> !o.isEmpty())
+                .collect(Collectors.toList())
                 : Collections.emptyList();
     }
 
@@ -196,8 +195,12 @@ class WinOdbcRegistryUtil {
     }
 
     private OdbcDriver.ConnectFunctions toConnectFunctions(Object obj, OdbcDriver.ConnectFunctions defaultValue) {
-        return obj != null
-                ? OdbcDriver.ConnectFunctions.parse(obj.toString(), defaultValue)
-                : defaultValue;
+        if (obj != null) {
+            try {
+                return OdbcDriver.ConnectFunctions.parse(obj.toString());
+            } catch (IllegalArgumentException ex) {
+            }
+        }
+        return defaultValue;
     }
 }
