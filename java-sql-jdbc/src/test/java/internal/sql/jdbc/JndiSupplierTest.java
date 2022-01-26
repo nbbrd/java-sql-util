@@ -29,7 +29,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import nbbrd.sql.jdbc.InMemoryDriver;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

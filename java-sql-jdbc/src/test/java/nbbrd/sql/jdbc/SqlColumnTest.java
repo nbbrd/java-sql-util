@@ -22,7 +22,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

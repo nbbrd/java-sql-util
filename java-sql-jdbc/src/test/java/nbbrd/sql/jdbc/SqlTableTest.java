@@ -27,7 +27,7 @@ import static nbbrd.sql.jdbc.SqlTable.ALL_SCHEMAS;
 import static nbbrd.sql.jdbc.SqlTable.ALL_TABLE_NAMES;
 import static nbbrd.sql.jdbc.SqlTable.ALL_TYPES;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

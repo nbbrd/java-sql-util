@@ -22,7 +22,7 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

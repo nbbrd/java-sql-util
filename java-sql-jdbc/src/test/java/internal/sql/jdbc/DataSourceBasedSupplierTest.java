@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import org.hsqldb.jdbc.JDBCDataSource;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

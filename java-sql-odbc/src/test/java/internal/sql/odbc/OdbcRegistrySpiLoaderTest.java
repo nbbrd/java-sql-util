@@ -22,7 +22,7 @@ import java.util.ServiceLoader;
 import nbbrd.io.sys.OS;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

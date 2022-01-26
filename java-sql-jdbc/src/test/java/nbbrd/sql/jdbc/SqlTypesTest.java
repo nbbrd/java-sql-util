@@ -19,7 +19,7 @@ package nbbrd.sql.jdbc;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

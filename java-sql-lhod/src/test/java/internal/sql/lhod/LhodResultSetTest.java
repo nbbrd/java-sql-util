@@ -1,39 +1,42 @@
 /*
  * Copyright 2019 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.lhod;
 
-import static _test.SQLExceptions.assertThatSQLException;
-import static _test.SQLExceptions.withoutErrorCode;
+import nbbrd.sql.jdbc.SqlFunc;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
-import nbbrd.sql.jdbc.SqlFunc;
+
+import static _test.SQLExceptions.assertThatSQLException;
+import static _test.SQLExceptions.withoutErrorCode;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Before;
-import org.junit.Test;
+
+;
 
 /**
- *
  * @author Philippe Charles
  */
 public class LhodResultSetTest {
 
     private TabDataReader good, bad, ugly, err, closed;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException {
         good = TabDataReader.of(Resources.Sample.TOP5_STMT.newReader());
 //        bad = Resources.badExecutor().exec(Resources.GOOD_STMT_QUERY);
@@ -43,7 +46,7 @@ public class LhodResultSetTest {
         closed.close();
     }
 
-//    @After
+    //    @After
 //    public void after() {
 //        Stream.of(good, bad, ugly, err, closed)
 //                .forEach(conn -> {

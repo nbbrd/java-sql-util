@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.*;
 import org.hsqldb.jdbc.JDBCDriver;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *
