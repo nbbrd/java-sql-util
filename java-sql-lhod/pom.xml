@@ -105,7 +105,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>repack-step2</id>
@@ -115,7 +115,7 @@
                                         <move todir="${repack.pacdir}/${repack.prefix}">
                                             <fileset dir="${repack.basedir}" />
                                         </move>
-                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace="\1 ${repack.prefix}.nbbrd.picocsv">
+                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace=" ${repack.prefix}.nbbrd.picocsv">
                                             <fileset dir="${repack.pacdir}/${repack.prefix}"/>
                                         </replaceregexp>
                                     </target>
