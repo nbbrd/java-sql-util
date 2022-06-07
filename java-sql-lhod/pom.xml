@@ -115,7 +115,7 @@
                                         <move todir="${repack.pacdir}/${repack.prefix}">
                                             <fileset dir="${repack.basedir}" />
                                         </move>
-                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace=" ${repack.prefix}.nbbrd.picocsv">
+                                        <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace="\1 ${repack.prefix}.nbbrd.picocsv">
                                             <fileset dir="${repack.pacdir}/${repack.prefix}"/>
                                         </replaceregexp>
                                     </target>
