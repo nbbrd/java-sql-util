@@ -39,6 +39,7 @@
         <module>java-sql-jdbc</module>
         <module>java-sql-odbc</module>
         <module>java-sql-lhod</module>
+        <module>java-sql-bom</module>
     </modules>
 
     <dependencyManagement>
