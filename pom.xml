@@ -12,6 +12,7 @@
     <name>java-sql</name>
     <description>Java SQL utilities</description>
     <url>https://github.com/nbbrd/java-sql-util</url>
+    <inceptionYear>2019</inceptionYear>
 
     <licenses>
         <license>
