@@ -85,7 +85,7 @@
                                         <skipTag>true</skipTag>
                                         <draft>true</draft>
                                         <!-- Fix default value -->
-                                        <branch>main</branch>
+                                        <branch>master</branch>
                                         <changelog>
                                             <external>${project.parent.basedir}/CHANGELOG.md</external>
                                         </changelog>
