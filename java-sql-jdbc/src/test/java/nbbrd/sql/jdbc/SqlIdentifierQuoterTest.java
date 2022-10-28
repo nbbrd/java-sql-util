@@ -21,7 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

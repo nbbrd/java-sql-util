@@ -17,7 +17,7 @@
 package nbbrd.sql.odbc;
 
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  * @author Philippe Charles
@@ -39,8 +39,7 @@ public class OdbcConnectionStringTest {
                 .with("Server", "(local)")
                 .with("Trusted_Connection", "Yes")
                 .with("Database", "AdventureWorks")
-                .build()
-                .toString() + ";"
+                .build() + ";"
         ).isEqualTo(s1);
 
         assertThat(OdbcConnectionString

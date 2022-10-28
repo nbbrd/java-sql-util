@@ -28,16 +28,14 @@ import java.nio.file.StandardCopyOption;
  * @author Philippe Charles
  */
 @lombok.Value
-@lombok.Builder(builderClassName = "Builder")
-public final class DefaultResourceExtractor implements ResourceExtractor {
+@lombok.Builder
+public class DefaultResourceExtractor implements ResourceExtractor {
 
-    @lombok.NonNull
-    private final File repository;
+    @lombok.NonNull File repository;
 
-    private final boolean persist;
+    boolean persist;
 
-    @lombok.NonNull
-    private final Class<?> anchor;
+    @lombok.NonNull Class<?> anchor;
 
     @Override
     public File getResourceAsFile(String resourceName) throws IOException {

@@ -21,7 +21,7 @@ import static nbbrd.sql.jdbc.SqlConnectionSupplier.*;
 import static org.assertj.core.api.Assertions.*;
 import org.hsqldb.jdbc.JDBCDataSource;
 import org.hsqldb.jdbc.JDBCDriver;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;;
 
 /**
  *

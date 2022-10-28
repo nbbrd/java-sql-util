@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
     <artifactId>java-sql-odbc</artifactId>
@@ -32,7 +32,12 @@
             <artifactId>java-service-processor</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+        <dependency>
+            <groupId>com.github.nbbrd.java-design-util</groupId>
+            <artifactId>java-design-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- compile and runtime -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -42,13 +47,12 @@
         <dependency>
             <groupId>com.github.nbbrd.java-io-util</groupId>
             <artifactId>java-io-win</artifactId>
-            <version>0.0.12</version>
         </dependency>
         
         <!-- test only -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

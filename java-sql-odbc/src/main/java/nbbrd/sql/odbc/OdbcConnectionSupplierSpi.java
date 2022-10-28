@@ -1,31 +1,31 @@
 /*
  * Copyright 2017 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package nbbrd.sql.odbc;
 
-import nbbrd.service.ServiceDefinition;
-import java.sql.Connection;
-import java.sql.SQLException;
 import nbbrd.service.Quantifier;
+import nbbrd.service.ServiceDefinition;
 import nbbrd.service.ServiceFilter;
 import nbbrd.service.ServiceSorter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 /**
- *
  * @author Philippe Charles
  */
 @ServiceDefinition(
@@ -34,8 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 )
 public interface OdbcConnectionSupplierSpi {
 
-    @NonNull
-    String getName();
+    @NonNull String getName();
 
     @ServiceFilter
     boolean isAvailable();
@@ -43,10 +42,9 @@ public interface OdbcConnectionSupplierSpi {
     @ServiceSorter
     int getCost();
 
-    @NonNull
-    Connection getConnection(@NonNull String connectionString) throws SQLException;
+    @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException;
 
-    static final int NO_COST = 0;
-    static final int LOW_COST = 100;
-    static final int HIGH_COST = 1000;
+    int NO_COST = 0;
+    int LOW_COST = 100;
+    int HIGH_COST = 1000;
 }

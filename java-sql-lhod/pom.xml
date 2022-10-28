@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
     <artifactId>java-sql-lhod</artifactId>
@@ -32,7 +32,12 @@
             <artifactId>java-service-processor</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+        <dependency>
+            <groupId>com.github.nbbrd.java-design-util</groupId>
+            <artifactId>java-design-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- compile and runtime -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -42,8 +47,8 @@
         
         <!-- test only -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -73,7 +78,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.1.2</version>
+                        <version>3.3.0</version>
                         <executions>
                             <execution>
                                 <id>repack-step1</id>
@@ -100,7 +105,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>repack-step2</id>
@@ -125,7 +130,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.3.0</version>
                         <executions>
                             <execution>
                                 <id>repack-step3</id>

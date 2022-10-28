@@ -6,12 +6,13 @@
 
     <groupId>com.github.nbbrd.java-sql-util</groupId>
     <artifactId>java-sql-parent</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
 
     <name>java-sql</name>
     <description>Java SQL utilities</description>
     <url>https://github.com/nbbrd/java-sql-util</url>
+    <inceptionYear>2019</inceptionYear>
 
     <licenses>
         <license>
@@ -39,6 +40,7 @@
         <module>java-sql-jdbc</module>
         <module>java-sql-odbc</module>
         <module>java-sql-lhod</module>
+        <module>java-sql-bom</module>
     </modules>
 
     <dependencyManagement>
@@ -47,22 +49,101 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.11.0</version>
+                <version>3.26.0</version>
+            </dependency>
+
+            <!-- dependencies  -->
+            <dependency>
+                <groupId>com.github.nbbrd.java-io-util</groupId>
+                <artifactId>java-io-bom</artifactId>
+                <version>0.0.20</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- test libraries -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.9.1</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.19.0</version>
+                <version>3.23.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Enforce reproducible builds -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.0.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.12.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M7</version>
+                </plugin>
+                <!-- Other plugins -->
+                <plugin>
+                    <groupId>com.github.nbbrd.heylogs</groupId>
+                    <artifactId>heylogs-maven-plugin</artifactId>
+                    <version>0.4.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>com.github.nbbrd.heylogs</groupId>
+                <artifactId>heylogs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check-changelog</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <!-- Base build java8 -->
@@ -82,13 +163,10 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.8.1</version>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <useModulePath>false</useModulePath>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -103,8 +181,9 @@
                 </property>
             </activation>
             <properties>
-                <lombok.version>1.18.18</lombok.version>
-                <java-service.version>1.3.2</java-service.version>
+                <lombok.version>1.18.24</lombok.version>
+                <java-service.version>1.5.2</java-service.version>
+                <java-design.version>1.3.1</java-design.version>
             </properties>
             <dependencyManagement>
                 <dependencies>
@@ -122,6 +201,16 @@
                         <groupId>com.github.nbbrd.java-service-util</groupId>
                         <artifactId>java-service-processor</artifactId>
                         <version>${java-service.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.github.nbbrd.java-design-util</groupId>
+                        <artifactId>java-design-annotation</artifactId>
+                        <version>${java-design.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.github.nbbrd.java-design-util</groupId>
+                        <artifactId>java-design-processor</artifactId>
+                        <version>${java-design.version}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -141,6 +230,11 @@
                                     <groupId>com.github.nbbrd.java-service-util</groupId>
                                     <artifactId>java-service-processor</artifactId>
                                     <version>${java-service.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.github.nbbrd.java-design-util</groupId>
+                                    <artifactId>java-design-processor</artifactId>
+                                    <version>${java-design.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -232,12 +326,17 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>3.0.0-M3</version>
+                        <version>3.1.0</version>
                         <dependencies>
                             <dependency>
                                 <groupId>org.kordamp.maven</groupId>
                                 <artifactId>pomchecker-enforcer-rules</artifactId>
-                                <version>1.1.0</version>
+                                <version>1.3.0</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>extra-enforcer-rules</artifactId>
+                                <version>1.6.1</version>
                             </dependency>
                         </dependencies>
                         <executions>
@@ -248,18 +347,36 @@
                                 </goals>
                                 <configuration>
                                     <rules>
+                                        <!-- Built-In Rules -->
+                                        <banDuplicatePomDependencyVersions/>
+                                        <dependencyConvergence/>
+                                        <reactorModuleConvergence/>
                                         <requireMavenVersion>
-                                            <version>3.3.9</version>
+                                            <version>3.6.0</version>
                                         </requireMavenVersion>
-                                        <DependencyConvergence/>
+                                        <requireNoRepositories>
+                                            <allowSnapshotRepositories>true</allowSnapshotRepositories>
+                                        </requireNoRepositories>
+                                        <requirePluginVersions/>
                                         <requireReleaseDeps>
                                             <onlyWhenRelease>true</onlyWhenRelease>
                                         </requireReleaseDeps>
-                                        <CheckMavenCentral
+                                        <requireUpperBoundDeps/>
+                                        <!-- pomchecker-enforcer-rules -->
+                                        <checkMavenCentral
                                                 implementation="org.kordamp.maven.enforcer.checker.CheckMavenCentral">
                                             <release>false</release>
                                             <strict>false</strict>
-                                        </CheckMavenCentral>
+                                        </checkMavenCentral>
+                                        <!-- extra-enforcer-rules -->
+                                        <banCircularDependencies/>
+                                        <banDuplicateClasses/>
+                                        <enforceBytecodeVersion>
+                                            <maxJdkVersion>8</maxJdkVersion>
+                                            <ignoredScopes>
+                                                <ignoreScope>test</ignoreScope>
+                                            </ignoredScopes>
+                                        </enforceBytecodeVersion>
                                     </rules>
                                 </configuration>
                             </execution>
@@ -282,7 +399,7 @@
                     <plugin>
                         <groupId>org.gaul</groupId>
                         <artifactId>modernizer-maven-plugin</artifactId>
-                        <version>2.2.0</version>
+                        <version>2.4.0</version>
                         <configuration>
                             <javaVersion>1.8</javaVersion>
                         </configuration>
@@ -314,7 +431,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.6</version>
+                        <version>0.8.8</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -329,6 +446,30 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Gitflow automation -->
+        <profile>
+            <id>gitflow-automation</id>
+            <activation>
+                <property>
+                    <name>!skipGitflowAutomation</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.amashchenko.maven.plugin</groupId>
+                        <artifactId>gitflow-maven-plugin</artifactId>
+                        <version>1.19.0</version>
+                        <configuration>
+                            <gitFlowConfig>
+                                <versionTagPrefix>v</versionTagPrefix>
+                            </gitFlowConfig>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -355,7 +496,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.4.1</version>
                         <executions>
                             <execution>
                                 <id>attach-empty-javadocs</id>
@@ -372,7 +513,7 @@
                     <plugin>
                         <groupId>org.simplify4u.plugins</groupId>
                         <artifactId>sign-maven-plugin</artifactId>
-                        <version>0.3.0</version>
+                        <version>1.0.1</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -399,7 +540,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -425,7 +566,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

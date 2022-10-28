@@ -23,12 +23,12 @@ import java.util.List;
  * @author Philippe Charles
  */
 @lombok.Value
-@lombok.Builder(builderClassName = "Builder")
+@lombok.Builder
 class TabDataQuery {
 
     @lombok.NonNull
-    private String procedure;
+    String procedure;
 
     @lombok.Singular
-    private List<String> parameters;
+    List<String> parameters;
 }

@@ -21,6 +21,7 @@ module nbbrd.sql.odbc {
     requires static org.checkerframework.checker.qual;
     requires static lombok;
     requires static nbbrd.service;
+    requires static nbbrd.design;
 
     // required dependencies
     requires transitive nbbrd.sql.jdbc;

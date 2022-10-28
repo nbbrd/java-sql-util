@@ -1,41 +1,35 @@
 /*
  * Copyright 2013 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.odbc.win;
 
 import nbbrd.sql.odbc.OdbcDataSource;
-import static nbbrd.sql.odbc.OdbcDataSource.Type.SYSTEM;
-import static nbbrd.sql.odbc.OdbcDataSource.Type.USER;
 import nbbrd.sql.odbc.OdbcDriver;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.IntSupplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
- *
  * @author Philippe Charles
  */
 @lombok.experimental.UtilityClass
@@ -43,7 +37,7 @@ class WinOdbcRegistryUtil {
 
     public interface Registry {
 
-        static enum Root {
+        enum Root {
 
             HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER
         }
@@ -145,14 +139,14 @@ class WinOdbcRegistryUtil {
         return OdbcDriver
                 .builder()
                 .name(driverName)
-                .apiLevel(toEnum(details.get("APILevel"), OdbcDriver.ApiLevel.class).orElse(OdbcDriver.ApiLevel.NONE))
+                .apiLevel(toEnum(details.get("APILevel"), OdbcDriver.ApiLevel::parse).orElse(OdbcDriver.ApiLevel.NONE))
                 .connectFunctions(toConnectFunctions(details.get("ConnectFunctions"), null))
                 .driverPath(toFile(details.get("Driver"), null))
                 .driverOdbcVer(toString(details.get("DriverOdbcVer"), null))
                 .fileExtensions(toFileExtensions(details.get("FileExtns")))
-                .fileUsage(toEnum(details.get("FileUsage"), OdbcDriver.FileUsage.class).orElse(OdbcDriver.FileUsage.NONE))
+                .fileUsage(toEnum(details.get("FileUsage"), OdbcDriver.FileUsage::parse).orElse(OdbcDriver.FileUsage.NONE))
                 .setupPath(toFile(details.get("Setup"), null))
-                .sqlLevel(toEnum(details.get("SQLLevel"), OdbcDriver.SqlLevel.class).orElse(OdbcDriver.SqlLevel.SQL_92_ENTRY))
+                .sqlLevel(toEnum(details.get("SQLLevel"), OdbcDriver.SqlLevel::parse).orElse(OdbcDriver.SqlLevel.SQL_92_ENTRY))
                 .usageCount(toInt(details.get("UsageCount"), -1))
                 .build();
     }
@@ -169,33 +163,24 @@ class WinOdbcRegistryUtil {
         return obj instanceof Integer ? (Integer) obj : defaultValue;
     }
 
-    private <Z extends Enum<Z> & IntSupplier> Optional<Z> toEnum(Object obj, Class<Z> enumType) {
+    private <Z extends Enum<Z>> Optional<Z> toEnum(Object obj, IntFunction<Z> parser) {
         if (obj == null) {
             return Optional.empty();
         }
         try {
             int value = Integer.parseInt(obj.toString());
-            return toEnum(value, enumType);
-        } catch (NumberFormatException ex) {
+            return Optional.of(parser.apply(value));
+        } catch (RuntimeException ex) {
             return Optional.empty();
         }
-    }
-
-    private static <Z extends Enum<Z> & IntSupplier> Optional<Z> toEnum(int value, Class<Z> enumType) {
-        for (Z o : enumType.getEnumConstants()) {
-            if (o.getAsInt() == value) {
-                return Optional.of(o);
-            }
-        }
-        return Optional.empty();
     }
 
     private List<String> toFileExtensions(Object obj) {
         return obj != null
                 ? splitToStream(",", obj.toString())
-                        .map(WinOdbcRegistryUtil::getFileExtension)
-                        .filter(o -> !o.isEmpty())
-                        .collect(Collectors.toList())
+                .map(WinOdbcRegistryUtil::getFileExtension)
+                .filter(o -> !o.isEmpty())
+                .collect(Collectors.toList())
                 : Collections.emptyList();
     }
 
@@ -210,8 +195,12 @@ class WinOdbcRegistryUtil {
     }
 
     private OdbcDriver.ConnectFunctions toConnectFunctions(Object obj, OdbcDriver.ConnectFunctions defaultValue) {
-        return obj != null
-                ? OdbcDriver.ConnectFunctions.parse(obj.toString(), defaultValue)
-                : defaultValue;
+        if (obj != null) {
+            try {
+                return OdbcDriver.ConnectFunctions.parse(obj.toString());
+            } catch (IllegalArgumentException ex) {
+            }
+        }
+        return defaultValue;
     }
 }

@@ -1,42 +1,45 @@
 /*
  * Copyright 2016 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.lhod;
 
+import nbbrd.sql.jdbc.SqlFunc;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.stream.Stream;
+
 import static _test.SQLExceptions.*;
 import static internal.sql.lhod.LhodConnection.of;
 import static internal.sql.lhod.Resources.CONN_STRING;
-import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.*;
-import org.junit.Test;
-import java.io.IOException;
-import java.util.stream.Stream;
-import nbbrd.sql.jdbc.SqlFunc;
-import org.junit.After;
-import org.junit.Before;
+
+;
 
 /**
- *
  * @author Philippe Charles
  */
 public class LhodConnectionTest {
 
     private TabDataExecutor good, bad, ugly, err, closed;
 
-    @Before
+    @BeforeEach
     public void before() {
         good = Resources.goodExecutor();
         bad = Resources.badExecutor();
@@ -45,7 +48,7 @@ public class LhodConnectionTest {
         closed = Resources.closedExecutor();
     }
 
-    @After
+    @AfterEach
     public void after() {
         Stream.of(good, bad, ugly, err, closed)
                 .forEach(conn -> {
