@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.3] - 2022-10-28
+
 ### Added
 
 - Add Maven BOM
@@ -14,8 +16,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Fix invalid use of functional interface
-
-### Fixed
 
 ## [1.0.2] - 2021-03-24
 
@@ -34,7 +34,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release
 
-[Unreleased]: https://github.com/nbbrd/java-sql-util/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/nbbrd/java-sql-util/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/nbbrd/java-sql-util/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/nbbrd/java-sql-util/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/nbbrd/java-sql-util/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/nbbrd/java-sql-util/releases/tag/v1.0.0
