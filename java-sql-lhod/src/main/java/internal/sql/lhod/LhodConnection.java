@@ -23,11 +23,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.lang.String.format;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -80,7 +77,7 @@ final class LhodConnection extends _Connection {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to get catalog name of '%s'", connectionString), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to get catalog name of '%s'", connectionString), ex);
         }
     }
 
@@ -152,7 +149,7 @@ final class LhodConnection extends _Connection {
 
     void checkState() throws SQLException {
         if (isClosed()) {
-            throw new SQLException(format("Connection '%s' closed", connectionString));
+            throw new SQLException(format(Locale.ROOT, "Connection '%s' closed", connectionString));
         }
     }
 

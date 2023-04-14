@@ -17,6 +17,7 @@
 package nbbrd.sql.jdbc;
 
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;;
@@ -64,7 +65,7 @@ public class SqlFuncTest {
     }
 
     SqlFunc<Class, String> simpleName = Class::getSimpleName;
-    SqlFunc<String, String> upperCase = String::toUpperCase;
+    SqlFunc<String, String> upperCase = s -> s.toUpperCase(Locale.ROOT);
     SqlFunc<Class, String> failingSimpleName = ofException("getSimpleName");
     SqlFunc<String, String> failingUpperCase = ofException("toUpperCase");
 

@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import static java.lang.String.format;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -46,7 +47,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
         }
     }
 
@@ -58,7 +59,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
         }
     }
 
@@ -70,7 +71,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to get identifier case type of '%s'", conn.getConnectionString()), ex);
         }
     }
 
@@ -97,7 +98,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to get string functions of '%s'", conn.getConnectionString()), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to get string functions of '%s'", conn.getConnectionString()), ex);
         }
     }
 
@@ -109,7 +110,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to get extra name chars of '%s'", conn.getConnectionString()), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to get extra name chars of '%s'", conn.getConnectionString()), ex);
         }
     }
 
@@ -132,7 +133,7 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to list tables with catalog='%s', schemaPattern='%s', tableNamePattern='%s', types='%s' of '%s'", catalog, schemaPattern, tableNamePattern, types != null ? Arrays.toString(types) : null, conn.getConnectionString()), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to list tables with catalog='%s', schemaPattern='%s', tableNamePattern='%s', types='%s' of '%s'", catalog, schemaPattern, tableNamePattern, types != null ? Arrays.toString(types) : null, conn.getConnectionString()), ex);
         }
     }
 

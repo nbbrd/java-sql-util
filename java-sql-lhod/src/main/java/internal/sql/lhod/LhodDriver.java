@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import nbbrd.service.ServiceProvider;
@@ -65,7 +66,7 @@ public final class LhodDriver extends _Driver {
         try {
             return LhodConnection.of(engine.getExecutor(), getConnectionString(url));
         } catch (IOException ex) {
-            throw new SQLException(format("Cannot instantiate executor: '%s'", url), ex);
+            throw new SQLException(format(Locale.ROOT, "Cannot instantiate executor: '%s'", url), ex);
         }
     }
 
@@ -74,7 +75,7 @@ public final class LhodDriver extends _Driver {
         if (url == null) {
             throw new SQLException("URL cannot be null");
         }
-        return url.toLowerCase().startsWith(PREFIX);
+        return url.toLowerCase(Locale.ROOT).startsWith(PREFIX);
     }
 
     @Override

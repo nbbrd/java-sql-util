@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 /**
  *
@@ -50,7 +51,7 @@ final class LhodStatement extends _Statement {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to execute query '%s'", sql), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to execute query '%s'", sql), ex);
         }
     }
 
