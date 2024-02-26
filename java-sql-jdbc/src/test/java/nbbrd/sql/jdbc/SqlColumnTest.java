@@ -41,7 +41,7 @@ public class SqlColumnTest {
 
     @Test
     public void testAllOfMetaData() throws SQLException {
-        for (InMemoryDriver driver : InMemoryDriver.not(InMemoryDriver.DERBY, InMemoryDriver.SQLITE)) {
+        for (InMemoryDriver driver : InMemoryDriver.not(/*InMemoryDriver.DERBY, */InMemoryDriver.SQLITE)) {
             try (Connection conn = driver.getConnection()) {
                 try (Statement statement = conn.createStatement()) {
                     try (ResultSet rs = statement.executeQuery("select * from INFORMATION_SCHEMA.COLUMNS")) {

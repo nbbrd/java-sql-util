@@ -74,7 +74,7 @@ public class SqlTableTest {
 
     @Test
     public void testAllOfMetaData2() throws SQLException {
-        for (InMemoryDriver driver : InMemoryDriver.not(InMemoryDriver.DERBY, InMemoryDriver.SQLITE, InMemoryDriver.H2)) {
+        for (InMemoryDriver driver : InMemoryDriver.not(/*InMemoryDriver.DERBY, */InMemoryDriver.SQLITE, InMemoryDriver.H2)) {
             try (Connection conn = driver.getConnection()) {
                 DatabaseMetaData metaData = conn.getMetaData();
 

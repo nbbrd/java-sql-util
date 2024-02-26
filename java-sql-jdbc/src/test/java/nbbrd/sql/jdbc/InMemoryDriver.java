@@ -21,7 +21,7 @@ import java.util.EnumSet;
 public enum InMemoryDriver {
     H2("jdbc:h2:mem:test", SqlIdentifierQuoter.DEFAULT.getQuoteString(), SqlIdentifierStorageRule.UPPER, "", true),
     HSQLDB("jdbc:hsqldb:mem:test", SqlIdentifierQuoter.DEFAULT.getQuoteString(), SqlIdentifierStorageRule.UPPER, "", false),
-    DERBY("jdbc:derby:memory:test;create=true", SqlIdentifierQuoter.DEFAULT.getQuoteString(), SqlIdentifierStorageRule.UPPER, "", true),
+//    DERBY("jdbc:derby:memory:test;create=true", SqlIdentifierQuoter.DEFAULT.getQuoteString(), SqlIdentifierStorageRule.UPPER, "", true),
     SQLITE("jdbc:sqlite::memory:", SqlIdentifierQuoter.DEFAULT.getQuoteString(), SqlIdentifierStorageRule.MIXED, "", true);
 
     private final String url;

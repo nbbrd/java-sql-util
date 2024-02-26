@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </parent>
 
     <artifactId>java-sql-bom</artifactId>
@@ -42,7 +42,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.3.0</version>
+                <version>1.6.0</version>
                 <configuration>
                     <flattenMode>bom</flattenMode>
                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -86,7 +86,6 @@
                     <plugin>
                         <groupId>org.jreleaser</groupId>
                         <artifactId>jreleaser-maven-plugin</artifactId>
-                        <version>1.2.0</version>
                         <executions>
                             <execution>
                                 <phase>install</phase>

@@ -22,6 +22,8 @@ import java.io.IOException;
 import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import internal.nbbrd.picocsv.Csv;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -106,7 +108,7 @@ final class TabDataReader implements Closeable {
         List<String> types = readHeader(reader, "types");
 
         if (names.size() != types.size()) {
-            throw new TabDataFormatError(format("Invalid data type length: expected '%s', found '%s'", names.size(), types.size()));
+            throw new TabDataFormatError(format(Locale.ROOT, "Invalid data type length: expected '%s', found '%s'", names.size(), types.size()));
         }
 
         List<TabDataColumn> result = new ArrayList<>();
@@ -122,7 +124,7 @@ final class TabDataReader implements Closeable {
 
     private static List<String> readHeader(Csv.Reader reader, String id) throws IOException {
         if (!reader.readLine()) {
-            throw new TabDataFormatError(format("Expected header %s", id));
+            throw new TabDataFormatError(format(Locale.ROOT, "Expected header %s", id));
         }
         if (!reader.readField()) {
             throw parseError(reader);

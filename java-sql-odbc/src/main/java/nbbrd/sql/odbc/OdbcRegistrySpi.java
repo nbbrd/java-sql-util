@@ -16,10 +16,7 @@
  */
 package nbbrd.sql.odbc;
 
-import nbbrd.service.Quantifier;
-import nbbrd.service.ServiceDefinition;
-import nbbrd.service.ServiceFilter;
-import nbbrd.service.ServiceSorter;
+import nbbrd.service.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.IOException;
@@ -34,6 +31,7 @@ import java.util.List;
 )
 public interface OdbcRegistrySpi {
 
+    @ServiceId
     @NonNull String getName();
 
     @ServiceFilter

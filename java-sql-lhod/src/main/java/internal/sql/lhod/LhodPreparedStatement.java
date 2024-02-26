@@ -21,10 +21,7 @@ import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -61,7 +58,7 @@ final class LhodPreparedStatement extends _PreparedStatement {
         } catch (IOException ex) {
             throw ex instanceof TabDataRemoteError
                     ? new SQLException(ex.getMessage(), "", ((TabDataRemoteError) ex).getNumber())
-                    : new SQLException(format("Failed to execute query '%s'", sql), ex);
+                    : new SQLException(format(Locale.ROOT, "Failed to execute query '%s'", sql), ex);
         }
     }
 
