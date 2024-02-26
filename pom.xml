@@ -6,7 +6,7 @@
 
     <groupId>com.github.nbbrd.java-sql-util</groupId>
     <artifactId>java-sql-parent</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>java-sql</name>
@@ -39,7 +39,7 @@
     <properties>
         <!-- Java 8+ config -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2024-02-26T10:38:06Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-02-26T10:38:13Z</project.build.outputTimestamp>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
 
