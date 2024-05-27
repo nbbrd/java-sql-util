@@ -19,6 +19,7 @@ package internal.sql.lhod;
 import internal.sys.ResourceExtractor;
 import nbbrd.io.sys.ProcessReader;
 import nbbrd.io.win.CScriptWrapper;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,7 +37,7 @@ final class VbsExecutor implements TabDataExecutor {
     private boolean closed = false;
 
     @Override
-    public TabDataReader exec(TabDataQuery query) throws IOException {
+    public @NonNull TabDataReader exec(@NonNull TabDataQuery query) throws IOException {
         if (closed) {
             throw new IOException("Executor closed");
         }

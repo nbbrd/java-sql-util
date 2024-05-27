@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcDriver;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -52,7 +53,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
     private final Consumer<? super String> onUnexpectedNull;
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         String result;
 
         try {
@@ -95,7 +96,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<String> getDataSourceNames(OdbcDataSource.Type[] types) throws IOException {
+    public @NonNull List<String> getDataSourceNames(OdbcDataSource.Type[] types) throws IOException {
         Objects.requireNonNull(types);
 
         List<String> result;
@@ -141,7 +142,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<String> getDriverNames() throws IOException {
+    public @NonNull List<String> getDriverNames() throws IOException {
         List<String> result;
 
         try {
@@ -162,7 +163,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<OdbcDriver> getDrivers() throws IOException {
+    public @NonNull List<OdbcDriver> getDrivers() throws IOException {
         List<OdbcDriver> result;
 
         try {

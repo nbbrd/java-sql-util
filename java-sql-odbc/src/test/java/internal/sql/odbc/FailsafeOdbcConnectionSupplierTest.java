@@ -18,6 +18,7 @@ package internal.sql.odbc;
 
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -216,7 +217,7 @@ public class FailsafeOdbcConnectionSupplierTest {
         }
 
         @Override
-        public Connection getConnection(String connectionString) throws SQLException {
+        public Connection getConnection(@NonNull String connectionString) throws SQLException {
             return null;
         }
     }
@@ -239,7 +240,7 @@ public class FailsafeOdbcConnectionSupplierTest {
         }
 
         @Override
-        public Connection getConnection(String connectionString) throws SQLException {
+        public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
             throw new UnsupportedOperationException();
         }
     }

@@ -16,6 +16,8 @@
  */
 package internal.sys;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +41,7 @@ public final class CachedResourceExtractor implements ResourceExtractor {
     private final ConcurrentMap<String, Entry> index;
 
     @Override
-    public File getResourceAsFile(String resourceName) throws IOException {
+    public @NonNull File getResourceAsFile(@NonNull String resourceName) throws IOException {
         Objects.requireNonNull(resourceName);
 
         Entry result = index.get(resourceName);

@@ -16,6 +16,8 @@
  */
 package internal.sql.lhod;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.io.IOException;
 
 /**
@@ -24,5 +26,6 @@ import java.io.IOException;
  */
 interface TabDataEngine {
 
+    @NonNull
     TabDataExecutor getExecutor() throws IOException;
 }

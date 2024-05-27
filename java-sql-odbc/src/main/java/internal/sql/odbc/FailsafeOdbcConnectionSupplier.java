@@ -23,6 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -93,7 +94,7 @@ public final class FailsafeOdbcConnectionSupplier implements OdbcConnectionSuppl
     }
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public Connection getConnection(@NonNull String connectionString) throws SQLException {
         Objects.requireNonNull(connectionString);
 
         Connection result;

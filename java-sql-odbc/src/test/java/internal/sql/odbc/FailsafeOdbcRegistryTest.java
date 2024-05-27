@@ -20,6 +20,7 @@ import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcDataSource.Type;
 import nbbrd.sql.odbc.OdbcDriver;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -387,12 +388,12 @@ public class FailsafeOdbcRegistryTest {
         }
 
         @Override
-        public List<String> getDriverNames() throws IOException {
+        public @NonNull List<String> getDriverNames() throws IOException {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<OdbcDriver> getDrivers() throws IOException {
+        public @NonNull List<OdbcDriver> getDrivers() throws IOException {
             throw new UnsupportedOperationException();
         }
     }

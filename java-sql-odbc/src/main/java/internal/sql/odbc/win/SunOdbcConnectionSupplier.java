@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import nbbrd.service.ServiceProvider;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -52,7 +53,7 @@ public final class SunOdbcConnectionSupplier implements OdbcConnectionSupplierSp
     }
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public Connection getConnection(@NonNull String connectionString) throws SQLException {
         return delegate.getConnection(connectionString);
     }
 

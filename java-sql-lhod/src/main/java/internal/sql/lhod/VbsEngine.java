@@ -19,6 +19,8 @@ package internal.sql.lhod;
 import internal.sys.CachedResourceExtractor;
 import internal.sys.DefaultResourceExtractor;
 import internal.sys.ResourceExtractor;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.io.IOException;
 
 /**
@@ -30,7 +32,7 @@ final class VbsEngine implements TabDataEngine {
     private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsEngine.class));
 
     @Override
-    public TabDataExecutor getExecutor() throws IOException {
+    public @NonNull TabDataExecutor getExecutor() throws IOException {
         return new VbsExecutor(scripts);
     }
 }

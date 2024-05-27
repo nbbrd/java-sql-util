@@ -25,6 +25,7 @@ import nbbrd.service.ServiceProvider;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcDriver;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 public final class RegOdbcRegistry implements OdbcRegistrySpi {
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return "OdbcRegistryOverRegCommand";
     }
 
@@ -56,7 +57,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<String> getDataSourceNames(OdbcDataSource.Type[] types) throws IOException {
+    public @NonNull List<String> getDataSourceNames(OdbcDataSource.Type[] types) throws IOException {
         MapRegistry.Builder reg = MapRegistry.builder();
         for (OdbcDataSource.Type o : types) {
             reg.load(WinOdbcRegistryUtil.getRoot(o), WinOdbcRegistryUtil.DATA_SOURCES_KEY, false);
@@ -74,7 +75,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<String> getDriverNames() throws IOException {
+    public @NonNull List<String> getDriverNames() throws IOException {
         Registry reg = MapRegistry
                 .builder()
                 .load(Root.HKEY_LOCAL_MACHINE, WinOdbcRegistryUtil.DRIVERS_KEY, false)
@@ -83,7 +84,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<OdbcDriver> getDrivers() throws IOException {
+    public @NonNull List<OdbcDriver> getDrivers() throws IOException {
         Registry reg = MapRegistry
                 .builder()
                 .load(Root.HKEY_LOCAL_MACHINE, WinOdbcRegistryUtil.DRIVER_KEY, true)

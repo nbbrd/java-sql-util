@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -29,7 +30,7 @@ public enum NoOpSupplier implements SqlConnectionSupplier {
     INSTANCE;
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         Objects.requireNonNull(connectionString);
         throw new SQLException("No connection for '" + connectionString + "'");
     }

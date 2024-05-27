@@ -19,6 +19,7 @@ package internal.sql.lhod;
 import nbbrd.io.sys.OS;
 import nbbrd.service.ServiceProvider;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -47,7 +48,11 @@ public final class LhodConnectionSupplier implements OdbcConnectionSupplierSpi {
     }
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
-        return driver.connect(LhodDriver.PREFIX + connectionString, null);
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
+        Connection result = driver.connect(LhodDriver.PREFIX + connectionString, null);
+        if (result == null) {
+            throw new SQLException("Null connection. Wrong kind of driver ?");
+        }
+        return result;
     }
 }

@@ -24,6 +24,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  *
@@ -36,7 +37,7 @@ public final class JndiSupplier implements SqlConnectionSupplier {
     private final Callable<? extends Context> contextSupplier;
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         Objects.requireNonNull(connectionString);
         return lookupByName(connectionString).getConnection();
     }

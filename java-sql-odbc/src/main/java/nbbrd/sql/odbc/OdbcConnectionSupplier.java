@@ -46,7 +46,7 @@ public final class OdbcConnectionSupplier implements SqlConnectionSupplier {
     }
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         return spi.getConnection(connectionString);
     }
 

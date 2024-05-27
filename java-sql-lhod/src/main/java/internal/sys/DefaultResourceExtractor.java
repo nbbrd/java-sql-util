@@ -16,6 +16,8 @@
  */
 package internal.sys;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class DefaultResourceExtractor implements ResourceExtractor {
     @lombok.NonNull Class<?> anchor;
 
     @Override
-    public File getResourceAsFile(String resourceName) throws IOException {
+    public @NonNull File getResourceAsFile(@NonNull String resourceName) throws IOException {
         try (InputStream stream = anchor.getResourceAsStream(resourceName)) {
             if (stream == null) {
                 throw new FileNotFoundException(resourceName);
