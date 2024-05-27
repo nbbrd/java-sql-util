@@ -38,7 +38,4 @@ module nbbrd.sql.odbc {
     uses nbbrd.sql.odbc.OdbcRegistrySpi;
     provides nbbrd.sql.odbc.OdbcRegistrySpi with
             internal.sql.odbc.win.RegOdbcRegistry;
-
-    // private api
-    exports internal.sys to nbbrd.sql.lhod;
 }
