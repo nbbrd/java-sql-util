@@ -14,15 +14,15 @@
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
-package internal.sql.lhod.vbs;
+package internal.sql.lhod.ps;
 
 import internal.sql.lhod.TabDataExecutor;
 import internal.sql.lhod.TabDataQuery;
 import internal.sql.lhod.TabDataReader;
 import internal.sys.ResourceExtractor;
+import lombok.NonNull;
 import nbbrd.io.sys.ProcessReader;
 import nbbrd.io.win.CScriptWrapper;
-import lombok.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,9 +32,9 @@ import java.io.IOException;
  * @author Philippe Charles
  */
 @lombok.RequiredArgsConstructor
-final class VbsExecutor implements TabDataExecutor {
+final class PsExecutor implements TabDataExecutor {
 
-    @lombok.NonNull
+    @NonNull
     private final ResourceExtractor scripts;
 
     private boolean closed = false;
@@ -44,7 +44,7 @@ final class VbsExecutor implements TabDataExecutor {
         if (closed) {
             throw new IOException("Executor closed");
         }
-        return TabDataReader.of(exec(query.getProcedure() + ".vbs", query.getParameters().toArray(new String[0])));
+        return TabDataReader.of(exec(query.getProcedure() + ".ps1", query.getParameters().toArray(new String[0])));
     }
 
     @Override
@@ -59,7 +59,12 @@ final class VbsExecutor implements TabDataExecutor {
 
     private BufferedReader exec(String scriptName, String[] args) throws IOException {
         File script = scripts.getResourceAsFile(scriptName);
-        Process process = CScriptWrapper.exec(script, CScriptWrapper.NO_TIMEOUT, args);
-        return ProcessReader.newReader(process);
+        Process process = PowerShellWrapper.exec(script, PowerShellWrapper.NO_TIMEOUT, args);
+        BufferedReader bufferedReader = ProcessReader.newReader(process);
+//        String line;
+//        while((line = bufferedReader.readLine()) != null) {
+//            System.out.println(line);
+//        }
+        return bufferedReader;
     }
 }

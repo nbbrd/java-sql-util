@@ -44,6 +44,11 @@ class Resources {
         private final Supplier<? extends IOException> onGetExecutor;
 
         @Override
+        public @NonNull String getId() {
+            return "failing";
+        }
+
+        @Override
         public @NonNull TabDataExecutor getExecutor() throws IOException {
             throw onGetExecutor.get();
         }

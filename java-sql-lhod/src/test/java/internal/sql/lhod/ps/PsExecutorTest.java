@@ -1,4 +1,4 @@
-package internal.sql.lhod.vbs;
+package internal.sql.lhod.ps;
 
 import internal.sql.lhod.TabDataColumn;
 import internal.sql.lhod.TabDataQuery;
@@ -15,16 +15,16 @@ import java.util.UUID;
 import static _test.TabConditions.rowCount;
 import static org.assertj.core.api.Assertions.*;
 
-class VbsExecutorTest {
+class PsExecutorTest {
 
     @SuppressWarnings({"resource", "DataFlowIssue", "EmptyTryBlock"})
     @Test
     public void testFactories() {
         assertThatNullPointerException()
-                .isThrownBy(() -> new VbsExecutor(null));
+                .isThrownBy(() -> new PsExecutor(null));
 
         assertThatCode(() -> {
-            try (VbsExecutor ignore = new VbsExecutor(extractor)) {
+            try (PsExecutor ignore = new PsExecutor(extractor)) {
             }
         }).doesNotThrowAnyException();
     }
@@ -33,7 +33,7 @@ class VbsExecutorTest {
     @Test
     @EnabledOnOs(OS.WINDOWS)
     public void testExec() throws IOException {
-        try (VbsExecutor x = new VbsExecutor(extractor)) {
+        try (PsExecutor x = new PsExecutor(extractor)) {
             assertThatNullPointerException()
                     .isThrownBy(() -> x.exec(null));
 
@@ -54,9 +54,9 @@ class VbsExecutorTest {
                 assertThat(reader).has(rowCount(330));
             }
 
-//            assertThatIOException()
-//                    .isThrownBy(() -> x.exec(TabDataQuery.builder().procedure("Print").parameter("boom.txt").build()))
-//                    .withMessageContaining("boom.txt");
+            assertThatIOException()
+                    .isThrownBy(() -> x.exec(TabDataQuery.builder().procedure("Print").parameter("boom.txt").build()))
+                    .withMessageContaining("boom.txt");
 
             String missingDSN = UUID.randomUUID().toString().substring(0, 32);
             for (String procedure : new String[]{"DBProperties", "OpenSchema", "PreparedStatement"}) {
@@ -73,12 +73,12 @@ class VbsExecutorTest {
 
     @Test
     public void testIsClosed() {
-        try (VbsExecutor x = new VbsExecutor(extractor)) {
+        try (PsExecutor x = new PsExecutor(extractor)) {
             assertThat(x.isClosed()).isFalse();
             x.close();
             assertThat(x.isClosed()).isTrue();
         }
     }
 
-    private final ResourceExtractor extractor = DefaultResourceExtractor.of(VbsExecutorTest.class);
+    private final ResourceExtractor extractor = DefaultResourceExtractor.of(PsExecutorTest.class);
 }
