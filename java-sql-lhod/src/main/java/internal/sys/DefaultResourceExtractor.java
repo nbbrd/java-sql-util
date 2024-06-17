@@ -74,4 +74,8 @@ public class DefaultResourceExtractor implements ResourceExtractor {
                 ? File.createTempFile(resourceName.substring(0, idx), resourceName.substring(idx), parent)
                 : File.createTempFile("rsrc", resourceName, parent);
     }
+
+    // fix javadoc
+    public static final class Builder {
+    }
 }

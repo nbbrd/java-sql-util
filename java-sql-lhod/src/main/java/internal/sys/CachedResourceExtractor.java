@@ -83,4 +83,8 @@ public final class CachedResourceExtractor implements ResourceExtractor {
                     && lastModified.equals(Files.getLastModifiedTime(file.toPath()));
         }
     }
+
+    // fix javadoc
+    public static final class Builder {
+    }
 }
