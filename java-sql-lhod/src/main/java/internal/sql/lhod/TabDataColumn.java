@@ -21,7 +21,7 @@ package internal.sql.lhod;
  * @author Philippe Charles
  */
 @lombok.Value
-class TabDataColumn {
+public class TabDataColumn {
 
     String name;
     int type;

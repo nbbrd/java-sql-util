@@ -1,47 +1,49 @@
 /*
  * Copyright 2016 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.lhod;
 
-import java.io.BufferedReader;
+import internal.nbbrd.picocsv.Csv;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import nbbrd.design.StaticFactoryMethod;
+
 import java.io.Closeable;
 import java.io.IOException;
-import static java.lang.String.format;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import internal.nbbrd.picocsv.Csv;
-import lombok.NonNull;
+import static java.lang.String.format;
 
 /**
- *
  * @author Philippe Charles
  */
-@lombok.RequiredArgsConstructor
-final class TabDataReader implements Closeable {
+@lombok.RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TabDataReader implements Closeable {
 
-    @NonNull
-    static TabDataReader of(@NonNull BufferedReader reader) throws IOException {
-        Csv.Reader x = Csv.Reader.of(Csv.Format.RFC4180.toBuilder().delimiter('\t').build(), Csv.ReaderOptions.DEFAULT, reader, Csv.DEFAULT_CHAR_BUFFER_SIZE);
-        List<TabDataColumn> columns = readColumnHeaders(x);
-        return new TabDataReader(x, columns, new String[columns.size()]);
+    private static final Csv.Format FORMAT = Csv.Format.RFC4180.toBuilder().delimiter('\t').build();
+
+    @StaticFactoryMethod
+    public static @NonNull TabDataReader of(@NonNull Reader reader) throws IOException {
+        Csv.Reader tsv = Csv.Reader.of(FORMAT, Csv.ReaderOptions.DEFAULT, reader);
+        List<TabDataColumn> columns = readColumnHeaders(tsv);
+        return new TabDataReader(tsv, columns, new String[columns.size()]);
     }
-
-    private static final String DELIMITER = "\t";
 
     private final Csv.Reader reader;
 
@@ -62,10 +64,9 @@ final class TabDataReader implements Closeable {
                 throw parseError(reader);
             }
             int idx = 0;
-            currentRow[idx++] = reader.toString();
-            while (reader.readField()) {
+            do {
                 currentRow[idx++] = reader.toString();
-            }
+            } while (reader.readField());
             return true;
         }
         return false;

@@ -24,7 +24,7 @@ import java.io.IOException;
  *
  * @author Philippe Charles
  */
-interface TabDataEngine {
+public interface TabDataEngine {
 
     @NonNull
     TabDataExecutor getExecutor() throws IOException;

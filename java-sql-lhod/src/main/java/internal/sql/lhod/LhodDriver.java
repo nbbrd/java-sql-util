@@ -25,6 +25,9 @@ import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
+
+import internal.sql.lhod.vbs.VbsEngine;
+import lombok.NonNull;
 import nbbrd.service.ServiceProvider;
 
 /**
@@ -54,7 +57,7 @@ public final class LhodDriver extends _Driver {
     }
 
 //    @VisibleForTesting
-    LhodDriver(TabDataEngine engine) {
+    LhodDriver(@NonNull TabDataEngine engine) {
         this.engine = engine;
     }
 

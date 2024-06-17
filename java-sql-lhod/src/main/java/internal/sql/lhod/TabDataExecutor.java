@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * @author Philippe Charles
  */
-interface TabDataExecutor extends Closeable {
+public interface TabDataExecutor extends Closeable {
 
     @NonNull
     TabDataReader exec(@NonNull TabDataQuery query) throws IOException;

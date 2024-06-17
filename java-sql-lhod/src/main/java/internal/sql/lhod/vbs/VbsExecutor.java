@@ -14,8 +14,11 @@
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
-package internal.sql.lhod;
+package internal.sql.lhod.vbs;
 
+import internal.sql.lhod.TabDataExecutor;
+import internal.sql.lhod.TabDataQuery;
+import internal.sql.lhod.TabDataReader;
 import internal.sys.ResourceExtractor;
 import nbbrd.io.sys.ProcessReader;
 import nbbrd.io.win.CScriptWrapper;
