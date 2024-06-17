@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import internal.nbbrd.picocsv.Csv;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  *

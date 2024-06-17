@@ -25,7 +25,7 @@ import nbbrd.service.ServiceProvider;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcDriver;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -66,7 +66,7 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
+    public @NonNull List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
         MapRegistry.Builder reg = MapRegistry.builder();
         for (OdbcDataSource.Type o : types) {
             reg.load(WinOdbcRegistryUtil.getRoot(o), WinOdbcRegistryUtil.DATA_SOURCE_KEY, true);
@@ -108,13 +108,13 @@ public final class RegOdbcRegistry implements OdbcRegistrySpi {
         private final Map<String, List<RegWrapper.RegValue>> keys;
 
         @Override
-        public boolean keyExists(Root root, String key) throws IOException {
+        public boolean keyExists(@NonNull Root root, @NonNull String key) {
             String target = root + WinOdbcRegistryUtil.KEY_SEPARATOR + key;
             return keys.keySet().stream().anyMatch(o -> o.startsWith(target));
         }
 
         @Override
-        public Map<String, Object> getValues(Root root, String key) throws IOException {
+        public @NonNull Map<String, Object> getValues(@NonNull Root root, @NonNull String key) {
             String target = root + WinOdbcRegistryUtil.KEY_SEPARATOR + key;
             return keys.containsKey(target)
                     ? keys.get(target).stream().collect(Collectors.toMap(RegWrapper.RegValue::getName, RegWrapper.RegValue::getValue))

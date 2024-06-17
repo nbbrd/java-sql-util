@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import nbbrd.sql.jdbc.SqlFunc;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  * A connection supplier that uses {@link DriverManager}.

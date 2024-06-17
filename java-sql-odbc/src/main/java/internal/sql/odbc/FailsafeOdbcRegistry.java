@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcDriver;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  *
@@ -64,6 +64,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
             return getId();
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getName");
             onUnexpectedNull.accept(msg);
@@ -109,6 +110,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
             throw new IOException(msg, unexpected);
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getDataSourceNames");
             onUnexpectedNull.accept(msg);
@@ -119,7 +121,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
     }
 
     @Override
-    public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
+    public @NonNull List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
         Objects.requireNonNull(types);
 
         List<OdbcDataSource> result;
@@ -132,6 +134,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
             throw new IOException(msg, unexpected);
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getDataSources");
             onUnexpectedNull.accept(msg);
@@ -153,6 +156,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
             throw new IOException(msg, unexpected);
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getDriverNames");
             onUnexpectedNull.accept(msg);
@@ -174,6 +178,7 @@ public final class FailsafeOdbcRegistry implements OdbcRegistrySpi {
             throw new IOException(msg, unexpected);
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getDrivers");
             onUnexpectedNull.accept(msg);

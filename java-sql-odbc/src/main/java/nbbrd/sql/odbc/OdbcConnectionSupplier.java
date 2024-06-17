@@ -19,7 +19,7 @@ package nbbrd.sql.odbc;
 import internal.sql.odbc.FailsafeOdbcConnectionSupplier;
 import internal.sql.odbc.OdbcConnectionSupplierSpiLoader;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;

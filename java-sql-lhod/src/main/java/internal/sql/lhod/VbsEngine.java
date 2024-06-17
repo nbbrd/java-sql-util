@@ -19,7 +19,7 @@ package internal.sql.lhod;
 import internal.sys.CachedResourceExtractor;
 import internal.sys.DefaultResourceExtractor;
 import internal.sys.ResourceExtractor;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.io.IOException;
 

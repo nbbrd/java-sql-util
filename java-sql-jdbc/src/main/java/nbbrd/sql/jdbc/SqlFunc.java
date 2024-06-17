@@ -17,7 +17,7 @@
 package nbbrd.sql.jdbc;
 
 import nbbrd.design.StaticFactoryMethod;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.sql.SQLException;
 import java.util.Objects;

@@ -18,7 +18,7 @@ package nbbrd.sql.jdbc;
 
 import java.util.Locale;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  *

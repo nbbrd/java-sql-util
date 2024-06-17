@@ -19,7 +19,7 @@ package internal.sql.lhod;
 import nbbrd.io.sys.OS;
 import nbbrd.service.ServiceProvider;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,7 +33,7 @@ public final class LhodConnectionSupplier implements OdbcConnectionSupplierSpi {
     private final LhodDriver driver = new LhodDriver();
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return driver.getClass().getName();
     }
 

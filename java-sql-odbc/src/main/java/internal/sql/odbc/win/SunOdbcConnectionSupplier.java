@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import nbbrd.service.ServiceProvider;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  *
@@ -36,7 +36,7 @@ public final class SunOdbcConnectionSupplier implements OdbcConnectionSupplierSp
     private final SqlConnectionSupplier delegate = SqlConnectionSupplier.ofDriverManager(JDBC_ODBC_DRIVER_NAME, o -> JDBC_ODBC_DRIVER_PREFIX + o);
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return JDBC_ODBC_DRIVER_NAME;
     }
 
@@ -53,7 +53,7 @@ public final class SunOdbcConnectionSupplier implements OdbcConnectionSupplierSp
     }
 
     @Override
-    public Connection getConnection(@NonNull String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         return delegate.getConnection(connectionString);
     }
 

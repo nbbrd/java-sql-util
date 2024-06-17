@@ -19,7 +19,7 @@ package internal.sql.lhod;
 import internal.sys.ResourceExtractor;
 import nbbrd.io.sys.ProcessReader;
 import nbbrd.io.win.CScriptWrapper;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;

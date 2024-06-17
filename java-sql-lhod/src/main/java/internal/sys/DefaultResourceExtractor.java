@@ -16,7 +16,7 @@
  */
 package internal.sys;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -17,7 +17,7 @@
 package nbbrd.sql.odbc;
 
 import nbbrd.service.*;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;

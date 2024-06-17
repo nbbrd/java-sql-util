@@ -22,7 +22,7 @@ import java.util.Objects;
 import javax.sql.DataSource;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import nbbrd.sql.jdbc.SqlFunc;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  * A connection supplier that uses {@link javax.sql.DataSource}.

@@ -16,13 +16,12 @@
  */
 package internal.sql.odbc;
 
+import lombok.NonNull;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
 import nbbrd.sql.odbc.OdbcRegistrySpi;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @Test
-    public void testGetNameNull() throws IOException {
+    public void testGetNameNull() {
         FailsafeOdbcConnectionSupplier x = of(new NullImpl());
 
         assertThat(x.getName())
@@ -61,7 +60,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @Test
-    public void testIsAvailableNull() throws IOException {
+    public void testIsAvailableNull() {
         FailsafeOdbcConnectionSupplier x = of(new NullImpl());
 
         assertThat(x.isAvailable())
@@ -75,7 +74,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @Test
-    public void testGetCostNull() throws IOException {
+    public void testGetCostNull() {
         FailsafeOdbcConnectionSupplier x = of(new NullImpl());
 
         assertThat(x.getCost())
@@ -88,8 +87,9 @@ public class FailsafeOdbcConnectionSupplierTest {
                 .isEmpty();
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
-    public void testGetConnectionNull() throws IOException {
+    public void testGetConnectionNull() {
         FailsafeOdbcConnectionSupplier x = of(new NullImpl());
 
         assertThatNullPointerException()
@@ -111,7 +111,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @Test
-    public void testGetNameError() throws IOException {
+    public void testGetNameError() {
         FailsafeOdbcConnectionSupplier x = of(new ErrorImpl());
 
         assertThat(x.getName())
@@ -129,7 +129,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @Test
-    public void testIsAvailableError() throws IOException {
+    public void testIsAvailableError() {
         FailsafeOdbcConnectionSupplier x = of(new ErrorImpl());
 
         assertThat(x.isAvailable())
@@ -146,7 +146,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @Test
-    public void testGetCostError() throws IOException {
+    public void testGetCostError() {
         FailsafeOdbcConnectionSupplier x = of(new ErrorImpl());
 
         assertThat(x.getCost())
@@ -162,8 +162,9 @@ public class FailsafeOdbcConnectionSupplierTest {
                 .isEmpty();
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
-    public void testGetConnectionError() throws IOException {
+    public void testGetConnectionError() {
         FailsafeOdbcConnectionSupplier x = of(new ErrorImpl());
 
         assertThatNullPointerException()
@@ -193,16 +194,17 @@ public class FailsafeOdbcConnectionSupplierTest {
     }
 
     @lombok.Value
-    static final class UnexpectedError {
+    static class UnexpectedError {
 
-        private String msg;
-        private RuntimeException ex;
+        String msg;
+        RuntimeException ex;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     static final class NullImpl implements OdbcConnectionSupplierSpi {
 
         @Override
-        public String getName() {
+        public @NonNull String getName() {
             return null;
         }
 
@@ -217,7 +219,7 @@ public class FailsafeOdbcConnectionSupplierTest {
         }
 
         @Override
-        public Connection getConnection(@NonNull String connectionString) throws SQLException {
+        public @NonNull Connection getConnection(@NonNull String connectionString) {
             return null;
         }
     }
@@ -225,7 +227,7 @@ public class FailsafeOdbcConnectionSupplierTest {
     static final class ErrorImpl implements OdbcConnectionSupplierSpi {
 
         @Override
-        public String getName() {
+        public @NonNull String getName() {
             throw new UnsupportedOperationException();
         }
 
@@ -240,7 +242,7 @@ public class FailsafeOdbcConnectionSupplierTest {
         }
 
         @Override
-        public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
+        public @NonNull Connection getConnection(@NonNull String connectionString) {
             throw new UnsupportedOperationException();
         }
     }
