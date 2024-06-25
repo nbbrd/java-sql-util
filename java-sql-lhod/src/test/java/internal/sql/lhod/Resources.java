@@ -128,9 +128,9 @@ class Resources {
             .builder()
             .procedure("OpenSchema")
             .parameter(CONN_STRING)
-            .parameter("\"\"")
-            .parameter("\"\"")
-            .parameter("\"\"")
+            .parameter("")
+            .parameter("")
+            .parameter("")
             .build();
 
     static final TabDataQuery GOOD_STMT_QUERY = TabDataQuery

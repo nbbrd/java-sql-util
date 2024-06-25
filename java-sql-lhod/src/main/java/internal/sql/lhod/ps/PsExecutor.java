@@ -22,11 +22,15 @@ import internal.sql.lhod.TabDataReader;
 import internal.sys.ResourceExtractor;
 import lombok.NonNull;
 import nbbrd.io.sys.ProcessReader;
-import nbbrd.io.win.CScriptWrapper;
+import nbbrd.io.win.PowerShellWrapper;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
+import java.util.stream.Stream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author Philippe Charles
@@ -59,12 +63,15 @@ final class PsExecutor implements TabDataExecutor {
 
     private BufferedReader exec(String scriptName, String[] args) throws IOException {
         File script = scripts.getResourceAsFile(scriptName);
-        Process process = PowerShellWrapper.exec(script, PowerShellWrapper.NO_TIMEOUT, args);
-        BufferedReader bufferedReader = ProcessReader.newReader(process);
-//        String line;
-//        while((line = bufferedReader.readLine()) != null) {
-//            System.out.println(line);
-//        }
-        return bufferedReader;
+        Process process = PowerShellWrapper.exec(script, encodeArguments(args));
+        return ProcessReader.newReader(UTF_8, process);
+    }
+
+    private String[] encodeArguments(String[] args) {
+        return Stream.of(args).map(PsExecutor::toBase64).toArray(String[]::new);
+    }
+
+    private static String toBase64(String arg) {
+        return "base64_" + Base64.getEncoder().encodeToString(arg.getBytes(UTF_8));
     }
 }

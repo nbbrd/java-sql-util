@@ -20,8 +20,7 @@ public class PowerShellDemo {
         TabDataQuery query = TabDataQuery
                 .builder()
                 .procedure("DbProperties")
-//                .parameter(getFirstSource().getName())
-                .parameter("boom")
+                .parameter(getFirstSource().getName())
                 .build();
 
         TabDataEngine engine = new PsEngine();

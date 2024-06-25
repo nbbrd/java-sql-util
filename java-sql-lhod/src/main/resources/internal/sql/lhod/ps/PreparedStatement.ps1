@@ -27,9 +27,9 @@ function Print-Body( [CsvWriter] $csv, $rs ) {
 
 [System.Threading.Thread]::CurrentThread.CurrentCulture = "en_US"
 
-$connectionString = $args[0]
-$sql = $args[1]
-$params = $args[2..$args.Length]
+$connectionString = [Helper]::DecodeArg($args[0])
+$sql = [Helper]::DecodeArg($args[1])
+$params = [Helper]::DecodeArgs($args[2..$args.Length])
 
 $csv = New-Object CsvWriter
 $conn = New-Object -ComObject ADODB.Connection
@@ -83,6 +83,19 @@ class Helper {
 
     static [void] CloseResource( $resource ) {
         if ($resource.State -eq [Helper]::adStateOpen) { $resource.Close() }
+    }
+
+    static [string] DecodeArg( [string] $argument ) {
+        if ($argument -like "base64_*") {
+            return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($argument.Substring(7)))
+        } else {
+            return $argument
+        }
+    }
+
+    static [array] DecodeArgs( [array] $arguments ) {
+        if ($arguments.Length -eq 0) { return @() }
+        return $arguments | ForEach-Object { [Helper]::DecodeArg($_) }
     }
 }
 

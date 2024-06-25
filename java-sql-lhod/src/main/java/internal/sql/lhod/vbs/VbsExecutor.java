@@ -20,13 +20,15 @@ import internal.sql.lhod.TabDataExecutor;
 import internal.sql.lhod.TabDataQuery;
 import internal.sql.lhod.TabDataReader;
 import internal.sys.ResourceExtractor;
+import lombok.NonNull;
 import nbbrd.io.sys.ProcessReader;
 import nbbrd.io.win.CScriptWrapper;
-import lombok.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.stream.Stream;
 
 /**
  * @author Philippe Charles
@@ -59,7 +61,15 @@ final class VbsExecutor implements TabDataExecutor {
 
     private BufferedReader exec(String scriptName, String[] args) throws IOException {
         File script = scripts.getResourceAsFile(scriptName);
-        Process process = CScriptWrapper.exec(script, CScriptWrapper.NO_TIMEOUT, args);
-        return ProcessReader.newReader(process);
+        Process process = CScriptWrapper.exec(script, CScriptWrapper.NO_TIMEOUT, encodeArguments(args));
+        return ProcessReader.newReader(Charset.defaultCharset(), process);
+    }
+
+    private String[] encodeArguments(String[] args) {
+        return Stream.of(args).map(VbsExecutor::emptyToDoubleQuotes).toArray(String[]::new);
+    }
+
+    private static String emptyToDoubleQuotes(String arg) {
+        return arg.isEmpty() ? "\"\"" : arg;
     }
 }

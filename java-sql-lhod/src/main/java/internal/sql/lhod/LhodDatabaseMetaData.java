@@ -122,9 +122,9 @@ final class LhodDatabaseMetaData extends _DatabaseMetaData {
                 .builder()
                 .procedure("OpenSchema")
                 .parameter(conn.getConnectionString())
-                .parameter(catalog != null ? catalog : "\"\"")
-                .parameter(schemaPattern != null && !schemaPattern.equals("%") ? schemaPattern : "\"\"")
-                .parameter(tableNamePattern != null && !tableNamePattern.equals("%") ? tableNamePattern : "\"\"")
+                .parameter(catalog != null ? catalog : "")
+                .parameter(schemaPattern != null && !schemaPattern.equals("%") ? schemaPattern : "")
+                .parameter(tableNamePattern != null && !tableNamePattern.equals("%") ? tableNamePattern : "")
                 .parameters(types != null ? Arrays.asList(types) : Collections.emptyList())
                 .build();
 

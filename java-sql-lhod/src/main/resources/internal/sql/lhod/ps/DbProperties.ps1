@@ -35,8 +35,8 @@ function Print-Property( [CsvWriter] $csv, $prop ) {
 
 [System.Threading.Thread]::CurrentThread.CurrentCulture = "en_US"
 
-$connectionString = $args[0]
-$dynamicPropertyKeys = $args[1..$args.Length]
+$connectionString = [Helper]::DecodeArg($args[0])
+$dynamicPropertyKeys = [Helper]::DecodeArgs($args[1..$args.Length])
 
 $csv = New-Object CsvWriter
 $conn = New-Object -ComObject ADODB.Connection
@@ -67,6 +67,19 @@ class Helper {
 
     static [void] CloseResource( $resource ) {
         if ($resource.State -eq [Helper]::adStateOpen) { $resource.Close() }
+    }
+
+    static [string] DecodeArg( [string] $argument ) {
+        if ($argument -like "base64_*") {
+            return [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($argument.Substring(7)))
+        } else {
+            return $argument
+        }
+    }
+
+    static [array] DecodeArgs( [array] $arguments ) {
+        if ($arguments.Length -eq 0) { return @() }
+        return $arguments | ForEach-Object { [Helper]::DecodeArg($_) }
     }
 }
 
