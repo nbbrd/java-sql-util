@@ -23,6 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import nbbrd.sql.odbc.OdbcConnectionSupplierSpi;
+import lombok.NonNull;
 
 /**
  *
@@ -50,7 +51,7 @@ public final class FailsafeOdbcConnectionSupplier implements OdbcConnectionSuppl
     private final Consumer<? super String> onUnexpectedNull;
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         String result;
 
         try {
@@ -61,6 +62,7 @@ public final class FailsafeOdbcConnectionSupplier implements OdbcConnectionSuppl
             return getId();
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getName");
             onUnexpectedNull.accept(msg);
@@ -93,7 +95,7 @@ public final class FailsafeOdbcConnectionSupplier implements OdbcConnectionSuppl
     }
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         Objects.requireNonNull(connectionString);
 
         Connection result;
@@ -106,6 +108,7 @@ public final class FailsafeOdbcConnectionSupplier implements OdbcConnectionSuppl
             throw new SQLException(msg, unexpected);
         }
 
+        //noinspection ConstantValue
         if (result == null) {
             String msg = getUnexpectedNullMsg("getConnection");
             onUnexpectedNull.accept(msg);

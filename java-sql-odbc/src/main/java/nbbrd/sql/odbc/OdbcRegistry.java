@@ -18,7 +18,7 @@ package nbbrd.sql.odbc;
 
 import internal.sql.odbc.FailsafeOdbcRegistry;
 import internal.sql.odbc.OdbcRegistrySpiLoader;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.List;

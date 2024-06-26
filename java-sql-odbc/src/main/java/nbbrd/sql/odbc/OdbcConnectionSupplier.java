@@ -19,7 +19,7 @@ package nbbrd.sql.odbc;
 import internal.sql.odbc.FailsafeOdbcConnectionSupplier;
 import internal.sql.odbc.OdbcConnectionSupplierSpiLoader;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -46,7 +46,7 @@ public final class OdbcConnectionSupplier implements SqlConnectionSupplier {
     }
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         return spi.getConnection(connectionString);
     }
 

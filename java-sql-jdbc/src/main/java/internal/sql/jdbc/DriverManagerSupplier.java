@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 import nbbrd.sql.jdbc.SqlConnectionSupplier;
 import nbbrd.sql.jdbc.SqlFunc;
+import lombok.NonNull;
 
 /**
  * A connection supplier that uses {@link DriverManager}.
@@ -36,7 +37,7 @@ public final class DriverManagerSupplier implements SqlConnectionSupplier {
     private final SqlFunc<String, String> toUrl;
 
     @Override
-    public Connection getConnection(String connectionString) throws SQLException {
+    public @NonNull Connection getConnection(@NonNull String connectionString) throws SQLException {
         Objects.requireNonNull(connectionString);
         if (!SqlConnectionSupplier.isDriverLoadable(driverClassName)) {
             throw new SQLException("Can't load jdbc driver '" + driverClassName + "'");

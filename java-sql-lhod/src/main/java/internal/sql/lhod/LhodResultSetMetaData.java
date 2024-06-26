@@ -18,7 +18,7 @@ package internal.sql.lhod;
 
 import java.sql.Types;
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  *

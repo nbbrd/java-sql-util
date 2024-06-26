@@ -14,23 +14,32 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sql.lhod;
+package internal.sql.lhod.vbs;
 
+import internal.sql.lhod.TabDataEngine;
+import internal.sql.lhod.TabDataExecutor;
 import internal.sys.CachedResourceExtractor;
 import internal.sys.DefaultResourceExtractor;
 import internal.sys.ResourceExtractor;
+import lombok.NonNull;
+
 import java.io.IOException;
 
 /**
  *
  * @author Philippe Charles
  */
-final class VbsEngine implements TabDataEngine {
+public final class VbsEngine implements TabDataEngine {
 
     private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(VbsEngine.class));
 
     @Override
-    public TabDataExecutor getExecutor() throws IOException {
+    public @NonNull String getId() {
+        return "vbs";
+    }
+
+    @Override
+    public @NonNull TabDataExecutor getExecutor() {
         return new VbsExecutor(scripts);
     }
 }

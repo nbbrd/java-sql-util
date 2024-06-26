@@ -21,7 +21,7 @@ import internal.sql.jdbc.DriverManagerSupplier;
 import internal.sql.jdbc.JndiSupplier;
 import internal.sql.jdbc.NoOpSupplier;
 import nbbrd.design.StaticFactoryMethod;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import javax.naming.InitialContext;
 import java.sql.Connection;

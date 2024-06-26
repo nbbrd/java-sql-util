@@ -16,6 +16,7 @@
  */
 package internal.sql.odbc;
 
+import lombok.NonNull;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcDataSource.Type;
 import nbbrd.sql.odbc.OdbcDriver;
@@ -23,7 +24,6 @@ import nbbrd.sql.odbc.OdbcRegistrySpi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetNameNull() throws IOException {
+    public void testGetNameNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThat(x.getName())
@@ -60,7 +60,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testIsAvailableNull() throws IOException {
+    public void testIsAvailableNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThat(x.isAvailable())
@@ -74,7 +74,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetCostNull() throws IOException {
+    public void testGetCostNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThat(x.getCost())
@@ -88,7 +88,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDataSourceNamesNull() throws IOException {
+    public void testGetDataSourceNamesNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThatNullPointerException()
@@ -110,7 +110,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDataSourcesNull() throws IOException {
+    public void testGetDataSourcesNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThatNullPointerException()
@@ -132,11 +132,11 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDriverNamesNull() throws IOException {
+    public void testGetDriverNamesNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThatIOException()
-                .isThrownBy(() -> x.getDriverNames())
+                .isThrownBy(x::getDriverNames)
                 .withNoCause()
                 .withMessageContaining("Unexpected null");
 
@@ -151,11 +151,11 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDriversNull() throws IOException {
+    public void testGetDriversNull() {
         FailsafeOdbcRegistry x = of(new NullImpl());
 
         assertThatIOException()
-                .isThrownBy(() -> x.getDrivers())
+                .isThrownBy(x::getDrivers)
                 .withNoCause()
                 .withMessageContaining("Unexpected null");
 
@@ -170,7 +170,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetNameError() throws IOException {
+    public void testGetNameError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThat(x.getName())
@@ -188,7 +188,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testIsAvailableError() throws IOException {
+    public void testIsAvailableError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThat(x.isAvailable())
@@ -205,7 +205,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetCostError() throws IOException {
+    public void testGetCostError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThat(x.getCost())
@@ -222,7 +222,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDataSourceNamesError() throws IOException {
+    public void testGetDataSourceNamesError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThatNullPointerException()
@@ -245,7 +245,7 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDataSourcesError() throws IOException {
+    public void testGetDataSourcesError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThatNullPointerException()
@@ -268,11 +268,11 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDriverNamesError() throws IOException {
+    public void testGetDriverNamesError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThatIOException()
-                .isThrownBy(() -> x.getDriverNames())
+                .isThrownBy(x::getDriverNames)
                 .withCauseInstanceOf(UnsupportedOperationException.class)
                 .withMessageContaining("Unexpected error");
 
@@ -288,11 +288,11 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @Test
-    public void testGetDriversError() throws IOException {
+    public void testGetDriversError() {
         FailsafeOdbcRegistry x = of(new ErrorImpl());
 
         assertThatIOException()
-                .isThrownBy(() -> x.getDrivers())
+                .isThrownBy(x::getDrivers)
                 .withCauseInstanceOf(UnsupportedOperationException.class)
                 .withMessageContaining("Unexpected error");
 
@@ -315,16 +315,17 @@ public class FailsafeOdbcRegistryTest {
     }
 
     @lombok.Value
-    static final class UnexpectedError {
+    static class UnexpectedError {
 
-        private String msg;
-        private RuntimeException ex;
+        String msg;
+        RuntimeException ex;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     static final class NullImpl implements OdbcRegistrySpi {
 
         @Override
-        public String getName() {
+        public @NonNull String getName() {
             return null;
         }
 
@@ -339,22 +340,22 @@ public class FailsafeOdbcRegistryTest {
         }
 
         @Override
-        public List<String> getDataSourceNames(Type[] types) throws IOException {
+        public @NonNull List<String> getDataSourceNames(Type[] types) {
             return null;
         }
 
         @Override
-        public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
+        public @NonNull List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) {
             return null;
         }
 
         @Override
-        public List<String> getDriverNames() throws IOException {
+        public @NonNull List<String> getDriverNames() {
             return null;
         }
 
         @Override
-        public List<OdbcDriver> getDrivers() throws IOException {
+        public @NonNull List<OdbcDriver> getDrivers() {
             return null;
         }
     }
@@ -362,7 +363,7 @@ public class FailsafeOdbcRegistryTest {
     static final class ErrorImpl implements OdbcRegistrySpi {
 
         @Override
-        public String getName() {
+        public @NonNull String getName() {
             throw new UnsupportedOperationException();
         }
 
@@ -377,22 +378,22 @@ public class FailsafeOdbcRegistryTest {
         }
 
         @Override
-        public List<String> getDataSourceNames(Type[] types) throws IOException {
+        public @NonNull List<String> getDataSourceNames(Type[] types) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) throws IOException {
+        public @NonNull List<OdbcDataSource> getDataSources(OdbcDataSource.Type[] types) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<String> getDriverNames() throws IOException {
+        public @NonNull List<String> getDriverNames() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<OdbcDriver> getDrivers() throws IOException {
+        public @NonNull List<OdbcDriver> getDrivers() {
             throw new UnsupportedOperationException();
         }
     }

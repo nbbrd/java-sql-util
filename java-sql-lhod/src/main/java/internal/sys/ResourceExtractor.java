@@ -14,20 +14,18 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package _demo;
+package internal.sys;
 
-import nbbrd.io.win.WhereWrapper;
-
+import java.io.File;
 import java.io.IOException;
+import lombok.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
-public class WhereWrapperDemo {
+public interface ResourceExtractor {
 
-    public static void main(String[] args) throws IOException {
-        System.err.println("where: " + WhereWrapper.isAvailable("where"));
-        System.err.println("xxx: " + WhereWrapper.isAvailable("xxx"));
-    }
+    @NonNull
+    File getResourceAsFile(@NonNull String resourceName) throws IOException;
 }

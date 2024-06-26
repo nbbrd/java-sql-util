@@ -16,6 +16,8 @@
  */
 package internal.sql.lhod;
 
+import lombok.NonNull;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,7 +44,12 @@ class Resources {
         private final Supplier<? extends IOException> onGetExecutor;
 
         @Override
-        public TabDataExecutor getExecutor() throws IOException {
+        public @NonNull String getId() {
+            return "failing";
+        }
+
+        @Override
+        public @NonNull TabDataExecutor getExecutor() throws IOException {
             throw onGetExecutor.get();
         }
     }
@@ -57,7 +64,7 @@ class Resources {
         private final Supplier<? extends IOException> onClose;
 
         @Override
-        public TabDataReader exec(TabDataQuery query) throws IOException {
+        public @NonNull TabDataReader exec(@NonNull TabDataQuery query) throws IOException {
             throw onExec.get();
         }
 
@@ -81,7 +88,7 @@ class Resources {
         private boolean closed = false;
 
         @Override
-        public TabDataReader exec(TabDataQuery query) throws IOException {
+        public @NonNull TabDataReader exec(@NonNull TabDataQuery query) throws IOException {
             if (closed) {
                 throw new IOException("Executor closed");
             }
@@ -121,9 +128,9 @@ class Resources {
             .builder()
             .procedure("OpenSchema")
             .parameter(CONN_STRING)
-            .parameter("\"\"")
-            .parameter("\"\"")
-            .parameter("\"\"")
+            .parameter("")
+            .parameter("")
+            .parameter("")
             .build();
 
     static final TabDataQuery GOOD_STMT_QUERY = TabDataQuery

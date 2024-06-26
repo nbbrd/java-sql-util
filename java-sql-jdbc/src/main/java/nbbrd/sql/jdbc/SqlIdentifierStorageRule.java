@@ -18,7 +18,7 @@ package nbbrd.sql.jdbc;
 
 import java.util.Locale;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 /**
  *
@@ -28,17 +28,17 @@ public enum SqlIdentifierStorageRule {
 
     UPPER {
         @Override
-        public boolean isValid(String identifier) {
+        public boolean isValid(@NonNull String identifier) {
             return identifier.toUpperCase(Locale.ROOT).equals(identifier);
         }
     }, LOWER {
         @Override
-        public boolean isValid(String identifier) {
+        public boolean isValid(@NonNull String identifier) {
             return identifier.toLowerCase(Locale.ROOT).equals(identifier);
         }
     }, MIXED {
         @Override
-        public boolean isValid(String identifier) {
+        public boolean isValid(@NonNull String identifier) {
             Objects.requireNonNull(identifier);
             return true;
         }

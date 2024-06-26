@@ -14,18 +14,30 @@
  * See the Licence for the specific language governing permissions and 
  * limitations under the Licence.
  */
-package internal.sys;
+package internal.sql.lhod.ps;
 
-import java.io.File;
-import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import internal.sql.lhod.TabDataEngine;
+import internal.sql.lhod.TabDataExecutor;
+import internal.sys.CachedResourceExtractor;
+import internal.sys.DefaultResourceExtractor;
+import internal.sys.ResourceExtractor;
+import lombok.NonNull;
 
 /**
  *
  * @author Philippe Charles
  */
-public interface ResourceExtractor {
+public final class PsEngine implements TabDataEngine {
 
-    @NonNull
-    File getResourceAsFile(@NonNull String resourceName) throws IOException;
+    private final ResourceExtractor scripts = CachedResourceExtractor.of(DefaultResourceExtractor.of(PsEngine.class));
+
+    @Override
+    public @NonNull String getId() {
+        return "ps";
+    }
+
+    @Override
+    public @NonNull TabDataExecutor getExecutor() {
+        return new PsExecutor(scripts);
+    }
 }

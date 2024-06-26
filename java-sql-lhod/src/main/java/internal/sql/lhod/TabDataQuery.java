@@ -24,7 +24,7 @@ import java.util.List;
  */
 @lombok.Value
 @lombok.Builder
-class TabDataQuery {
+public class TabDataQuery {
 
     @lombok.NonNull
     String procedure;

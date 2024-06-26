@@ -21,7 +21,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 import static java.lang.String.format;
 
 import java.util.*;

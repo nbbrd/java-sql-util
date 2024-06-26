@@ -16,6 +16,8 @@
  */
 package internal.sys;
 
+import lombok.NonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class DefaultResourceExtractor implements ResourceExtractor {
     @lombok.NonNull Class<?> anchor;
 
     @Override
-    public File getResourceAsFile(String resourceName) throws IOException {
+    public @NonNull File getResourceAsFile(@NonNull String resourceName) throws IOException {
         try (InputStream stream = anchor.getResourceAsStream(resourceName)) {
             if (stream == null) {
                 throw new FileNotFoundException(resourceName);
@@ -71,5 +73,9 @@ public class DefaultResourceExtractor implements ResourceExtractor {
         return idx != -1
                 ? File.createTempFile(resourceName.substring(0, idx), resourceName.substring(idx), parent)
                 : File.createTempFile("rsrc", resourceName, parent);
+    }
+
+    // fix javadoc
+    public static final class Builder {
     }
 }

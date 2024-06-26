@@ -16,13 +16,29 @@
  */
 package internal.sql.lhod;
 
+import _test.Excel;
+import ec.util.spreadsheet.helpers.ArraySheet;
+import internal.sql.lhod.ps.PsEngine;
+import internal.sql.lhod.vbs.VbsEngine;
 import nbbrd.sql.jdbc.SqlFunc;
+import nbbrd.sql.jdbc.SqlTable;
+import nbbrd.sql.odbc.OdbcConnectionString;
+import nbbrd.sql.odbc.OdbcDriver;
+import org.assertj.core.api.Assumptions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static _test.SQLExceptions.*;
@@ -182,6 +198,52 @@ public class LhodConnectionTest {
         assertThatIOException()
                 .isThrownBy(() -> of(err, CONN_STRING).getProperty(LhodConnection.DynamicProperty.CURRENT_CATALOG))
                 .isInstanceOf(TabDataRemoteError.class);
+    }
+
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    public void testRealConnection() throws IOException, SQLException {
+        Optional<OdbcDriver> excelDriver = Excel.getDriver();
+        Assumptions.assumeThat(excelDriver).isPresent();
+        testExcelConnection(excelDriver.orElseThrow(RuntimeException::new));
+    }
+
+    private void testExcelConnection(OdbcDriver excelDriver) throws IOException, SQLException {
+        ArraySheet table = ArraySheet.copyOf("test", new Object[][]{{"c1", "c2"}, {"v1", "v2"}});
+
+        OdbcConnectionString connectionString = Excel.getConnectionString(excelDriver, Excel.createTempFile(table));
+
+        for (TabDataEngine engine : new TabDataEngine[]{new VbsEngine(), new PsEngine()}) {
+            try (TabDataExecutor executor = engine.getExecutor()) {
+                try (Connection conn = of(executor, connectionString.toString())) {
+                    assertThat(SqlTable.allOf(conn.getMetaData()))
+                            .extracting(SqlTable::getName)
+                            .containsExactly("test$");
+
+                    try (Statement statement = conn.createStatement()) {
+                        try (ResultSet resultSet = statement.executeQuery("select * from [test$]")) {
+                            assertThat(getRows(resultSet))
+                                    .hasSize(1)
+                                    .element(0, ARRAY)
+                                    .containsExactly("v1", "v2");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static List<Object[]> getRows(ResultSet resultSet) throws SQLException {
+        int columnCount = resultSet.getMetaData().getColumnCount();
+        List<Object[]> rows = new ArrayList<>();
+        while (resultSet.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 0; i < row.length; i++) {
+                row[i] = resultSet.getObject(i + 1);
+            }
+            rows.add(row);
+        }
+        return rows;
     }
 
     private void testCloseException(String methodName, SqlFunc<LhodConnection, ?> method) {

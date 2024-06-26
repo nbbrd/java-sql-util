@@ -17,7 +17,7 @@
 package nbbrd.sql.odbc;
 
 import nbbrd.service.*;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,9 +40,9 @@ public interface OdbcRegistrySpi {
     @ServiceSorter
     int getCost();
 
-    @NonNull List<String> getDataSourceNames(OdbcDataSource./*@NonNull*/ Type[] types) throws IOException;
+    @NonNull List<String> getDataSourceNames(OdbcDataSource.@NonNull Type[] types) throws IOException;
 
-    @NonNull List<OdbcDataSource> getDataSources(OdbcDataSource./*@NonNull*/ Type[] types) throws IOException;
+    @NonNull List<OdbcDataSource> getDataSources(OdbcDataSource.@NonNull Type[] types) throws IOException;
 
     @NonNull List<OdbcDriver> getDrivers() throws IOException;
 

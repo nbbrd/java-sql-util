@@ -14,15 +14,21 @@
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
-package internal.sql.lhod;
+package internal.sql.lhod.vbs;
 
+import internal.sql.lhod.TabDataExecutor;
+import internal.sql.lhod.TabDataQuery;
+import internal.sql.lhod.TabDataReader;
 import internal.sys.ResourceExtractor;
+import lombok.NonNull;
 import nbbrd.io.sys.ProcessReader;
 import nbbrd.io.win.CScriptWrapper;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.stream.Stream;
 
 /**
  * @author Philippe Charles
@@ -36,7 +42,7 @@ final class VbsExecutor implements TabDataExecutor {
     private boolean closed = false;
 
     @Override
-    public TabDataReader exec(TabDataQuery query) throws IOException {
+    public @NonNull TabDataReader exec(@NonNull TabDataQuery query) throws IOException {
         if (closed) {
             throw new IOException("Executor closed");
         }
@@ -44,18 +50,26 @@ final class VbsExecutor implements TabDataExecutor {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         closed = true;
     }
 
     @Override
-    public boolean isClosed() throws IOException {
+    public boolean isClosed() {
         return closed;
     }
 
     private BufferedReader exec(String scriptName, String[] args) throws IOException {
         File script = scripts.getResourceAsFile(scriptName);
-        Process process = CScriptWrapper.exec(script, CScriptWrapper.NO_TIMEOUT, args);
-        return ProcessReader.newReader(process);
+        Process process = CScriptWrapper.exec(script, CScriptWrapper.NO_TIMEOUT, encodeArguments(args));
+        return ProcessReader.newReader(Charset.defaultCharset(), process);
+    }
+
+    private String[] encodeArguments(String[] args) {
+        return Stream.of(args).map(VbsExecutor::emptyToDoubleQuotes).toArray(String[]::new);
+    }
+
+    private static String emptyToDoubleQuotes(String arg) {
+        return arg.isEmpty() ? "\"\"" : arg;
     }
 }

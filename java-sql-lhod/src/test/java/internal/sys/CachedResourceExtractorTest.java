@@ -30,8 +30,6 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIOException;
 
-;
-
 /**
  * @author Philippe Charles
  */

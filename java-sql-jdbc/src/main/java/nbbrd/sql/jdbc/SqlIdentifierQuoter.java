@@ -19,7 +19,7 @@ package nbbrd.sql.jdbc;
 import internal.sql.jdbc.JdbcUtil;
 import nbbrd.design.StaticFactoryMethod;
 import nbbrd.design.VisibleForTesting;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;

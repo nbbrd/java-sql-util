@@ -1,23 +1,27 @@
 /*
  * Copyright 2015 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package internal.sql.lhod;
 
+import internal.sql.lhod.ps.PsEngine;
+import lombok.NonNull;
+import nbbrd.design.VisibleForTesting;
+import nbbrd.service.ServiceProvider;
+
 import java.io.IOException;
-import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -25,7 +29,8 @@ import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
-import nbbrd.service.ServiceProvider;
+
+import static java.lang.String.format;
 
 /**
  * https://msdn.microsoft.com/en-us/library/aa478977.aspx
@@ -50,11 +55,11 @@ public final class LhodDriver extends _Driver {
     private final TabDataEngine engine;
 
     public LhodDriver() {
-        this(new VbsEngine());
+        this(new PsEngine());
     }
 
-//    @VisibleForTesting
-    LhodDriver(TabDataEngine engine) {
+    @VisibleForTesting
+    public LhodDriver(@NonNull TabDataEngine engine) {
         this.engine = engine;
     }
 

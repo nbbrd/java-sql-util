@@ -16,19 +16,29 @@
  */
 package internal.sql.lhod;
 
+import lombok.ToString;
+
 import java.io.IOException;
 
 /**
  *
  * @author Philippe Charles
  */
+@lombok.ToString
 final class TabDataRemoteError extends IOException {
 
+    @ToString.Include
     @lombok.Getter
     private final int number;
 
     public TabDataRemoteError(String description, int number) {
         super(description);
         this.number = number;
+    }
+
+    @ToString.Include(name = "message")
+    @Override
+    public String getMessage() {
+        return super.getMessage();
     }
 }

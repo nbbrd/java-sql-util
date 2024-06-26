@@ -18,7 +18,7 @@ package internal.sql.jdbc;
 
 import java.util.logging.Level;
 import java.util.stream.Stream;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import lombok.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
