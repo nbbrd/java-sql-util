@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.5] - 2024-06-26
+
 ### Fixed
 
 - Fix backend argument encoding
@@ -49,7 +51,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release
 
-[Unreleased]: https://github.com/nbbrd/java-sql-util/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/nbbrd/java-sql-util/compare/v1.0.5...HEAD
+[1.0.5]: https://github.com/nbbrd/java-sql-util/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/nbbrd/java-sql-util/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/nbbrd/java-sql-util/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/nbbrd/java-sql-util/compare/v1.0.1...v1.0.2
