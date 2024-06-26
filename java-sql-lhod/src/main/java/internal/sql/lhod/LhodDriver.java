@@ -16,8 +16,12 @@
  */
 package internal.sql.lhod;
 
+import internal.sql.lhod.ps.PsEngine;
+import lombok.NonNull;
+import nbbrd.design.VisibleForTesting;
+import nbbrd.service.ServiceProvider;
+
 import java.io.IOException;
-import static java.lang.String.format;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -26,10 +30,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import internal.sql.lhod.vbs.VbsEngine;
-import lombok.NonNull;
-import nbbrd.design.VisibleForTesting;
-import nbbrd.service.ServiceProvider;
+import static java.lang.String.format;
 
 /**
  * https://msdn.microsoft.com/en-us/library/aa478977.aspx
@@ -54,7 +55,7 @@ public final class LhodDriver extends _Driver {
     private final TabDataEngine engine;
 
     public LhodDriver() {
-        this(new VbsEngine());
+        this(new PsEngine());
     }
 
     @VisibleForTesting

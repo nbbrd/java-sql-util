@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix backend argument encoding
+- Fix backend output encoding
+
+### Changed
+
+- Migrate VBScript to PowerShell [#362](https://github.com/nbbrd/java-sql-util/issues/362)
+
 ## [1.0.4] - 2024-02-26
 
 ### Fixed
