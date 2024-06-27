@@ -209,7 +209,7 @@ public class LhodConnectionTest {
     }
 
     private void testExcelConnection(OdbcDriver excelDriver) throws IOException, SQLException {
-        ArraySheet table = ArraySheet.copyOf("test", new Object[][]{{"c1", "c2"}, {"v1", "v2"}});
+        ArraySheet table = ArraySheet.copyOf("test", new Object[][]{{"c1", "c2"}, {"v\n1", "v\"2"}});
 
         OdbcConnectionString connectionString = Excel.getConnectionString(excelDriver, Excel.createTempFile(table));
 
@@ -225,7 +225,7 @@ public class LhodConnectionTest {
                             assertThat(getRows(resultSet))
                                     .hasSize(1)
                                     .element(0, ARRAY)
-                                    .containsExactly("v1", "v2");
+                                    .containsExactly("v\n1", "v\"2");
                         }
                     }
                 }
