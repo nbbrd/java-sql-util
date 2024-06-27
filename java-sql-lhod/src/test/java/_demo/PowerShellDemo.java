@@ -5,6 +5,7 @@ import internal.sql.lhod.TabDataExecutor;
 import internal.sql.lhod.TabDataQuery;
 import internal.sql.lhod.TabDataReader;
 import internal.sql.lhod.ps.PsEngine;
+import internal.sql.lhod.vbs.VbsEngine;
 import nbbrd.sql.odbc.OdbcDataSource;
 import nbbrd.sql.odbc.OdbcRegistry;
 
@@ -23,14 +24,18 @@ public class PowerShellDemo {
                 .parameter(getFirstSource().getName())
                 .build();
 
-        TabDataEngine engine = new PsEngine();
-
-        try (TabDataExecutor executor = engine.getExecutor()) {
-            try (TabDataReader reader = executor.exec(query)) {
-                System.out.println(reader.getColumns());
+        for (TabDataEngine engine : new TabDataEngine[]{new VbsEngine(), new PsEngine()}) {
+            System.out.println("[" + engine.getId() + "]");
+            try (TabDataExecutor executor = engine.getExecutor()) {
+                long current = System.currentTimeMillis();
+                try (TabDataReader reader = executor.exec(query)) {
+                    System.out.println(reader.getColumns());
+                    System.out.println("Head: " + (System.currentTimeMillis() - current) + " ms");
+                    current = System.currentTimeMillis();
+                }
+                System.out.println("Body: " + (System.currentTimeMillis() - current) + " ms");
             }
         }
-
     }
 
     private static OdbcDataSource getFirstSource() throws IOException {

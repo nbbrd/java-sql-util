@@ -107,7 +107,7 @@ class CsvWriter {
     [string] $endOfLine
 
     [STATE] $state
-    [string] $buffer
+    [System.Text.StringBuilder] $buffer
 
     CsvWriter() {
         # Csv format
@@ -116,7 +116,7 @@ class CsvWriter {
         $this.endOfLine = "`r`n"
         # Initial state
         $this.state = [STATE]::NO_FIELD
-        $this.buffer = ""
+        $this.buffer = [System.Text.StringBuilder]::new()
     }
 
     [void] WriteField( [string] $field ) {
@@ -131,13 +131,13 @@ class CsvWriter {
             }
             ([STATE]::SINGLE_EMPTY_FIELD) {
                 $this.state = [STATE]::MULTI_FIELD
-                $this.buffer += $this.delimiter
+                $this.buffer.Append($this.delimiter)
                 if ($this.IsNonEmptyField($field)) {
                     $this.WriteNonEmptyField($field)
                 }
             }
             ([STATE]::MULTI_FIELD) {
-                $this.buffer += $this.delimiter
+                $this.buffer.Append($this.delimiter)
                 if ($this.IsNonEmptyField($field)) {
                     $this.WriteNonEmptyField($field)
                 }
@@ -147,9 +147,9 @@ class CsvWriter {
 
     [void] WriteEndOfLine() {
         $this.FlushField()
-        $this.buffer += $this.endOfLine
-        Write-Host ($this.buffer) -NoNewline
-        $this.buffer = ""
+        $this.buffer.Append($this.endOfLine)
+        [Console]::Write($this.buffer.ToString())
+        $this.buffer.Clear()
     }
 
     [boolean] IsNonEmptyField( [string] $field ) {
@@ -157,20 +157,20 @@ class CsvWriter {
     }
 
     [void] WriteNonEmptyField( [string] $field ) {
-        $this.buffer += $this.quote
+        $this.buffer.Append($this.quote)
         foreach ($char in $field.ToCharArray()) {
             if ($char -eq $this.quote) {
-                $this.buffer += $this.quote
+                $this.buffer.Append($this.quote)
             }
-            $this.buffer += $char
+            $this.buffer.Append($char)
         }
-        $this.buffer += $this.quote
+        $this.buffer.Append($this.quote)
     }
 
     [void] FlushField() {
         if ($this.state -eq [STATE]::SINGLE_EMPTY_FIELD) {
-            $this.buffer += $this.quote
-            $this.buffer += $this.quote
+            $this.buffer.Append($this.quote)
+            $this.buffer.Append($this.quote)
         }
         $this.state = [STATE]::NO_FIELD
     }

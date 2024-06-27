@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix slow output of PowerShell scripts
+
 ## [1.0.5] - 2024-06-26
 
 ### Fixed
