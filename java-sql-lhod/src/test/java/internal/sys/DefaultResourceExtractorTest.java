@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -43,7 +44,7 @@ public class DefaultResourceExtractorTest {
                         .builder()
                         .anchor(DefaultResourceExtractorTest.class)
                         .persist(false)
-                        .repository(new File(System.getProperty("java.io.tmpdir")))
+                        .repository(Paths.get(System.getProperty("java.io.tmpdir")).toFile())
                         .build()
                 );
     }

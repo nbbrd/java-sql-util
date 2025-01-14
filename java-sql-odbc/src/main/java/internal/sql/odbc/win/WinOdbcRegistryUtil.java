@@ -22,6 +22,7 @@ import lombok.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -156,7 +157,7 @@ class WinOdbcRegistryUtil {
     }
 
     private File toFile(Object obj, File defaultValue) {
-        return obj instanceof String ? new File((String) obj) : defaultValue;
+        return obj instanceof String ? Paths.get((String) obj).toFile() : defaultValue;
     }
 
     private int toInt(Object obj, int defaultValue) {
