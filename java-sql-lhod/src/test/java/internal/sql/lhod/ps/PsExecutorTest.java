@@ -31,7 +31,7 @@ class PsExecutorTest {
 
     @SuppressWarnings("DataFlowIssue")
     @Test
-    @EnabledOnOs(OS.WINDOWS)
+    @EnabledOnOs(value = OS.WINDOWS, architectures = "amd64")
     public void testExec() throws IOException {
         try (PsExecutor x = new PsExecutor(extractor)) {
             assertThatNullPointerException()
