@@ -118,7 +118,7 @@
                                 <phase>initialize</phase>
                                 <configuration>
                                     <target>
-                                        <move todir="${repack.pacdir}/${repack.prefix}">
+                                        <move todir="${repack.pacdir}/${repack.prefix}" preservelastmodified="true">
                                             <fileset dir="${repack.basedir}" />
                                         </move>
                                         <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace="\1 ${repack.prefix}.nbbrd.picocsv">

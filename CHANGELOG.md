@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix timestamp in source that prevents reproducible build
+
 ### Changed
 
 - Modernize use of NIO API
