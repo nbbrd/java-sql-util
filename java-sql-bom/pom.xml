@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
 
     <artifactId>java-sql-bom</artifactId>
@@ -42,7 +42,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
                 <configuration>
                     <flattenMode>bom</flattenMode>
                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -78,6 +78,7 @@
                                 </goals>
                                 <configuration>
                                     <inputFile>${project.parent.basedir}/CHANGELOG.md</inputFile>
+                                    <outputFile>${project.build.directory}/CHANGELOG.md</outputFile>
                                 </configuration>
                             </execution>
                         </executions>

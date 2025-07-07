@@ -31,7 +31,7 @@ class PsExecutorTest {
 
     @SuppressWarnings("DataFlowIssue")
     @Test
-    @EnabledOnOs(OS.WINDOWS)
+    @EnabledOnOs(value = OS.WINDOWS, architectures = "amd64")
     public void testExec() throws IOException {
         try (PsExecutor x = new PsExecutor(extractor)) {
             assertThatNullPointerException()
@@ -68,6 +68,19 @@ class PsExecutorTest {
             x.close();
             assertThatIOException()
                     .isThrownBy(() -> x.exec(query));
+        }
+    }
+
+    @Test
+    @EnabledOnOs(value = OS.WINDOWS, architectures = "aarch64")
+    public void testExecArm64() {
+        try (PsExecutor x = new PsExecutor(extractor)) {
+            String missingDSN = UUID.randomUUID().toString().substring(0, 32);
+            for (String procedure : new String[]{"DBProperties", "OpenSchema", "PreparedStatement"}) {
+                assertThatIOException()
+                        .isThrownBy(() -> x.exec(TabDataQuery.builder().procedure(procedure).parameter(missingDSN).build()))
+                        .withMessageContaining("Provider cannot be found. It may not be properly installed.");
+            }
         }
     }
 

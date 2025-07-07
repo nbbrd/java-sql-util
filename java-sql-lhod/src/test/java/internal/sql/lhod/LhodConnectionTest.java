@@ -24,10 +24,10 @@ import nbbrd.sql.jdbc.SqlFunc;
 import nbbrd.sql.jdbc.SqlTable;
 import nbbrd.sql.odbc.OdbcConnectionString;
 import nbbrd.sql.odbc.OdbcDriver;
-import org.assertj.core.api.Assumptions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
@@ -38,7 +38,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static _test.SQLExceptions.*;
@@ -202,13 +201,10 @@ public class LhodConnectionTest {
 
     @Test
     @EnabledOnOs(OS.WINDOWS)
+    @EnabledIf("hasExcelDriver")
     public void testRealConnection() throws IOException, SQLException {
-        Optional<OdbcDriver> excelDriver = Excel.getDriver();
-        Assumptions.assumeThat(excelDriver).isPresent();
-        testExcelConnection(excelDriver.orElseThrow(RuntimeException::new));
-    }
+        OdbcDriver excelDriver = Excel.getDriver().orElseThrow(RuntimeException::new);
 
-    private void testExcelConnection(OdbcDriver excelDriver) throws IOException, SQLException {
         ArraySheet table = ArraySheet.copyOf("test", new Object[][]{{"c1", "c2"}, {"v\n1", "v\"2"}});
 
         OdbcConnectionString connectionString = Excel.getConnectionString(excelDriver, Excel.createTempFile(table));
@@ -231,6 +227,10 @@ public class LhodConnectionTest {
                 }
             }
         }
+    }
+
+    private boolean hasExcelDriver() throws IOException {
+        return Excel.getDriver().isPresent();
     }
 
     private static List<Object[]> getRows(ResultSet resultSet) throws SQLException {

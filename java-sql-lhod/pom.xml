@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.nbbrd.java-sql-util</groupId>
         <artifactId>java-sql-parent</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
 
     <artifactId>java-sql-lhod</artifactId>
@@ -84,7 +84,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.7.1</version>
+                        <version>3.8.1</version>
                         <executions>
                             <execution>
                                 <id>repack-step1</id>
@@ -97,7 +97,7 @@
                                         <artifactItem>
                                             <groupId>com.github.nbbrd.picocsv</groupId>
                                             <artifactId>picocsv</artifactId>
-                                            <version>2.4.0</version>
+                                            <version>2.6.0</version>
                                             <classifier>sources</classifier>
                                             <includes>**/Csv.java</includes>
                                         </artifactItem>
@@ -118,7 +118,7 @@
                                 <phase>initialize</phase>
                                 <configuration>
                                     <target>
-                                        <move todir="${repack.pacdir}/${repack.prefix}">
+                                        <move todir="${repack.pacdir}/${repack.prefix}" preservelastmodified="true">
                                             <fileset dir="${repack.basedir}" />
                                         </move>
                                         <replaceregexp byline="true" match="(package|import|import static) nbbrd.picocsv" replace="\1 ${repack.prefix}.nbbrd.picocsv">
@@ -136,7 +136,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>3.6.0</version>
+                        <version>3.6.1</version>
                         <executions>
                             <execution>
                                 <id>repack-step3</id>
