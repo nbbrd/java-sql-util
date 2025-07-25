@@ -19,7 +19,7 @@ package nbbrd.sql.odbc;
 import nbbrd.design.RepresentableAsInt;
 import nbbrd.design.StaticFactoryMethod;
 import lombok.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;

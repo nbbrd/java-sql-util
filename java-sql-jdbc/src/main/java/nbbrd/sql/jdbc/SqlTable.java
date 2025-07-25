@@ -17,7 +17,7 @@
 package nbbrd.sql.jdbc;
 
 import lombok.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;

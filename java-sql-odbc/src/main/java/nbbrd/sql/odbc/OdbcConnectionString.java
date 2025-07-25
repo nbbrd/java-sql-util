@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import nbbrd.design.RepresentableAsString;
 import nbbrd.design.StaticFactoryMethod;
 import lombok.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.Map.Entry;

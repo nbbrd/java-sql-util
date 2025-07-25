@@ -19,7 +19,7 @@ package internal.sql.jdbc;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import lombok.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
