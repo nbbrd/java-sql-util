@@ -61,6 +61,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.1] - 2020-02-20
 
+### Changed
+
 - Fix use of LATEST_RESERVED_WORDS
 
 ## [1.0.0] - 2019-11-27
