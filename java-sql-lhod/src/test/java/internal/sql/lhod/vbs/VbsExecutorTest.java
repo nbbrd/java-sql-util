@@ -31,7 +31,7 @@ class VbsExecutorTest {
 
     @SuppressWarnings("DataFlowIssue")
     @Test
-    @EnabledOnOs(value = OS.WINDOWS, architectures = "amd64")
+    @EnabledOnOs(value = OS.WINDOWS)
     public void testExec() throws IOException {
         try (VbsExecutor x = new VbsExecutor(extractor)) {
             assertThatNullPointerException()
@@ -68,19 +68,6 @@ class VbsExecutorTest {
             x.close();
             assertThatIOException()
                     .isThrownBy(() -> x.exec(query));
-        }
-    }
-
-    @Test
-    @EnabledOnOs(value = OS.WINDOWS, architectures = "aarch64")
-    public void testExecArm64() {
-        try (VbsExecutor x = new VbsExecutor(extractor)) {
-            String missingDSN = UUID.randomUUID().toString().substring(0, 32);
-            for (String procedure : new String[]{"DBProperties", "OpenSchema", "PreparedStatement"}) {
-                assertThatIOException()
-                        .isThrownBy(() -> x.exec(TabDataQuery.builder().procedure(procedure).parameter(missingDSN).build()))
-                        .withMessageContaining("Provider cannot be found. It may not be properly installed.");
-            }
         }
     }
 
