@@ -9,15 +9,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.7] - 2025-07-07
 
-### Fixed
-
-- Fix timestamp in source that prevents reproducible build
-
 ### Changed
 
 - Modernize use of NIO API
 - Migrate OSSRH to Central Portal
 - Bump picocsv from 2.4.0 to 2.6.0
+
+### Fixed
+
+- Fix timestamp in source that prevents reproducible build
 
 ## [1.0.6] - 2024-06-27
 
@@ -27,14 +27,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.5] - 2024-06-26
 
+### Changed
+
+- Migrate VBScript to PowerShell [#362](https://github.com/nbbrd/java-sql-util/issues/362)
+
 ### Fixed
 
 - Fix backend argument encoding
 - Fix backend output encoding
-
-### Changed
-
-- Migrate VBScript to PowerShell [#362](https://github.com/nbbrd/java-sql-util/issues/362)
 
 ## [1.0.4] - 2024-02-26
 
