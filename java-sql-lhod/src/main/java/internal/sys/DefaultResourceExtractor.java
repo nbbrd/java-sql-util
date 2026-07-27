@@ -73,7 +73,7 @@ public class DefaultResourceExtractor implements ResourceExtractor {
     private static Path createEmptyFile(Path parent, String resourceName) throws IOException {
         int idx = resourceName.lastIndexOf(".");
         return idx != -1
-                ? Files.createTempFile(parent, resourceName.substring(0, idx), resourceName.substring(idx))
+                ? Files.createTempFile(parent, "rsrc", resourceName.substring(idx))
                 : Files.createTempFile(parent, "rsrc", resourceName);
     }
 
