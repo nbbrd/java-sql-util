@@ -8,6 +8,8 @@ import spreadsheet.fastexcel.FastExcelBookFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public final class Excel {
@@ -30,7 +32,8 @@ public final class Excel {
     }
 
     public static File createTempFile(ArraySheet table) throws IOException {
-        File excelFile = File.createTempFile("book1", ".xlsx");
+        Path tempFile = Files.createTempFile("book1", ".xlsx");
+        File excelFile = tempFile.toFile();
         new FastExcelBookFactory().store(excelFile, table.toBook());
         return excelFile;
     }
