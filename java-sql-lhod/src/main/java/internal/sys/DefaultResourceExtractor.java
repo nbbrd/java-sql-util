@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
@@ -46,18 +47,18 @@ public class DefaultResourceExtractor implements ResourceExtractor {
             if (stream == null) {
                 throw new FileNotFoundException(resourceName);
             }
-            File result = createEmptyFile(repository, resourceName);
-            Files.copy(stream, result.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Path result = createEmptyFile(repository.toPath(), resourceName);
+            Files.copy(stream, result, StandardCopyOption.REPLACE_EXISTING);
             if (!persist) {
-                result.deleteOnExit();
+                result.toFile().deleteOnExit();
             }
-            return result;
+            return result.toFile();
         }
     }
 
     public static Builder builder() {
         return new Builder()
-                .repository(getTempFolder())
+                .repository(getTempFolder().toFile())
                 .persist(false);
     }
 
@@ -65,15 +66,15 @@ public class DefaultResourceExtractor implements ResourceExtractor {
         return builder().anchor(anchor).build();
     }
 
-    private static File getTempFolder() {
-        return Paths.get(System.getProperty("java.io.tmpdir")).toFile();
+    private static Path getTempFolder() {
+        return Paths.get(System.getProperty("java.io.tmpdir"));
     }
 
-    private static File createEmptyFile(File parent, String resourceName) throws IOException {
+    private static Path createEmptyFile(Path parent, String resourceName) throws IOException {
         int idx = resourceName.lastIndexOf(".");
         return idx != -1
-                ? File.createTempFile(resourceName.substring(0, idx), resourceName.substring(idx), parent)
-                : File.createTempFile("rsrc", resourceName, parent);
+                ? Files.createTempFile(parent, resourceName.substring(0, idx), resourceName.substring(idx))
+                : Files.createTempFile(parent, "rsrc", resourceName);
     }
 
     // fix javadoc
